@@ -1,0 +1,33 @@
+# Workspace-level local files
+/.env
+/.env.*
+!/.env.example
+
+# Frontend generated files
+/frontend/node_modules/
+/frontend/dist/
+/frontend/dist-ssr/
+/frontend/*.local
+
+# Backend generated files
+/backend/target/
+/backend/build/
+/backend/.mvn/wrapper/maven-wrapper.jar
+/backend/HELP.md
+
+# IDE settings
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS and log files
+.DS_Store
+*.log
+
