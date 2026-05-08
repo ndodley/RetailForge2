@@ -1,10 +1,10 @@
-# RF2_Prototype
+# RF2_P2
 
-RF2_Prototype is a full-stack prototype with:
+RF2_P2 is the second full-stack prototype attempt to remake the original RetailForge project with:
 
 - a React + TypeScript frontend built with Vite
 - a Spring Boot backend
-- a PostgreSQL database defined in `docker-compose.yml`
+- a PostgreSQL database defined in `docker-compose.yml` using the `rf2_p2` database by default
 
 ## Project structure
 

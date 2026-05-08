@@ -1,4 +1,4 @@
-# PostgreSQL Docker setup for RF2_Prototype
+# PostgreSQL Docker setup for RF2_P2
 
 ## What this project now uses
 
@@ -9,7 +9,7 @@
 
 ## Database details
 
-- Database name: `rf2_prototype`
+- Database name: `rf2_p2`
 - Default username: `rf2_user`
 - Default password: `rf2_dev_password`
 - Host when backend runs on your computer: `localhost`
@@ -65,7 +65,7 @@ When you start the `postgres` service, Docker will:
 1. download the PostgreSQL 18.3 image if it is not already on your computer
 2. create a container from that image
 3. create a persistent Docker volume named `postgres_data`
-4. initialize the database `rf2_prototype`
+4. initialize the database `rf2_p2`
 5. create the database user `rf2_user`
 6. assign the password `rf2_dev_password`
 7. expose the database to your Windows machine on port `5434`
@@ -75,7 +75,7 @@ When you start the `postgres` service, Docker will:
 When the backend starts, Spring Boot will:
 
 1. read `backend/src/main/resources/application.properties`
-2. connect to `jdbc:postgresql://localhost:5434/rf2_prototype`
+2. connect to `jdbc:postgresql://localhost:5434/rf2_p2`
 3. log in with `rf2_user` and `rf2_dev_password`
 4. run Flyway migrations from `backend/src/main/resources/db/migration`
 5. use the database for persistence and Spring Session
@@ -102,11 +102,39 @@ In pgAdmin, create a server connection with:
 
 - Host name/address: `localhost`
 - Port: `5434`
-- Maintenance database: `postgres` first, then browse the database `rf2_prototype`
+- Maintenance database: `postgres` first, then browse the database `rf2_p2`
 - Username: `rf2_user`
 - Password: `rf2_dev_password`
 
 If you are looking at the Docker database in pgAdmin, make sure you are connecting to the Docker port `5434`, not your installed PostgreSQL 18 server on `5433`.
+
+## Can you use the same pgAdmin server entry?
+
+Yes. In pgAdmin, the saved "server" is just a connection profile to a PostgreSQL server instance. One PostgreSQL server can contain multiple databases.
+
+That means you can keep using the same pgAdmin server connection if it already points to the Docker PostgreSQL instance on `localhost:5434`.
+
+What changes is the database that your Spring Boot app connects to:
+
+- old prototype: `rf2_prototype`
+- this prototype: `rf2_p2`
+
+## If the Docker volume already exists
+
+Because `postgres_data` is persistent, changing `POSTGRES_DB` in `docker-compose.yml` does not automatically create `rf2_p2` inside an already-initialized PostgreSQL data directory.
+
+So if you already used this Docker-backed PostgreSQL server before, choose one of these options:
+
+1. create a new database named `rf2_p2` manually in pgAdmin or SQL, while keeping the same server and volume
+2. remove the old container and volume if you want a completely fresh PostgreSQL instance that auto-initializes `rf2_p2`
+
+To create the database manually in pgAdmin, connect to the same server and run:
+
+```sql
+CREATE DATABASE rf2_p2;
+```
+
+Then the backend can connect to it using the updated datasource URL.
 
 ## If you want different credentials
 

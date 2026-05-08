@@ -1,10 +1,10 @@
 services:
   postgres:
     image: postgres:18.3
-    container_name: rf2-prototype-postgres
+    container_name: rf2-p2-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-rf2_prototype}
+      POSTGRES_DB: ${POSTGRES_DB:-rf2_p2}
       POSTGRES_USER: ${POSTGRES_USER:-rf2_user}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rf2_dev_password}
     ports:
@@ -12,7 +12,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-rf2_user} -d ${POSTGRES_DB:-rf2_prototype}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-rf2_user} -d ${POSTGRES_DB:-rf2_p2}"]
       interval: 10s
       timeout: 5s
       retries: 5
