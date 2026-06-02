@@ -1,0 +1,29 @@
+.navbar .navbar-pill,
+.navbar .navbar-menu-item {
+  font-family: inherit;
+}
+
+.navbar .navbar-pill:focus-visible,
+.navbar .navbar-menu-item:focus-visible {
+  outline: 2px solid rgba(255, 152, 0, 0.45);
+  outline-offset: 2px;
+}
+
+.navbar .navbar-menu li + li {
+  margin-top: 4px;
+}
+
+.navbar .navbar-menu-item--active {
+  background: rgba(255, 152, 0, 0.16);
+}
+
+.navbar .navbar-avatar {
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .navbar .site-header__inner {
+	align-items: flex-start;
+  }
+}
+
