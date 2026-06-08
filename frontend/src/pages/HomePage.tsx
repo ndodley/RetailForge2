@@ -57,7 +57,7 @@ function HomePage() {
 				<Link to="/products" className="home-cta home-cta--primary">
 				  Browse products
 				</Link>
-				<Link to="/" className="home-cta home-cta--secondary">
+				<Link to="/auth?tab=register" className="home-cta home-cta--secondary">
 				  Create account
 				</Link>
 			  </div>

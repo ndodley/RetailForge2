@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import type { AuthUser } from '../../api/authStore'
 import { getCartItemCount, subscribeToCartUpdates } from '../../api/cartStore'
+import { useAuth } from '../../hooks/useAuth'
 import './Navbar.css'
 
 const adminItems = [
@@ -9,8 +11,24 @@ const adminItems = [
   { to: '/admin/products', label: 'Products' },
 ]
 
+function isAuthRoute(pathname: string) {
+  return pathname === '/auth' || pathname === '/login' || pathname === '/register'
+}
+
+function getUserInitials(user: AuthUser) {
+  const fullName = `${user.firstName} ${user.lastName}`.trim()
+  return fullName
+	.split(/\s+/)
+	.filter(Boolean)
+	.slice(0, 2)
+	.map((part) => part[0]?.toUpperCase() ?? '')
+	.join('')
+}
+
 function Navbar() {
   const location = useLocation()
+  const navigate = useNavigate()
+  const { user, canAccessAdmin, logout } = useAuth()
   const [adminOpen, setAdminOpen] = useState(false)
   const [accountOpen, setAccountOpen] = useState(false)
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
@@ -31,6 +49,15 @@ function Navbar() {
 	return 'dark'
   })
   const [cartCount, setCartCount] = useState(() => getCartItemCount())
+  const accountDisplayName = useMemo(
+	() => (user ? `${user.firstName} ${user.lastName}`.trim() || user.email : ''),
+	[user],
+  )
+  const accountInitials = useMemo(() => (user ? getUserInitials(user) : ''), [user])
+  const userRoleLabel = useMemo(
+	() => (user ? `${user.role.charAt(0).toUpperCase()}${user.role.slice(1)}` : ''),
+	[user],
+  )
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -94,57 +121,59 @@ function Navbar() {
 			</Link>
 		  </div>
 
-		  <div className="admin-dropdown-parent" style={{ position: 'relative' }}>
-			<button
-			  type="button"
-			  className="navbar-pill"
-			  style={{
-				fontWeight: 800,
-				cursor: 'pointer',
-				color: 'var(--text)',
-				padding: '8px 16px',
-				borderRadius: 999,
-				transition: 'background 0.2s, border 0.2s',
-				border: '1.5px solid rgba(255,152,0,0.35)',
-				background: adminOpen ? 'rgba(255,152,0,0.14)' : 'var(--nav-pill-bg)',
-			  }}
-			  onClick={() => setAdminOpen((open) => !open)}
-			>
-			  Admin <span style={{ fontSize: 14 }}>▼</span>
-			</button>
+		  {canAccessAdmin ? (
+			<div className="admin-dropdown-parent" style={{ position: 'relative' }}>
+			  <button
+				type="button"
+				className="navbar-pill"
+				style={{
+				  fontWeight: 800,
+				  cursor: 'pointer',
+				  color: 'var(--text)',
+				  padding: '8px 16px',
+				  borderRadius: 999,
+				  transition: 'background 0.2s, border 0.2s',
+				  border: '1.5px solid rgba(255,152,0,0.35)',
+				  background: adminOpen ? 'rgba(255,152,0,0.14)' : 'var(--nav-pill-bg)',
+				}}
+				onClick={() => setAdminOpen((open) => !open)}
+			  >
+				Admin <span style={{ fontSize: 14 }}>▼</span>
+			  </button>
 
-			<ul
-			  className="navbar-menu"
-			  style={{
-				position: 'absolute',
-				top: 44,
-				left: 0,
-				background: 'var(--nav-menu-bg)',
-				border: '1.5px solid rgba(255,152,0,0.45)',
-				borderRadius: 14,
-				boxShadow: 'var(--shadow)',
-				padding: 8,
-				margin: 0,
-				minWidth: 190,
-				zIndex: 100,
-				display: adminOpen ? 'block' : 'none',
-				listStyle: 'none',
-			  }}
-			>
-			  {adminItems.map((item) => (
-				<li key={item.to}>
-				  <Link
-					to={item.to}
-					className={`navbar-menu-item ${location.pathname === item.to ? 'navbar-menu-item--active' : ''}`}
-					onClick={() => setAdminOpen(false)}
-					style={{ display: 'block', padding: '10px 12px', color: 'var(--text)', textDecoration: 'none', fontWeight: 800, borderRadius: 10 }}
-				  >
-					{item.label}
-				  </Link>
-				</li>
-			  ))}
-			</ul>
-		  </div>
+			  <ul
+				className="navbar-menu"
+				style={{
+				  position: 'absolute',
+				  top: 44,
+				  left: 0,
+				  background: 'var(--nav-menu-bg)',
+				  border: '1.5px solid rgba(255,152,0,0.45)',
+				  borderRadius: 14,
+				  boxShadow: 'var(--shadow)',
+				  padding: 8,
+				  margin: 0,
+				  minWidth: 190,
+				  zIndex: 100,
+				  display: adminOpen ? 'block' : 'none',
+				  listStyle: 'none',
+				}}
+			  >
+				{adminItems.map((item) => (
+				  <li key={item.to}>
+					<Link
+					  to={item.to}
+					  className={`navbar-menu-item ${location.pathname === item.to ? 'navbar-menu-item--active' : ''}`}
+					  onClick={() => setAdminOpen(false)}
+					  style={{ display: 'block', padding: '10px 12px', color: 'var(--text)', textDecoration: 'none', fontWeight: 800, borderRadius: 10 }}
+					>
+					  {item.label}
+					</Link>
+				  </li>
+				))}
+			  </ul>
+			</div>
+		  ) : null}
 
 		  <Link
 			to="/products"
@@ -186,86 +215,156 @@ function Navbar() {
 			<span style={{ fontWeight: 900, color: 'var(--text)' }}>Cart{cartCount > 0 ? ` (${cartCount})` : ''}</span>
 		  </Link>
 
-		  <div className="account-dropdown-parent" style={{ position: 'relative' }}>
-			<button
-			  type="button"
-			  className="navbar-pill"
-			  onClick={() => setAccountOpen((open) => !open)}
-			  style={{
-				display: 'flex',
-				alignItems: 'center',
-				gap: 10,
-				padding: '8px 14px',
-				borderRadius: 999,
-				border: '1.5px solid rgba(255,152,0,0.35)',
-				background: accountOpen ? 'rgba(255,152,0,0.14)' : 'var(--nav-pill-bg)',
-				cursor: 'pointer',
-				transition: 'background 0.2s, border 0.2s',
-			  }}
-			>
-			  <span className="navbar-avatar" aria-hidden>
-				AD
-			  </span>
-			  <span style={{ color: 'var(--text)', fontWeight: 900, fontSize: 14, maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-				admin@dummy.com
-			  </span>
-			  <span style={{ color: 'var(--accent)', fontWeight: 900, fontSize: 12 }}>▼</span>
-			</button>
+		  {user ? (
+			<div className="account-dropdown-parent" style={{ position: 'relative' }}>
+			  <button
+				type="button"
+				className="navbar-pill"
+				onClick={() => setAccountOpen((open) => !open)}
+				style={{
+				  display: 'flex',
+				  alignItems: 'center',
+				  gap: 10,
+				  padding: '8px 14px',
+				  borderRadius: 999,
+				  border: '1.5px solid rgba(255,152,0,0.35)',
+				  background: accountOpen ? 'rgba(255,152,0,0.14)' : 'var(--nav-pill-bg)',
+				  cursor: 'pointer',
+				  transition: 'background 0.2s, border 0.2s',
+				}}
+			  >
+				<span className="navbar-avatar" aria-hidden>
+				  {accountInitials}
+				</span>
+				<span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0 }}>
+				  <span style={{ color: 'var(--text)', fontWeight: 900, fontSize: 14, maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+					{accountDisplayName}
+				  </span>
+				  <span style={{ color: 'var(--muted-2)', fontWeight: 800, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+					{userRoleLabel}
+				  </span>
+				</span>
+				<span style={{ color: 'var(--accent)', fontWeight: 900, fontSize: 12 }}>▼</span>
+			  </button>
 
-			<ul
-			  className="navbar-menu navbar-menu--right"
-			  style={{
-				position: 'absolute',
-				top: 46,
-				right: 0,
-				background: 'var(--nav-menu-bg)',
-				border: '1.5px solid rgba(255,152,0,0.45)',
-				borderRadius: 14,
-				boxShadow: 'var(--shadow)',
-				padding: 8,
-				margin: 0,
-				minWidth: 220,
-				zIndex: 120,
-				display: accountOpen ? 'block' : 'none',
-				listStyle: 'none',
-			  }}
-			>
-			  <li>
-				<Link to="/" onClick={() => setAccountOpen(false)} className="navbar-menu-item" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', color: 'var(--text)', textDecoration: 'none', fontWeight: 900, borderRadius: 10 }}>
-				  <span aria-hidden>👤</span> Home
-				</Link>
-			  </li>
-			  <li>
-				<Link to="/products" onClick={() => setAccountOpen(false)} className="navbar-menu-item" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', color: 'var(--text)', textDecoration: 'none', fontWeight: 900, borderRadius: 10 }}>
-				  <span aria-hidden>🛍️</span> Products
-				</Link>
-			  </li>
-			  <li>
-				<button
-				  type="button"
-				  className="navbar-menu-item"
-				  onClick={() => setAccountOpen(false)}
-				  style={{
-					display: 'flex',
-					alignItems: 'center',
-					gap: 10,
-					padding: '10px 12px',
-					color: 'var(--text)',
-					textDecoration: 'none',
-					fontWeight: 900,
-					borderRadius: 10,
-					background: 'transparent',
-					border: 'none',
-					width: '100%',
-					cursor: 'pointer',
-					textAlign: 'left',
-				  }}
-				>
-				  <span aria-hidden>🚪</span> Logout
-				</button>
-			  </li>
-			</ul>
-		  </div>
+			  <ul
+				className="navbar-menu navbar-menu--right"
+				style={{
+				  position: 'absolute',
+				  top: 46,
+				  right: 0,
+				  background: 'var(--nav-menu-bg)',
+				  border: '1.5px solid rgba(255,152,0,0.45)',
+				  borderRadius: 14,
+				  boxShadow: 'var(--shadow)',
+				  padding: 8,
+				  margin: 0,
+				  minWidth: 240,
+				  zIndex: 120,
+				  display: accountOpen ? 'block' : 'none',
+				  listStyle: 'none',
+				}}
+			  >
+				<li>
+				  <div className="navbar-menu-item" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2, padding: '10px 12px', color: 'var(--text)', fontWeight: 900, borderRadius: 10 }}>
+					<span>{user.email}</span>
+					<span style={{ color: 'var(--muted-2)', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{userRoleLabel}</span>
+				  </div>
+				</li>
+				<li>
+				  <Link to="/" onClick={() => setAccountOpen(false)} className="navbar-menu-item" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', color: 'var(--text)', textDecoration: 'none', fontWeight: 900, borderRadius: 10 }}>
+					<span aria-hidden>🏠</span> Home
+				  </Link>
+				</li>
+				<li>
+				  <Link to="/products" onClick={() => setAccountOpen(false)} className="navbar-menu-item" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', color: 'var(--text)', textDecoration: 'none', fontWeight: 900, borderRadius: 10 }}>
+					<span aria-hidden>🛍️</span> Products
+				  </Link>
+				</li>
+				{canAccessAdmin ? (
+				  <li>
+					<Link to="/admin/products" onClick={() => setAccountOpen(false)} className="navbar-menu-item" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', color: 'var(--text)', textDecoration: 'none', fontWeight: 900, borderRadius: 10 }}>
+					  <span aria-hidden>🧰</span> Admin catalog
+					</Link>
+				  </li>
+				) : null}
+				<li>
+				  <button
+					type="button"
+					className="navbar-menu-item"
+					onClick={() => {
+					  logout()
+					  setAccountOpen(false)
+					  setAdminOpen(false)
+					  navigate('/')
+					}}
+					style={{
+					  display: 'flex',
+					  alignItems: 'center',
+					  gap: 10,
+					  padding: '10px 12px',
+					  color: 'var(--text)',
+					  textDecoration: 'none',
+					  fontWeight: 900,
+					  borderRadius: 10,
+					  background: 'transparent',
+					  border: 'none',
+					  width: '100%',
+					  cursor: 'pointer',
+					  textAlign: 'left',
+					}}
+				  >
+					<span aria-hidden>🚪</span> Logout
+				  </button>
+				</li>
+			  </ul>
+			</div>
+		  ) : (
+			<>
+			  <Link
+				to="/auth?tab=login"
+				className="navbar-pill"
+				style={{
+				  color: 'var(--accent)',
+				  textDecoration: 'none',
+				  fontWeight: 900,
+				  fontSize: 14,
+				  padding: '8px 14px',
+				  borderRadius: 999,
+				  border: isAuthRoute(location.pathname) && location.search !== '?tab=register'
+					? '1.5px solid rgba(255,152,0,0.55)'
+					: '1.5px solid rgba(255,152,0,0.30)',
+				  background: isAuthRoute(location.pathname) && location.search !== '?tab=register'
+					? 'rgba(255,152,0,0.10)'
+					: 'var(--nav-pill-bg-2)',
+				  transition: 'background 0.2s, border 0.2s',
+				}}
+			  >
+				Login
+			  </Link>
+			  <Link
+				to="/auth?tab=register"
+				className="navbar-pill"
+				style={{
+				  color: 'var(--text)',
+				  textDecoration: 'none',
+				  fontWeight: 900,
+				  fontSize: 14,
+				  padding: '8px 14px',
+				  borderRadius: 999,
+				  border: isAuthRoute(location.pathname) && location.search === '?tab=register'
+					? '1.5px solid rgba(255,152,0,0.55)'
+					: '1.5px solid rgba(255,152,0,0.45)',
+				  background: isAuthRoute(location.pathname) && location.search === '?tab=register'
+					? 'rgba(255,152,0,0.20)'
+					: 'rgba(255,152,0,0.14)',
+				  transition: 'background 0.2s, border 0.2s',
+				}}
+			  >
+				Register
+			  </Link>
+			</>
+		  )}
 
 		  <button
 			type="button"

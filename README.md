@@ -37,6 +37,7 @@ At the moment, this repo includes a working storefront shell, product browsing/d
 ### Storefront
 
 - Home page
+- Merged authentication page with Login/Register tabs
 - Product listing page with search, filters, sorting, and pagination
 - Product detail page
 - Product cards with image fallback handling and improved dedicated styling
@@ -50,6 +51,7 @@ At the moment, this repo includes a working storefront shell, product browsing/d
 - CSV bulk upload for departments, categories, and products
 - Optional multipart image upload for products
 - Filesystem-backed image serving through `/images/**`
+- Admin routes guarded for `manager` and `employee` roles in the current frontend auth prototype
 
 ### Backend API
 
@@ -78,12 +80,18 @@ This repo is still a prototype. Some original RetailForge concepts are not fully
 
 Examples:
 
-- authentication/real account flows
+- backend-persisted authentication/session flows
 - persistent server-side cart and checkout
 - persistent favorites
 - order history and reviews
 
 The current cart is intentionally browser-local and lives in `frontend/src/api/cartStore.ts`.
+
+The current auth implementation is also prototype-level and frontend-local:
+
+- users and the active session are stored in browser `localStorage`
+- roles currently supported in the frontend are `customer`, `manager`, and `employee`
+- this is intended as a temporary bridge until the Spring Boot backend gets the full auth/session implementation
 
 ## Project structure
 
@@ -102,6 +110,8 @@ Important app folders:
 - `frontend/src/pages/` - storefront and admin pages
 - `frontend/src/components/` - shared UI and admin tables/layout
 - `frontend/src/api/` - frontend API clients and local cart store
+- `frontend/src/context/` - auth provider state
+- `frontend/src/hooks/` - shared hooks such as `useAuth`
 - `backend/src/main/java/` - controllers, services, entities, config, security
 - `backend/src/main/resources/db/migration/` - Flyway migrations
 - `backend/media/` - local media storage for uploaded/shared product images
@@ -187,12 +197,30 @@ The frontend expects the backend at `http://localhost:8080` unless `VITE_API_BAS
 Current frontend routes:
 
 - `/` - home page
+- `/auth?tab=login|register` - merged authentication page
+- `/login` - compatibility route for the login tab
+- `/register` - compatibility route for the register tab
 - `/products` - storefront product listing
 - `/products/:id` - product detail page
 - `/cart` - browser-local cart page
 - `/admin/departments` - department management
 - `/admin/categories` - category management
 - `/admin/products` - product management
+
+## Current auth prototype behavior
+
+The merged auth page follows the same overall login/register flow from the original project, but the initial implementation in this repo is frontend-local for now.
+
+- Login and Register are now combined into a single tabbed page
+- Register signs the user in immediately after account creation
+- The navbar switches between guest actions and an authenticated account menu
+- The admin catalog routes currently require `manager` or `employee`
+
+For quick local testing, the frontend seeds demo accounts in browser storage:
+
+- `cust1@dummy.com` / `password123` (`customer`)
+- `manager@dummy.com` / `password123` (`manager`)
+- `employee@dummy.com` / `password123` (`employee`)
 
 ## Media and image handling
 
