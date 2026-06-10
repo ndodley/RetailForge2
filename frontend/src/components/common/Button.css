@@ -1,0 +1,64 @@
+.rf-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 24px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    box-shadow: var(--shadow);
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+:root .rf-btn {
+    color: #000000;
+}
+
+:root[data-theme='dark'] .rf-btn {
+    color: #ffffff;
+}
+
+.rf-btn--full {
+    width: 100%;
+}
+
+.rf-btn--primary {
+    background: var(--link);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.rf-btn--primary:hover {
+    transform: translateY(-2px);
+    background: #2563eb;
+}
+
+.rf-btn--danger {
+    background: #d93636;
+    border: 1px solid #b02a2a;
+}
+
+.rf-btn--danger:hover {
+    transform: translateY(-2px);
+    background: #c22f2f;
+}
+
+.rf-btn--pill {
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--nav-pill-bg-2);
+    border: 1px solid var(--border);
+}
+
+.rf-btn--pill:hover:not(:disabled) {
+    transform: translateY(-2px);
+}
+
+.rf-btn--pill:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

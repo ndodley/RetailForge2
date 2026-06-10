@@ -1,29 +1,219 @@
-.navbar .navbar-pill,
-.navbar .navbar-menu-item {
-  font-family: inherit;
+/* NAVBAR CONTAINER */
+.navbar {
+  border-bottom: 1px solid var(--border);
+  background: var(--nav-bg);
+  padding: 1.5rem 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
+.navbar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+}
+
+/* LEFT GROUP */
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+/* LOGO */
+.navbar-logo a {
+  font-weight: 900;
+  font-size: clamp(24px, 2.4vw, 32px);
+  letter-spacing: 0.3px;
+  color: var(--accent);
+  text-decoration: none;
+  padding-bottom: 3px;
+  border-bottom: 3px solid transparent;
+  transition: border 0.2s;
+}
+
+.navbar-logo a.active {
+  border-bottom: 3px solid var(--accent);
+}
+
+/* PILL BUTTONS */
+.navbar-pill {
+  font-weight: 800;
+  color: var(--text);
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1.5px solid transparent;
+  background: var(--nav-pill-bg);
+  transition: background 0.2s, border 0.2s;
+  cursor: pointer;
+}
+
+.navbar-pill--active {
+  background: rgba(255,152,0,0.14);
+  border: 1.5px solid rgba(255,152,0,0.55);
+}
+
+/* ADMIN BUTTON */
+.admin-button {
+  border: 1.5px solid rgba(255,152,0,0.35);
+}
+
+.admin-button.open {
+  background: rgba(255,152,0,0.14);
+}
+
+/* ⭐ ANCHOR DROPDOWNS TO THEIR PARENT */
+.admin-dropdown-parent,
+.account-dropdown-parent {
+  position: relative;
+}
+
+/* DROPDOWN MENUS */
+.navbar-menu {
+  position: absolute;
+  top: calc(100% + 6px); /* sits directly under the button */
+  left: 0;
+  background: var(--nav-menu-bg);
+  border: 1.5px solid rgba(255,152,0,0.45);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 8px;
+  margin: 0;
+  min-width: 190px;
+  z-index: 1000;
+  display: none;
+  list-style: none;
+}
+
+.navbar-menu.open {
+  display: block;
+}
+
+/* RIGHT-ALIGNED DROPDOWN */
+.navbar-menu--right {
+  right: 0;
+  left: auto;
+  min-width: 240px;
+}
+
+/* MENU ITEMS */
+.navbar-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 900;
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+
+.navbar-menu-item:hover {
+  background: rgba(255,152,0,0.16);
+}
+
+.navbar-menu-item--active {
+  background: rgba(255,152,0,0.16);
+}
+
+/* ACCOUNT DROPDOWN */
+.account-button {
+  border: 1.5px solid rgba(255,152,0,0.35);
+}
+
+.account-button.open {
+  background: rgba(255,152,0,0.14);
+}
+
+.navbar-avatar {
+  font-weight: 900;
+  background: var(--nav-pill-bg-2);
+  padding: 6px 10px;
+  border-radius: 50%;
+}
+
+.account-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.account-name {
+  color: var(--text);
+  font-weight: 900;
+  font-size: 14px;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-role {
+  color: var(--muted-2);
+  font-weight: 800;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.account-email {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+/* RIGHT GROUP */
+.navbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+/* CART */
+.cart-pill {
+  border: 1.5px solid rgba(255,152,0,0.30);
+  background: var(--nav-pill-bg-2);
+}
+
+.cart-pill.navbar-pill--active {
+  border: 1.5px solid rgba(255,152,0,0.55);
+  background: rgba(255,152,0,0.10);
+}
+
+.cart-icon {
+  font-size: 20px;
+}
+
+.cart-text {
+  font-weight: 900;
+  color: var(--text);
+}
+
+/* THEME TOGGLE */
+.theme-toggle {
+  border: 1.5px solid rgba(255,152,0,0.35);
+}
+
+/* ACCESSIBILITY */
 .navbar .navbar-pill:focus-visible,
 .navbar .navbar-menu-item:focus-visible {
-  outline: 2px solid rgba(255, 152, 0, 0.45);
+  outline: 2px solid rgba(255,152,0,0.45);
   outline-offset: 2px;
 }
 
-.navbar .navbar-menu li + li {
-  margin-top: 4px;
-}
-
-.navbar .navbar-menu-item--active {
-  background: rgba(255, 152, 0, 0.16);
-}
-
-.navbar .navbar-avatar {
-  box-sizing: border-box;
-}
-
+/* MOBILE */
 @media (max-width: 768px) {
   .navbar .site-header__inner {
-	align-items: flex-start;
+    align-items: flex-start;
   }
 }
-
