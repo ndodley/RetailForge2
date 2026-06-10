@@ -1,0 +1,131 @@
+.cart-page {
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: auto;
+    color: var(--text);
+}
+
+.cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.cart-header h2 {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.cart-header-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.cart-content {
+    display: flex;
+    gap: 30px;
+}
+
+.cart-items {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.cart-item-card {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    background: var(--surface-2); /* uses your index.css variable */
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+}
+
+.cart-item-image {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 10px;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+}
+
+.cart-item-info {
+    flex: 1;
+}
+
+.cart-item-dept {
+    font-size: 14px;
+    opacity: 0.7;
+}
+
+.cart-item-name {
+    font-size: 20px;
+    margin: 5px 0;
+}
+
+.cart-item-meta {
+    font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cart-item-controls {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.qty-display {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.cart-summary-card {
+    flex: 1;
+    padding: 20px;
+    background: var(--surface-2);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    height: fit-content;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.total-row {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+}
+
+.empty-cart-modern {
+    text-align: center;
+    padding: 60px 20px;
+    background: var(--surface-2);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+}
+
+.empty-icon {
+    font-size: 60px;
+    margin-bottom: 20px;
+}
+
+.empty-shop-btn {
+    margin-top: 20px;
+    display: inline-block;
+}

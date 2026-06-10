@@ -1,132 +1,220 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
-import {
-  clearCart,
-  getCartItems,
-  removeProductFromCart,
-  subscribeToCartUpdates,
-  updateCartItemQuantity,
-  type StoreCartItem,
-} from '../api/cartStore'
-import { buildBackendImageUrl } from '../api/products'
-import Footer from '../components/common/Footer'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import Navbar from '../components/common/Navbar'
+import Footer from '../components/common/Footer'
+import Button from '../components/common/Button'
+import { useAuth } from '../hooks/useAuth'
+import {
+	fetchCart,
+	updateCartQuantity,
+	removeFromCart,
+	clearCartApi,
+	type CartItem,
+	type CartDto,
+} from '../api/cart'
+import { buildBackendImageUrl } from '../api/products'
+import './Cart.css'
 
 function Cart() {
-  const [cartItems, setCartItems] = useState<StoreCartItem[]>(() => getCartItems())
+	const navigate = useNavigate()
+	const location = useLocation()
+	const { user, loading } = useAuth()
 
-  useEffect(() => subscribeToCartUpdates(() => setCartItems(getCartItems())), [])
+	const [cart, setCart] = useState<CartDto | null>(null)
+	const [loadingCart, setLoadingCart] = useState(true)
 
-  const subtotal = useMemo(() => cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0), [cartItems])
-  const shipping = cartItems.length > 0 ? 12 : 0
+	// Redirect if not logged in
+	useEffect(() => {
+		if (!loading && !user) {
+			navigate('/login', { state: { from: location.pathname }, replace: true })
+		}
+	}, [user, loading, navigate, location])
 
-  return (
-	<>
-	  <Navbar />
-	  <main className="content-page">
-		<section className="content-page__hero">
-		  <p className="eyebrow">Cart</p>
-		  <h1>Shopping cart starter page</h1>
-		  <p>
-			This page is a placeholder for your future session-based cart flow. It gives you something
-			visual to design around right now.
-		  </p>
-		</section>
+	// Load cart
+	useEffect(() => {
+		if (!loading && user) {
+			;(async () => {
+				try {
+					const data = await fetchCart()
+					setCart(data)
+				} finally {
+					setLoadingCart(false)
+				}
+			})()
+		}
+	}, [user, loading])
 
-		<section className="section-block cart-layout">
-		  <div className="cart-list">
-			{cartItems.length === 0 ? (
-			  <article className="cart-item-card">
-				<div>
-				  <span className="cart-item-card__department">Cart is empty</span>
-				  <h3>Browse the live catalog to add products.</h3>
+	if (loading || loadingCart || !user) {
+		return (
+			<>
+				<Navbar />
+				<main className="cart-page">
+					<div style={{ color: 'var(--text)' }}>Loading cart…</div>
+				</main>
+				<Footer />
+			</>
+		)
+	}
+
+	const cartItems = cart?.items ?? []
+	const subtotal = cart?.subtotal ?? 0
+	const totalItems = cart?.totalItems ?? 0
+
+	// ⭐ Prevent quantity < 1 and > stock
+	const handleQuantityChange = async (item: CartItem, newQty: number) => {
+		if (newQty <= 0) {
+			// Delete item instead of sending 0
+			const updated = await removeFromCart(item.productId)
+			setCart(updated)
+			return
+		}
+
+		if (newQty > item.stock) {
+			return // Prevent exceeding stock
+		}
+
+		const updated = await updateCartQuantity(item.productId, newQty)
+		setCart(updated)
+	}
+
+	const handleRemove = async (item: CartItem) => {
+		const updated = await removeFromCart(item.productId)
+		setCart(updated)
+	}
+
+	const handleClearCart = async () => {
+		const updated = await clearCartApi()
+		setCart(updated)
+	}
+
+	return (
+		<>
+			<Navbar />
+
+			<main className="cart-page">
+				<div className="cart-header fade-in">
+					<h2>🛒 Shopping Cart</h2>
+
+					{cartItems.length > 0 && (
+						<div className="cart-header-actions">
+							<Button variant="primary" onClick={() => navigate('/products')}>
+								Continue Shopping
+							</Button>
+						</div>
+					)}
 				</div>
-				<div className="cart-item-card__meta">
-				  <Link to="/products" className="button button--primary">
-					Shop products
-				  </Link>
-				</div>
-			  </article>
-			) : (
-			  cartItems.map((item) => (
-				<article key={item.productId} className="cart-item-card" style={{ display: 'flex', gap: 18, alignItems: 'center', flexWrap: 'wrap' }}>
-				  <img
-					src={buildBackendImageUrl(item.imagePath)}
-					alt={item.name}
-					style={{ width: 92, height: 92, objectFit: 'contain', borderRadius: 12, background: 'var(--surface-3)', border: '1px solid var(--border)', padding: 8 }}
-					onError={(event) => {
-					  event.currentTarget.src = buildBackendImageUrl(null)
-					}}
-				  />
 
-				  <div style={{ flex: 1, minWidth: 220 }}>
-					<span className="cart-item-card__department">{item.departmentName || 'Uncategorized'}</span>
-					<h3>{item.name}</h3>
-					<div className="cart-item-card__meta" style={{ alignItems: 'center', flexWrap: 'wrap' }}>
-					  <span>${item.price.toFixed(2)} each</span>
-					  <strong>${(item.price * item.quantity).toFixed(2)}</strong>
+				{cartItems.length === 0 ? (
+					<div className="empty-cart-modern fade-in">
+						<div className="empty-icon">🛍️</div>
+						<h3>Your cart is empty</h3>
+						<p>Looks like you haven’t added anything yet.</p>
+
+						<Link to="/products" className="button button--primary empty-shop-btn">
+							Shop Products
+						</Link>
 					</div>
-				  </div>
+				) : (
+					<div className="cart-content">
+						<div className="cart-items fade-in">
+							{cartItems.map((item) => {
+								const lineTotal = item.price * item.quantity
 
-				  <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-					<button
-					  type="button"
-					  className="button button--ghost"
-					  onClick={() => updateCartItemQuantity(item.productId, item.quantity - 1)}
-					>
-					  −
-					</button>
-					<strong style={{ minWidth: 36, textAlign: 'center' }}>Qty {item.quantity}</strong>
-					<button
-					  type="button"
-					  className="button button--ghost"
-					  onClick={() => updateCartItemQuantity(item.productId, item.quantity + 1)}
-					  disabled={item.quantity >= item.stock}
-					>
-					  +
-					</button>
-					<button type="button" className="button button--ghost" onClick={() => removeProductFromCart(item.productId)}>
-					  Remove
-					</button>
-				  </div>
-				</article>
-			  ))
-			)}
-		  </div>
+								return (
+									<div key={item.id} className="cart-item-card slide-up">
+										<Link to={`/products/${item.productId}`}>
+											<img
+												src={buildBackendImageUrl(item.imagePath)}
+												alt={item.name}
+												className="cart-item-image"
+												onError={(e) => {
+													e.currentTarget.src = buildBackendImageUrl(null)
+												}}
+											/>
+										</Link>
 
-		  <aside className="cart-summary-card">
-			<h2>Order summary</h2>
-			<div className="cart-summary-card__row">
-			  <span>Items</span>
-			  <strong>{cartItems.reduce((count, item) => count + item.quantity, 0)}</strong>
-			</div>
-			<div className="cart-summary-card__row">
-			  <span>Subtotal</span>
-			  <strong>${subtotal.toFixed(2)}</strong>
-			</div>
-			<div className="cart-summary-card__row">
-			  <span>Estimated shipping</span>
-			  <strong>${shipping.toFixed(2)}</strong>
-			</div>
-			<div className="cart-summary-card__row cart-summary-card__row--total">
-			  <span>Total</span>
-			  <strong>${(subtotal + shipping).toFixed(2)}</strong>
-			</div>
-			<button type="button" className="button button--primary button--full" disabled={cartItems.length === 0}>
-			  Checkout comes next
-			</button>
-			{cartItems.length > 0 && (
-			  <button type="button" className="button button--ghost button--full" onClick={clearCart}>
-				Clear cart
-			  </button>
-			)}
-		  </aside>
-		</section>
-	  </main>
-	  <Footer />
-	</>
-  )
+										<div className="cart-item-info">
+                      <span className="cart-item-dept">
+                        {item.categoryName || 'Uncategorized'}
+                      </span>
+
+											<h3 className="cart-item-name">{item.name}</h3>
+
+											<div className="cart-item-meta">
+												<span>${item.price.toFixed(2)} each</span>
+												<strong>${lineTotal.toFixed(2)}</strong>
+											</div>
+										</div>
+
+										<div className="cart-item-controls">
+											<Button
+												variant="pill"
+												disabled={item.quantity <= 1}
+												onClick={() => handleQuantityChange(item, item.quantity - 1)}
+											>
+												−
+											</Button>
+
+											<strong className="qty-display">{item.quantity}</strong>
+
+											<Button
+												variant="pill"
+												disabled={item.quantity >= item.stock}
+												onClick={() => handleQuantityChange(item, item.quantity + 1)}
+											>
+												+
+											</Button>
+
+											<Button variant="danger" onClick={() => handleRemove(item)}>
+												Remove
+											</Button>
+										</div>
+									</div>
+								)
+							})}
+						</div>
+
+						<aside className="cart-summary-card sticky fade-in">
+							<h2>Order Summary</h2>
+
+							<div className="summary-row">
+								<span className="summary-label">Items</span>
+								<strong className="summary-value">{totalItems}</strong>
+							</div>
+
+							<div className="summary-row">
+								<span className="summary-label">Subtotal</span>
+								<strong className="summary-value">${subtotal.toFixed(2)}</strong>
+							</div>
+
+							<div className="summary-row total-row">
+								<span className="summary-label">Total</span>
+								<strong className="summary-value">${subtotal.toFixed(2)}</strong>
+							</div>
+
+							<Button
+								variant="primary"
+								fullWidth
+								onClick={() =>
+									navigate('/checkout', {
+										state: { subtotal, cartItems, totalItems },
+									})
+								}
+							>
+								Proceed to Checkout
+							</Button>
+
+							<Button variant="danger" fullWidth onClick={handleClearCart}>
+								Clear Cart
+							</Button>
+						</aside>
+					</div>
+				)}
+			</main>
+
+			<Footer />
+		</>
+	)
 }
 
 export default Cart
-
