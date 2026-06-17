@@ -118,7 +118,7 @@ function Cart() {
 					<div className="cart-content">
 						<div className="cart-items fade-in">
 							{cartItems.map((item) => {
-								const lineTotal = item.price * item.quantity
+								const lineTotal = item.priceAtTime * item.quantity
 
 								return (
 									<div key={item.id} className="cart-item-card slide-up">
@@ -141,7 +141,7 @@ function Cart() {
 											<h3 className="cart-item-name">{item.name}</h3>
 
 											<div className="cart-item-meta">
-												<span>${item.price.toFixed(2)} each</span>
+												<span>${item.priceAtTime.toFixed(2)} each</span>
 												<strong>${lineTotal.toFixed(2)}</strong>
 											</div>
 										</div>

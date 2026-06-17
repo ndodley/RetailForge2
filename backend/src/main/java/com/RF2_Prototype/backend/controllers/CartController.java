@@ -15,11 +15,17 @@ public class CartController {
         this.cartService = cartService;
     }
 
+    // ============================
+    // GET CART
+    // ============================
     @GetMapping
     public ResponseEntity<CartDto> getCart() {
         return ResponseEntity.ok(cartService.getCartForCurrentUser());
     }
 
+    // ============================
+    // ADD ITEM (POST /api/cart/items)
+    // ============================
     @PostMapping("/items")
     public ResponseEntity<CartDto> addItem(
             @RequestParam Integer productId,
@@ -28,6 +34,9 @@ public class CartController {
         return ResponseEntity.ok(cartService.addItem(productId, quantity));
     }
 
+    // ============================
+    // UPDATE QUANTITY (PATCH /api/cart/items/{productId})
+    // ============================
     @PatchMapping("/items/{productId}")
     public ResponseEntity<CartDto> updateQuantity(
             @PathVariable Integer productId,
@@ -36,11 +45,17 @@ public class CartController {
         return ResponseEntity.ok(cartService.updateQuantity(productId, quantity));
     }
 
+    // ============================
+    // REMOVE ITEM (DELETE /api/cart/items/{productId})
+    // ============================
     @DeleteMapping("/items/{productId}")
     public ResponseEntity<CartDto> removeItem(@PathVariable Integer productId) {
         return ResponseEntity.ok(cartService.removeItem(productId));
     }
 
+    // ============================
+    // CLEAR CART (DELETE /api/cart)
+    // ============================
     @DeleteMapping
     public ResponseEntity<CartDto> clearCart() {
         return ResponseEntity.ok(cartService.clearCart());

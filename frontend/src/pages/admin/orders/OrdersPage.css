@@ -1,0 +1,67 @@
+.admin-loading {
+    padding: 2rem;
+    text-align: center;
+    color: var(--text);
+}
+
+.admin-empty {
+    padding: 6px 0;
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.admin-search-panel {
+    max-width: 980px;
+    margin-bottom: 14px;
+}
+
+.admin-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    color: var(--text);
+}
+
+.admin-pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.admin-grid-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: var(--shadow-1);
+}
+
+.admin-grid-title {
+    font-weight: 900;
+    color: var(--text);
+}
+
+.admin-grid-meta {
+    margin-top: 4px;
+    color: var(--muted-2);
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.admin-grid-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 10px;
+}
+
+.admin-btn--danger {
+    background: var(--danger);
+    color: var(--surface-2);
+}

@@ -1,0 +1,256 @@
+.order-missing,
+.order-loading {
+    min-height: 100vh;
+    background: var(--app-bg);
+    padding: 2rem;
+    text-align: center;
+    color: var(--text);
+}
+
+.home-link {
+    color: var(--link);
+    font-weight: 700;
+}
+
+.order-confirmation-bg {
+    min-height: 100vh;
+    background: var(--app-bg);
+    padding: 2rem 1rem;
+    display: flex;
+    justify-content: center;
+}
+
+.order-confirmation-container {
+    max-width: 760px;
+    width: 100%;
+    background: var(--surface-2);
+    border-radius: 24px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-2);
+    overflow: hidden;
+}
+
+/* HEADER */
+.order-header {
+    background: var(--nav-bg);
+    padding: 2.25rem 2rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.order-header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.order-checkmark {
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    background: var(--success);
+    border: 2px solid var(--border);
+    box-shadow: var(--shadow-1);
+}
+
+.order-header-text {
+    text-align: center;
+}
+
+.order-title {
+    font-weight: 900;
+    font-size: 30px;
+    color: var(--text);
+}
+
+.order-subtitle {
+    margin-top: 6px;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+/* SUMMARY */
+.order-summary {
+    padding: 1.75rem 2rem 2rem;
+    color: var(--text);
+    background: var(--surface-2);
+}
+
+.summary-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.summary-row.full {
+    grid-column: 1 / -1;
+}
+
+.summary-label {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--muted);
+}
+
+.summary-value {
+    font-size: 16px;
+    font-weight: 900;
+}
+
+.summary-status {
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: var(--nav-pill-bg);
+    border: 1px solid var(--border);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 12px;
+}
+
+.summary-status.paid {
+    color: var(--success);
+}
+
+/* ITEMS */
+.order-items-card {
+    margin: 0 2rem 2rem;
+    background: var(--surface-2);
+    border-radius: 16px;
+    padding: 1.25rem;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-1);
+}
+
+.items-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.items-title {
+    font-weight: 900;
+    font-size: 18px;
+}
+
+.items-count {
+    font-weight: 800;
+    color: var(--muted-2);
+}
+
+.items-error {
+    color: var(--danger);
+    font-weight: 800;
+    margin-bottom: 12px;
+}
+
+.items-table-wrapper {
+    overflow-x: auto;
+}
+
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface-3);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-1);
+}
+
+.items-table th {
+    padding: 14px 12px;
+    font-weight: 900;
+    font-size: 14px;
+    text-align: left;
+    color: var(--text);
+    background: var(--nav-pill-bg);
+}
+
+.items-table th.right {
+    text-align: right;
+}
+
+.items-table th.center {
+    text-align: center;
+}
+
+.items-table td {
+    padding: 14px 12px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+}
+
+.item-product {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.item-img {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface-3);
+}
+
+.item-info {
+    min-width: 0;
+}
+
+.item-name {
+    font-weight: 900;
+    color: var(--text);
+    text-decoration: none;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.item-id {
+    margin-top: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted-2);
+}
+
+.right {
+    text-align: right;
+}
+
+.center {
+    text-align: center;
+}
+
+.link {
+    color: var(--link);
+}
+
+.success {
+    color: var(--success);
+}
+
+/* FOOTER */
+.order-footer {
+    text-align: center;
+    padding-bottom: 2rem;
+}
+
+.footer-thanks {
+    font-weight: 900;
+    color: var(--success);
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.footer-home {
+    color: var(--link);
+    font-weight: 900;
+    font-size: 16px;
+    text-decoration: underline;
+}

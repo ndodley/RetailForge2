@@ -2,12 +2,11 @@ package com.RF2_Prototype.backend.models.dtos;
 
 import java.math.BigDecimal;
 
-public record CartItemDto(
+public record OrderItemDto(
         Integer id,
         Integer productId,
         String productName,
         String imagePath,
-        BigDecimal priceAtTime,
-        Integer quantity,
-        Integer stock
+        BigDecimal price,
+        Integer quantity
 ) {}

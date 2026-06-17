@@ -1,0 +1,131 @@
+.checkout-page {
+    display: flex;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background: var(--app-bg);
+}
+
+.checkout-card {
+    width: 100%;
+    max-width: 720px;
+    background: var(--surface-2);
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-1);
+}
+
+.checkout-title {
+    text-align: center;
+    font-weight: 800;
+    margin-bottom: 32px;
+    color: var(--text);
+}
+
+.order-summary h3 {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.order-items {
+    margin-top: 14px;
+    padding: 14px;
+    border-radius: 12px;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-1);
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+}
+
+.item-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.item-img {
+    width: 46px;
+    height: 46px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface-3);
+}
+
+.item-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.item-name {
+    font-weight: 900;
+    color: var(--text);
+}
+
+.item-category {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted-2);
+}
+
+.item-sub {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted-2);
+}
+
+.item-total {
+    font-weight: 900;
+    color: var(--text);
+}
+
+.order-total {
+    margin-top: 16px;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.order-total span {
+    color: var(--success);
+}
+
+.payment-form {
+    margin-top: 24px;
+}
+
+.address-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+    margin-bottom: 16px;
+}
+
+.payment-element {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: var(--surface-2);
+}
+
+.error-msg {
+    margin-top: 16px;
+    font-weight: 700;
+    color: var(--danger);
+}
