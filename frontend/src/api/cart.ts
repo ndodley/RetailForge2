@@ -7,7 +7,7 @@ export interface CartItem {
     name: string
     categoryName: string | null
     imagePath: string | null
-    price: number
+    priceAtTime: number
     quantity: number
     stock: number
 }

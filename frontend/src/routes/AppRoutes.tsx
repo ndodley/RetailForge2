@@ -4,10 +4,19 @@ import HomePage from '../pages/HomePage'
 import ProductPage from '../pages/ProductPage'
 import ProductInfoPage from '../pages/ProductInfoPage'
 import Cart from '../pages/Cart'
+import CheckoutPage from '../pages/CheckoutPage'
+import OrderConfirmationPage from "../pages/OrderConfirmationPage.tsx";
 import CategoriesPage from '../pages/admin/categories/CategoriesPage'
 import DepartmentsPage from '../pages/admin/departments/DepartmentsPage'
 import ProductsPage from '../pages/admin/products/ProductsPage'
 import { RequireRole } from './RequireRole'
+
+// ⭐ Stripe imports
+import { Elements } from '@stripe/react-stripe-js'
+import { loadStripe } from '@stripe/stripe-js'
+
+// ⭐ Load Stripe with your publishable key
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
 
 function AppRoutes() {
   return (
@@ -20,6 +29,12 @@ function AppRoutes() {
         <Route path="/products" element={<ProductPage />} />
         <Route path="/products/:id" element={<ProductInfoPage />} />
         <Route path="/cart" element={<Cart />} />
+
+        {/* ⭐ FIXED: Wrap CheckoutPage in <Elements> */}
+        <Route path="/checkout" element={<Elements stripe={stripePromise}><CheckoutPage /></Elements>} />
+
+        <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
+
         <Route
           path="/admin/departments"
           element={
