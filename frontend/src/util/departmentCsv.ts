@@ -1,38 +1,35 @@
 import { parseCsvLine } from "./csvUtils"
 
-export async function parseCategoryCsv(file: File) {
+export async function parseDepartmentCsv(file: File) {
     const text = await file.text()
     const lines = text
         .split(/\r?\n/)
-        .map((l) => l.trim())
-        .filter((l) => l.length > 0)
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0)
 
     if (lines.length === 0) return []
 
     const headers = parseCsvLine(lines[0]).map((h) => h.toLowerCase())
     const nameIndex = headers.indexOf("name")
-    const deptIndex = headers.indexOf("departmentid")
 
-    if (nameIndex === -1 || deptIndex === -1) {
-        throw new Error("CSV must include name and departmentId columns.")
+    if (nameIndex === -1) {
+        throw new Error("CSV must include a name column.")
     }
 
     return lines
         .slice(1)
         .map((line) => parseCsvLine(line))
-        .map((cols) => ({
-            name: cols[nameIndex]?.trim() ?? "",
-            description: "",
-            departmentId: Number(cols[deptIndex] ?? 0),   // ALWAYS NUMBER
-        }))
+        .map((cols) => ({ name: cols[nameIndex]?.trim() ?? "" }))
         .filter((row) => row.name.length > 0)
 }
 
-export function exportCategoriesCsv(rows: any[]) {
-    const headers = ["name", "departmentId"]
+export function exportDepartmentsCsv(departments: any[]) {
+    const headers = ["name"]
+    const rows = departments.map((d) => [d.name])
+
     const csv = [headers, ...rows]
         .map((row) =>
-            row.map((v: any) => `"${String(v).replaceAll('"', '""')}"`).join(","),
+            row.map((v) => `"${String(v).replaceAll('"', '""')}"`).join(","),
         )
         .join("\n")
 
@@ -40,18 +37,18 @@ export function exportCategoriesCsv(rows: any[]) {
     const url = URL.createObjectURL(blob)
     const link = document.createElement("a")
     link.href = url
-    link.download = "categories.csv"
+    link.download = "departments.csv"
     link.click()
     URL.revokeObjectURL(url)
 }
 
-export function downloadCategoriesTemplate() {
-    const csv = "name,departmentId\n"
+export function downloadDepartmentsTemplate() {
+    const csv = "name\n"
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
     const url = URL.createObjectURL(blob)
     const link = document.createElement("a")
     link.href = url
-    link.download = "categories-template.csv"
+    link.download = "departments-template.csv"
     link.click()
     URL.revokeObjectURL(url)
 }

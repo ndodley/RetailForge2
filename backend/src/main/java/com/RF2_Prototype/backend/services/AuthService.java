@@ -130,9 +130,13 @@ public class AuthService {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),
-                user.getRole().name().toLowerCase(Locale.ROOT),
+                user.getPasswordHash(),
+                user.getRole(),
                 user.getPhoneNumber(),
-                user.getAddress()
+                user.getAddress(),
+                user.getAvatar_path(),
+                user.getCreatedAt(),
+                user.getUpdatedAt()
         );
     }
 }

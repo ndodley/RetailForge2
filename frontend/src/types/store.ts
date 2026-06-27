@@ -21,6 +21,33 @@ export interface CategoryRecord {
   departmentName: string | null
 }
 
+export interface ProductRecord {
+  id: number
+  name: string
+  brand: string | null
+  rating: number
+  price: number
+  description: string
+  stock: number
+  imagePath: string | null
+  categoryId: number | null
+  categoryName: string | null
+  departmentId: number | null
+  departmentName: string | null
+}
+
+export interface UserRecord {
+  id: number
+  first_name: string
+  last_name: string
+  email: string
+  password?: string
+  role: string
+  phoneNumber: string
+  address: string
+  avatar_path: string | null
+}
+
 export interface HighlightMetric {
   label: string
   value: string

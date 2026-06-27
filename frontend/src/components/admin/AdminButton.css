@@ -1,0 +1,46 @@
+.rf-admin-btn {
+    font-weight: 900;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.rf-admin-btn-icon {
+    display: inline-flex;
+    align-items: center;
+}
+
+.rf-admin-btn-label {
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Primary */
+.rf-btn--primary.rf-admin-btn {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #000;
+}
+
+/* Danger */
+.rf-btn--danger.rf-admin-btn {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+    border-radius: 999px;
+}
+
+/* Pill */
+.rf-btn--pill.rf-admin-btn {
+    background: var(--surface-3);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+/* Surface */
+.rf-btn--secondary.rf-admin-btn {
+    background: var(--surface-2);
+    border-color: var(--border);
+    color: var(--text);
+}

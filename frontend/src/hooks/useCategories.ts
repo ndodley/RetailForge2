@@ -1,45 +1,22 @@
 import { useEffect, useMemo, useState } from "react"
-import categoryAdminApi from "../api/categoryAdmin"
 import {
-    fetchDepartments,
+    fetchCategories,
+    createCategory,
+    updateCategory,
+    deleteCategory,
+    bulkCreateCategories,
     getApiErrorMessage,
-    type DepartmentDto,
-} from "../api/departments"
+} from "../api/categories"
+
+import { fetchDepartments } from "../api/departments"
+import type { CategoryRecord } from "../types/store"
 import { parseCategoryCsv } from "../util/categoryCsv"
 
-export interface CategoryRecord {
-    id: number
-    name: string
-    description: string
-    departmentId: number | null
-    departmentName: string | null
-}
-
-export interface DraftState {
-    name: string
-    description: string
-    departmentId: string
-    uploadFile: File | null
-    uploadFileName: string
-    isUploading: boolean
-}
-
-type CategoryTab = "dashboard" | "upsert"
-
-function toCategoryRecord(category: any): CategoryRecord {
-    return {
-        id: category.id,
-        name: category.name,
-        description: category.description,
-        departmentId: category.departmentId,
-        departmentName: category.departmentName,
-    }
-}
-
 export function useCategories() {
-    const [activeTab, setActiveTab] = useState<CategoryTab>("dashboard")
     const [categories, setCategories] = useState<CategoryRecord[]>([])
-    const [departments, setDepartments] = useState<DepartmentDto[]>([])
+    const [departments, setDepartments] = useState<{ id: number; name: string }[]>([])
+
+    const [activeTab, setActiveTab] = useState<"dashboard" | "upsert">("dashboard")
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
 
     const [isLoading, setIsLoading] = useState(true)
@@ -47,11 +24,11 @@ export function useCategories() {
     const [errorMessage, setErrorMessage] = useState("")
     const [successMessage, setSuccessMessage] = useState("")
 
-    const [draft, setDraft] = useState<DraftState>({
+    const [draft, setDraft] = useState({
         name: "",
         description: "",
-        departmentId: "",
-        uploadFile: null,
+        departmentId: 0,
+        uploadFile: null as File | null,
         uploadFileName: "",
         isUploading: false,
     })
@@ -61,24 +38,27 @@ export function useCategories() {
         [categories, selectedCategoryId],
     )
 
-    // Load categories + departments
     useEffect(() => {
         async function load() {
             setIsLoading(true)
+            setErrorMessage("")
+
             try {
                 const [catRes, deptRes] = await Promise.all([
-                    categoryAdminApi.fetchCategories(),
+                    fetchCategories(),
                     fetchDepartments(),
                 ])
-                setCategories(catRes.map(toCategoryRecord))
+
+                setCategories(catRes)
                 setDepartments(deptRes)
-            } catch (err) {
-                setErrorMessage(getApiErrorMessage(err, "Unable to load categories."))
+            } catch (error) {
+                setErrorMessage(getApiErrorMessage(error, "Unable to load categories."))
             } finally {
                 setIsLoading(false)
             }
         }
-        load()
+
+        void load()
     }, [])
 
     function clearMessages() {
@@ -91,78 +71,82 @@ export function useCategories() {
         setDraft({
             name: "",
             description: "",
-            departmentId: "",
+            departmentId: 0,
             uploadFile: null,
             uploadFileName: "",
             isUploading: false,
         })
-    }
-
-    async function reloadCategories() {
-        const res = await categoryAdminApi.fetchCategories()
-        setCategories(res.map(toCategoryRecord))
     }
 
     function handleEditCategory(id: number) {
         clearMessages()
-        const c = categories.find((x) => x.id === id)
+        const cat = categories.find((c) => c.id === id)
+
         setSelectedCategoryId(id)
         setDraft({
-            name: c?.name ?? "",
-            description: c?.description ?? "",
-            departmentId: c?.departmentId ? String(c.departmentId) : "",
+            name: cat?.name ?? "",
+            description: cat?.description ?? "",
+            departmentId: cat?.departmentId ?? 0,
             uploadFile: null,
             uploadFileName: "",
             isUploading: false,
         })
+
         setActiveTab("upsert")
     }
 
     async function handleDeleteCategory(id: number) {
         clearMessages()
+
         try {
-            await categoryAdminApi.deleteCategory(id)
+            await deleteCategory(id)
             setCategories((prev) => prev.filter((c) => c.id !== id))
-            if (selectedCategoryId === id) resetUpsertState()
             setSuccessMessage("Category deleted successfully.")
-        } catch (err) {
-            setErrorMessage(getApiErrorMessage(err, "Unable to delete category."))
+        } catch (error) {
+            setErrorMessage(getApiErrorMessage(error, "Unable to delete category."))
         }
     }
 
     async function handleSaveChanges() {
         const name = draft.name.trim()
-        const desc = draft.description.trim()
-        const deptId = Number.parseInt(draft.departmentId, 10)
+        const departmentId = draft.departmentId
 
-        if (!name) return setErrorMessage("Category name is required.")
-        if (!desc) return setErrorMessage("Category description is required.")
-        if (!Number.isFinite(deptId)) return setErrorMessage("Department is required.")
+        if (!name || !departmentId) {
+            setErrorMessage("Name and department are required.")
+            return
+        }
 
         clearMessages()
         setIsSaving(true)
 
         try {
-            const payload = { name, description: desc, departmentId: deptId }
-
             if (selectedCategoryId === null) {
-                const created = toCategoryRecord(await categoryAdminApi.createCategory(payload))
+                const created = await createCategory({
+                    name,
+                    description: draft.description.trim(),
+                    departmentId,
+                })
+
                 setCategories((prev) => [created, ...prev])
                 setSuccessMessage("Category created successfully.")
             } else {
-                const updated = toCategoryRecord(
-                    await categoryAdminApi.updateCategory(selectedCategoryId, payload),
-                )
+                const updated = await updateCategory(selectedCategoryId, {
+                    name,
+                    description: draft.description.trim(),
+                    departmentId,
+                })
+
                 setCategories((prev) =>
                     prev.map((c) => (c.id === selectedCategoryId ? updated : c)),
                 )
+
                 setSuccessMessage("Category updated successfully.")
             }
 
             resetUpsertState()
             setActiveTab("dashboard")
-        } catch (err) {
-            setErrorMessage(getApiErrorMessage(err, "Unable to save category."))
+        } catch (error) {
+            setErrorMessage(getApiErrorMessage(error, "Unable to save category."))
         } finally {
             setIsSaving(false)
         }
@@ -179,29 +163,21 @@ export function useCategories() {
 
         try {
             const rows = await parseCategoryCsv(draft.uploadFile)
+
             if (rows.length === 0) {
-                setErrorMessage("CSV contains no valid rows.")
-                return
+                throw new Error("No category rows found in CSV.")
             }
 
-            const result = await categoryAdminApi.bulkCreateCategories(rows)
-            await reloadCategories()
+            const result = await bulkCreateCategories(rows)
+            setSuccessMessage(`Uploaded ${result.inserted} categories successfully.`)
 
-            setDraft({
-                name: "",
-                description: "",
-                departmentId: "",
-                uploadFile: null,
-                uploadFileName: "",
-                isUploading: false,
-            })
+            const refreshed = await fetchCategories()
+            setCategories(refreshed)
 
+            resetUpsertState()
             setActiveTab("dashboard")
-            setSuccessMessage(
-                `Uploaded ${result.inserted} categor${result.inserted === 1 ? "y" : "ies"} successfully.`,
-            )
-        } catch (err) {
-            setErrorMessage(getApiErrorMessage(err, "Bulk upload failed."))
+        } catch (error) {
+            setErrorMessage(getApiErrorMessage(error, "Unable to complete bulk upload."))
         } finally {
             setDraft((d) => ({ ...d, isUploading: false }))
         }

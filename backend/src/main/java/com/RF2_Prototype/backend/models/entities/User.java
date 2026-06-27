@@ -35,8 +35,11 @@ public class User implements Serializable {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "address", columnDefinition = "TEXT")
     private String address;
+
+    @Column(name = "avatar_path", columnDefinition = "TEXT")
+    private String avatar_path;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -64,45 +67,41 @@ public class User implements Serializable {
         this.id = id;
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
+
+    public String getFirstName() { return firstName; }
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
-    public String getLastName() {
-        return lastName;
-    }
+
+    public String getLastName() { return lastName; }
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
-    public String getEmail() {
-        return email;
-    }
+
+    public String getEmail() { return email; }
 
     public void setEmail(String email) {
         this.email = email;
     }
 
-    public String getPasswordHash() {
-        return passwordHash;
-    }
+
+    public String getPasswordHash() { return passwordHash; }
 
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
     }
 
-    public UserRole getRole() {
-        return role;
-    }
+
+    public UserRole getRole() { return role; }
 
     public void setRole(UserRole role) {
         this.role = role;
     }
+
 
     public String getPhoneNumber() {
         return phoneNumber;
@@ -112,19 +111,23 @@ public class User implements Serializable {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getAddress() {
-        return address;
-    }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
+    public String getAddress() { return address; }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+    public void setAddress(String address) { this.address = address; }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
+
+    public String getAvatar_path() { return avatar_path;}
+
+    public void setAvatar_path(String avatar_path) { this.avatar_path = avatar_path; }
+
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

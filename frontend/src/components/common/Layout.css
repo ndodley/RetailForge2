@@ -1,0 +1,26 @@
+.layout-page {
+    width: 100%;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+}
+
+.layout-container {
+    flex: 1;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 16px;
+}
+
+/* Admin pages get special blue background */
+.layout-page.admin-layout {
+    background: var(--admin-page-bg);
+}
+
+/* ⭐ Storefront pages get the original blue gradient */
+.layout-page.storefront-layout {
+    background: var(--app-bg);
+}

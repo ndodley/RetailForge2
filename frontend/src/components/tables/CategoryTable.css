@@ -1,0 +1,29 @@
+.rf-cat-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.rf-cat-title {
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--admin-text-strong);
+    margin-bottom: 4px;
+}
+
+.rf-cat-sub {
+    color: var(--admin-text-muted);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.rf-cat-sub strong {
+    color: var(--admin-text);
+    font-weight: 800;
+}
+
+.rf-cat-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}

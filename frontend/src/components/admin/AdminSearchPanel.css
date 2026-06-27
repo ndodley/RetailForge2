@@ -1,0 +1,38 @@
+.rf-admin-search {
+    /* Search panel inherits theme from parent */
+}
+
+/* ⭐ FIX: Ensure spacing matches storefront */
+.rf-admin-search .adv-search-topbar {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 34px !important;
+    padding: 10px 12px;
+    align-items: center;
+}
+
+.rf-admin-search h3 {
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--admin-text-strong);
+    margin: 0 0 12px 0;
+}
+
+.rf-admin-search input[type="text"] {
+    background: var(--admin-surface-3);
+    border: 1px solid var(--admin-border);
+    color: var(--admin-text);
+    border-radius: 10px;
+    padding: 0 14px;
+    height: 42px;
+}
+
+.rf-admin-search input[type="text"]::placeholder {
+    color: var(--admin-text-muted);
+}
+
+.rf-admin-search input[type="text"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.1);
+}
