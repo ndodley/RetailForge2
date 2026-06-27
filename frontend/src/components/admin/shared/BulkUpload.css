@@ -1,0 +1,87 @@
+.rf-bulk {
+    background: var(--admin-surface-2);
+    border: 1px solid var(--admin-border);
+    border-radius: 14px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.rf-bulk-header {
+    padding-bottom: 8px;
+    border-bottom: none;
+}
+
+.rf-bulk-title {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--admin-text-strong);
+    margin: 0 0 6px 0;
+}
+
+.rf-bulk-subtitle {
+    font-size: 14px;
+    color: var(--admin-text-muted);
+    font-weight: 500;
+    margin: 0;
+}
+
+.rf-bulk-body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.rf-bulk-fileRow {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.rf-bulk-fileLabel {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.rf-bulk-fileInput {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.rf-bulk-fileBtn {
+    background: var(--admin-surface-3);
+    border: 1px solid var(--admin-border);
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 14px;
+    color: var(--admin-text-strong);
+    cursor: pointer;
+    display: inline-block;
+    transition: all 0.2s ease;
+}
+
+.rf-bulk-fileBtn:hover {
+    background: var(--admin-surface-1);
+}
+
+.rf-bulk-fileName {
+    color: var(--admin-text);
+    font-size: 14px;
+}
+
+.rf-bulk-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.rf-bulk-footer {
+    font-size: 13px;
+    color: var(--admin-text-muted);
+    font-weight: 600;
+}

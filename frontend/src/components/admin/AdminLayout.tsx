@@ -1,37 +1,45 @@
-import type { ReactNode } from 'react'
-import Footer from '../common/Footer'
-import Navbar from '../common/Navbar'
-import './admin.css'
+import Layout from "../common/Layout"
+import "./admin.css"
+
+import type { AdminTab } from "../../types/AdminTab"
 
 interface AdminLayoutProps {
-  title: string
-  subtitle?: string
-  actions?: ReactNode
-  children: ReactNode
+	title: string
+	tabs: { label: string; key: AdminTab }[]
+	activeTab: AdminTab
+	onTabChange: (key: AdminTab) => void
+	children: React.ReactNode
 }
 
-function AdminLayout({ title, subtitle, actions, children }: AdminLayoutProps) {
-  return (
-	<>
-	  <Navbar />
-	  <main className="admin-page">
-		<div className="admin-container">
-		  <header className="admin-header">
-			<div>
-			  <div className="admin-pretitle">Admin / Catalog</div>
-			  <h1 className="admin-title">{title}</h1>
-			  {subtitle ? <div className="admin-subtitle">{subtitle}</div> : null}
-			</div>
-			{actions ? <div className="admin-actions">{actions}</div> : null}
-		  </header>
+function AdminLayout({ title, tabs = [], activeTab, onTabChange, children }: AdminLayoutProps) {
+	return (
+		<Layout isAdmin={true}>
+			<div className="rf-admin-page">
+				<header className="rf-admin-header">
+					<h1 className="rf-admin-title">{title}</h1>
+				</header>
 
-		  <section className="admin-card">{children}</section>
-		</div>
-	  </main>
-	  <Footer />
-	</>
-  )
+				{tabs.length > 0 && (
+					<nav className="rf-admin-tabs">
+						{tabs.map((tab) => (
+							<button
+								key={tab.key}
+								className={
+									"rf-admin-tab" +
+									(activeTab === tab.key ? " rf-admin-tab--active" : "")
+								}
+								onClick={() => onTabChange(tab.key)}
+							>
+								{tab.label}
+							</button>
+						))}
+					</nav>
+				)}
+
+				<main className="rf-admin-content">{children}</main>
+			</div>
+		</Layout>
+	)
 }
 
 export default AdminLayout
-

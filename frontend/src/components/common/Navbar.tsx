@@ -54,10 +54,16 @@ function Navbar() {
 
 	const accountInitials = useMemo(() => (user ? getUserInitials(user) : ''), [user])
 
-	const userRoleLabel = useMemo(
+	/*const userRoleLabel = useMemo(
 		() => (user ? `${user.role.charAt(0).toUpperCase()}${user.role.slice(1)}` : ''),
 		[user],
-	)
+	)*/
+
+	const userRoleLabel = useMemo(() => {
+		if (!user || !user.role) return ''
+		return user.role.charAt(0).toUpperCase() + user.role.slice(1)
+	}, [user])
+
 
 	// Apply theme
 	useEffect(() => {

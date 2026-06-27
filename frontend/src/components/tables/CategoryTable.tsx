@@ -1,57 +1,47 @@
-interface CategoryRecord {
-  id: number
-  name: string
-  description: string
-  departmentId: number | null
-  departmentName: string | null
-}
+import Table from "../tables/Table"
+import AdminButton from "../admin/AdminButton"
+import type { CategoryRecord } from "../../types/store"
+import "./CategoryTable.css"
 
 interface CategoryTableProps {
-  categories: CategoryRecord[]
-  onEdit: (categoryId: number) => void
-  onDelete: (categoryId: number) => void
+    items: CategoryRecord[]
+    onEdit: (id: number) => void
+    onDelete: (id: number) => void
 }
 
-export function CategoryTable({ categories, onEdit, onDelete }: CategoryTableProps) {
-  if (categories.length === 0) {
+function CategoryTable({ items, onEdit, onDelete }: CategoryTableProps) {
     return (
-      <div className="department-table__empty">
-        <h3>No categories found</h3>
-        <p>Try a different search term or create a new category from the editor tab.</p>
-      </div>
-    )
-  }
+        <Table
+            items={items}
+            renderItem={(cat) => (
+                <div className="rf-cat-card">
+                    <div className="rf-cat-title">{cat.name}</div>
 
-  return (
-    <div className="admin-grid">
-      {categories.map((category) => (
-        <article key={category.id} className="admin-grid-card category-grid-card">
-          <div className="admin-grid-title">{category.name}</div>
-          <div className="admin-grid-meta">Department: {category.departmentName ?? 'Unassigned'}</div>
-          <div className="admin-grid-meta">{category.description || 'No description'}</div>
-          <div className="admin-grid-actions admin-row-actions">
-            <button type="button" className="admin-btn admin-btn--sm" onClick={() => onEdit(category.id)}>
-              <span className="admin-action-icon" aria-hidden="true">
-                ✎
-              </span>
-              Edit
-            </button>
-            <button
-              type="button"
-              className="admin-btn admin-btn--sm admin-btn--danger"
-              onClick={() => onDelete(category.id)}
-            >
-              <span className="admin-action-icon" aria-hidden="true">
-                ✕
-              </span>
-              Delete
-            </button>
-          </div>
-        </article>
-      ))}
-    </div>
-  )
+                    <div className="rf-cat-sub">
+                        Department: <strong>{cat.departmentName ?? "Unassigned"}</strong>
+                    </div>
+
+                    <div className="rf-cat-actions">
+                        <AdminButton
+                            variant="pill"
+                            icon="edit"
+                            onClick={() => onEdit(cat.id)}
+                        >
+                            Edit
+                        </AdminButton>
+
+                        <AdminButton
+                            variant="danger"
+                            icon="delete"
+                            onClick={() => onDelete(cat.id)}
+                        >
+                            Delete
+                        </AdminButton>
+                    </div>
+                </div>
+            )}
+        />
+    )
 }
 
 export default CategoryTable
-

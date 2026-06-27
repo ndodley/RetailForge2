@@ -1,0 +1,106 @@
+import { parseCsvLine } from "./csvUtils"
+
+interface UserCsvRow {
+    first_name: string
+    last_name: string
+    email: string
+    password: string
+    role: string
+    phoneNumber?: string
+    address?: string
+}
+
+export async function parseUserCsv(file: File): Promise<UserCsvRow[]> {
+    const text = await file.text()
+    const lines = text
+        .split(/\r?\n/)
+        .map((l) => l.trim())
+        .filter((l) => l.length > 0)
+
+    if (lines.length === 0) return []
+
+    const headers = parseCsvLine(lines[0]).map((h) => h.toLowerCase())
+    const firstNameIndex = headers.indexOf("first_name")
+    const lastNameIndex = headers.indexOf("last_name")
+    const emailIndex = headers.indexOf("email")
+    const passwordIndex = headers.indexOf("password")
+    const roleIndex = headers.indexOf("role")
+    const phoneIndex = headers.indexOf("phone_number")
+    const addressIndex = headers.indexOf("address")
+
+    if (
+        firstNameIndex === -1 ||
+        lastNameIndex === -1 ||
+        emailIndex === -1 ||
+        passwordIndex === -1 ||
+        roleIndex === -1
+    ) {
+        throw new Error(
+            "CSV must include first_name, last_name, email, password, and role columns."
+        )
+    }
+
+    return lines
+        .slice(1)
+        .map((line) => parseCsvLine(line))
+        .map((cols) => ({
+            first_name: cols[firstNameIndex]?.trim() ?? "",
+            last_name: cols[lastNameIndex]?.trim() ?? "",
+            email: cols[emailIndex]?.trim() ?? "",
+            password: cols[passwordIndex]?.trim() ?? "",
+            role: cols[roleIndex]?.trim() ?? "",
+            phoneNumber: phoneIndex !== -1 ? cols[phoneIndex]?.trim() : undefined,
+            address: addressIndex !== -1 ? cols[addressIndex]?.trim() : undefined,
+        }))
+        .filter((row) => row.first_name && row.last_name && row.email && row.password && row.role)
+}
+
+export function exportUsersCsv(users: any[]) {
+    const headers = [
+        "first_name",
+        "last_name",
+        "email",
+        "password",
+        "role",
+        "phone_number",
+        "address",
+    ]
+    const rows = users.map((u) => [
+        u.first_name,
+        u.last_name,
+        u.email,
+        "********",
+        u.role,
+        u.phoneNumber || "",
+        u.address || "",
+    ])
+
+    const csv = [headers, ...rows].map((row) => row.join(",")).join("\n")
+    const blob = new Blob([csv], { type: "text/csv" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = "users.csv"
+    a.click()
+    URL.revokeObjectURL(url)
+}
+
+export function downloadUsersTemplate() {
+    const headers = [
+        "first_name",
+        "last_name",
+        "email",
+        "password",
+        "role",
+        "phone_number",
+        "address",
+    ]
+    const csv = headers.join(",")
+    const blob = new Blob([csv], { type: "text/csv" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = "users_template.csv"
+    a.click()
+    URL.revokeObjectURL(url)
+}
