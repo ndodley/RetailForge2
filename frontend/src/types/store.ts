@@ -48,6 +48,40 @@ export interface UserRecord {
   avatar_path: string | null
 }
 
+export interface ReviewRecord {
+  id: number
+  productId: number
+  productName: string
+  productImagePath: string | null
+  userId: number
+  userEmail: string
+  userFullName: string
+  rating: number
+  comment: string
+  created_at: string
+  updated_at: string
+}
+
+export interface OrderRecord {
+  id: number
+  userId: number
+  userEmail: string
+  total: number
+  status: string
+  shippingAddress: string
+  createdAt: string
+}
+
+export interface OrderDetailRecord extends OrderRecord {
+  items: Array<{
+    productId: number
+    productName: string
+    imagePath: string | null
+    price: number
+    quantity: number
+  }>
+}
+
 export interface HighlightMetric {
   label: string
   value: string

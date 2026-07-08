@@ -5,7 +5,7 @@ import {
     updateCategory,
     deleteCategory,
     bulkCreateCategories,
-    getApiErrorMessage,
+    getCategoryApiErrorMessage,
 } from "../api/categories"
 
 import { fetchDepartments } from "../api/departments"
@@ -52,7 +52,7 @@ export function useCategories() {
                 setCategories(catRes)
                 setDepartments(deptRes)
             } catch (error) {
-                setErrorMessage(getApiErrorMessage(error, "Unable to load categories."))
+                setErrorMessage(getCategoryApiErrorMessage(error, "Unable to load categories."))
             } finally {
                 setIsLoading(false)
             }
@@ -103,7 +103,7 @@ export function useCategories() {
             setCategories((prev) => prev.filter((c) => c.id !== id))
             setSuccessMessage("Category deleted successfully.")
         } catch (error) {
-            setErrorMessage(getApiErrorMessage(error, "Unable to delete category."))
+            setErrorMessage(getCategoryApiErrorMessage(error, "Unable to delete category."))
         }
     }
 
@@ -146,7 +146,7 @@ export function useCategories() {
             resetUpsertState()
             setActiveTab("dashboard")
         } catch (error) {
-            setErrorMessage(getApiErrorMessage(error, "Unable to save category."))
+            setErrorMessage(getCategoryApiErrorMessage(error, "Unable to save category."))
         } finally {
             setIsSaving(false)
         }
@@ -177,7 +177,7 @@ export function useCategories() {
             resetUpsertState()
             setActiveTab("dashboard")
         } catch (error) {
-            setErrorMessage(getApiErrorMessage(error, "Unable to complete bulk upload."))
+            setErrorMessage(getCategoryApiErrorMessage(error, "Unable to complete category bulk upload."))
         } finally {
             setDraft((d) => ({ ...d, isUploading: false }))
         }

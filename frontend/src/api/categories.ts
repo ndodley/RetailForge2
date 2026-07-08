@@ -55,7 +55,7 @@ export async function bulkCreateCategories(rows: CategoryBulkRowDto[]) {
   return data
 }
 
-export function getApiErrorMessage(error: unknown, fallback: string) {
+export function getCategoryApiErrorMessage(error: unknown, fallback: string) {
   if (axios.isAxiosError(error)) {
     const responseData = error.response?.data
 
@@ -92,13 +92,3 @@ export function getApiErrorMessage(error: unknown, fallback: string) {
   return fallback
 }
 
-const categoriesApi = {
-  fetchCategories,
-  fetchCategoryById,
-  createCategory,
-  updateCategory,
-  deleteCategory,
-  bulkCreateCategories,
-}
-
-export default categoriesApi

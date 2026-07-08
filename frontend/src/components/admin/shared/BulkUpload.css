@@ -9,8 +9,7 @@
 }
 
 .rf-bulk-header {
-    padding-bottom: 8px;
-    border-bottom: none;
+    padding-bottom: 4px;
 }
 
 .rf-bulk-title {
@@ -22,21 +21,30 @@
 
 .rf-bulk-subtitle {
     font-size: 14px;
-    color: var(--admin-text-muted);
-    font-weight: 500;
+    color: var(--admin-accent, #1a6bbf);
+    font-weight: 600;
     margin: 0;
 }
 
 .rf-bulk-body {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 12px;
 }
 
-.rf-bulk-fileRow {
+/* File picker + buttons on one row */
+.rf-bulk-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.rf-bulk-left {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
 }
 
 .rf-bulk-fileLabel {
@@ -50,19 +58,22 @@
     inset: 0;
     opacity: 0;
     cursor: pointer;
+    width: 100%;
+    height: 100%;
 }
 
 .rf-bulk-fileBtn {
     background: var(--admin-surface-3);
     border: 1px solid var(--admin-border);
-    padding: 10px 16px;
-    border-radius: 10px;
-    font-weight: 800;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 700;
     font-size: 14px;
     color: var(--admin-text-strong);
     cursor: pointer;
     display: inline-block;
-    transition: all 0.2s ease;
+    transition: background 0.2s;
+    white-space: nowrap;
 }
 
 .rf-bulk-fileBtn:hover {
@@ -76,12 +87,87 @@
 
 .rf-bulk-actions {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
 }
 
-.rf-bulk-footer {
+/* Info lines */
+.rf-bulk-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.rf-bulk-info-line {
     font-size: 13px;
     color: var(--admin-text-muted);
-    font-weight: 600;
+    font-weight: 500;
+}
+
+.rf-bulk-info-line strong {
+    color: var(--admin-text);
+}
+
+/* Preview table */
+.rf-bulk-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.rf-bulk-preview-heading {
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    color: var(--admin-text-muted);
+    text-transform: uppercase;
+}
+
+.rf-bulk-preview-scroll {
+    max-height: 280px;
+    overflow-y: auto;
+    border: 1px solid var(--admin-border);
+    border-radius: 8px;
+}
+
+.rf-bulk-preview-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.rf-bulk-preview-table thead {
+    position: sticky;
+    top: 0;
+    background: var(--admin-surface-3);
+    z-index: 1;
+}
+
+.rf-bulk-preview-table th {
+    text-align: left;
+    padding: 10px 14px;
+    font-weight: 900;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--admin-text-muted);
+    border-bottom: 1px solid var(--admin-border);
+    white-space: nowrap;
+}
+
+.rf-bulk-preview-table td {
+    padding: 10px 14px;
+    color: var(--admin-text);
+    border-bottom: 1px solid var(--admin-border);
+    vertical-align: top;
+    word-break: break-word;
+}
+
+.rf-bulk-preview-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.rf-bulk-preview-table tbody tr:hover {
+    background: var(--admin-surface-3);
 }

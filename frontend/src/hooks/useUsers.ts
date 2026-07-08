@@ -5,7 +5,7 @@ import {
     updateUser,
     deleteUser,
     bulkCreateUsers,
-    getApiErrorMessage,
+    getUserApiErrorMessage,
 } from "../api/users"
 import type { UserRecord } from "../types/store"
 import { parseUserCsv } from "../util/userCsv"
@@ -27,7 +27,7 @@ export function useUsers() {
         last_name: "",
         email: "",
         password: "",
-        role: "",
+        role: "customer",
         phoneNumber: "",
         address: "",
         uploadFile: null as File | null,
@@ -44,7 +44,7 @@ export function useUsers() {
                 const usersRes = await fetchUsers()
                 setUsers(usersRes)
             } catch (error) {
-                setErrorMessage(getApiErrorMessage(error, "Unable to load users."))
+                setErrorMessage(getUserApiErrorMessage(error, "Unable to load users."))
             } finally {
                 setIsLoading(false)
             }
@@ -66,7 +66,7 @@ export function useUsers() {
             last_name: "",
             email: "",
             password: "",
-            role: "",
+            role: "customer",
             phoneNumber: "",
             address: "",
             uploadFile: null,
@@ -86,7 +86,7 @@ export function useUsers() {
             last_name: user?.last_name ?? "",
             email: user?.email ?? "",
             password: "",
-            role: user?.role ?? "",
+            role: user?.role ?? "customer",
             phoneNumber: user?.phoneNumber ?? "",
             address: user?.address ?? "",
             uploadFile: null,
@@ -105,7 +105,7 @@ export function useUsers() {
             setUsers((prev) => prev.filter((u) => u.id !== id))
             setSuccessMessage("User deleted successfully.")
         } catch (error) {
-            setErrorMessage(getApiErrorMessage(error, "Unable to delete user."))
+            setErrorMessage(getUserApiErrorMessage(error, "Unable to delete user."))
         }
     }
 
@@ -157,7 +157,7 @@ export function useUsers() {
             resetUpsertState()
             setActiveTab("dashboard")
         } catch (error) {
-            setErrorMessage(getApiErrorMessage(error, "Unable to save user."))
+            setErrorMessage(getUserApiErrorMessage(error, "Unable to save user."))
         } finally {
             setIsSaving(false)
         }
@@ -188,7 +188,7 @@ export function useUsers() {
             resetUpsertState()
             setActiveTab("dashboard")
         } catch (error) {
-            setErrorMessage(getApiErrorMessage(error, "Unable to complete bulk upload."))
+            setErrorMessage(getUserApiErrorMessage(error, "Unable to complete bulk upload."))
         } finally {
             setDraft((d) => ({ ...d, isUploading: false }))
         }

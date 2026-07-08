@@ -41,6 +41,7 @@ function CategoriesPage() {
     setSearchTerm,
     filterSections,
     visibleCategories,
+    resetFilters,
   } = useCategoryFilters(categories, departments)
 
   const { setPage, safePage, totalPages, pagedItems } =
@@ -50,7 +51,7 @@ function CategoriesPage() {
 
   function handleExportCsv() {
     exportCategoriesCsv(
-        visibleCategories.map((c) => [c.name, c.departmentId]),
+        visibleCategories.map((c) => [c.name, c.departmentId])
     )
   }
 
@@ -88,6 +89,7 @@ function CategoriesPage() {
                   searchTerm={searchTerm}
                   setSearchTerm={setSearchTerm}
                   filterSections={filterSections}
+                  onReset={resetFilters}
                   isLoading={isLoading}
                   items={visibleCategories}
                   pagedItems={pagedItems}
@@ -121,6 +123,7 @@ function CategoriesPage() {
                         : "Add New Category"
                   }
                   subtitle="Categories are used to group products within departments."
+                  submitLabel={draft && draft.name && draft.departmentId ? "Update Category" : "Add Category"}
                   isSaving={isSaving}
                   isEditing={Boolean(draft && draft.name && draft.departmentId)}
                   onSubmit={handleSaveChanges}

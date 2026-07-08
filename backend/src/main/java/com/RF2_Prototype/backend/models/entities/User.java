@@ -12,6 +12,8 @@ public class User implements Serializable {
 
     private static final long serialVersionUID = 1L; // for Serializable interface
 
+    private static final String DEFAULT_IMAGE_PATH = "/images/other_images/default_avatar.jpg";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -47,11 +49,17 @@ public class User implements Serializable {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    public User() {
+    }
+
     @PrePersist
     public void onCreate() {
         LocalDateTime now = LocalDateTime.now();
         createdAt = now;
         updatedAt = now;
+        if (avatar_path == null) {
+            avatar_path = DEFAULT_IMAGE_PATH;
+        }
     }
 
     @PreUpdate

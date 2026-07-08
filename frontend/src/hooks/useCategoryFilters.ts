@@ -1,27 +1,34 @@
 import { useMemo, useState } from "react"
 import type { CategoryRecord } from "../types/store"
+import type { FilterSection } from "../components/common/AdvancedSearchPanel"
 
 type SortField = "best" | "alpha"
-type SortDirection = "asc" | "desc"
+type SortOrder = "asc" | "desc"
 
 export function useCategoryFilters(
     categories: CategoryRecord[],
-    departments: { id: number; name: string }[],
+    departments: { id: number; name: string }[]
 ) {
     const [searchTerm, setSearchTerm] = useState("")
     const [sortField, setSortField] = useState<SortField>("best")
-    const [sortDirection, setSortDirection] = useState<SortDirection>("asc")
+    const [sortOrder, setSortOrder] = useState<SortOrder>("asc")
     const [selectedDepartmentId, setSelectedDepartmentId] = useState<number | null>(null)
 
-    const filterSections = useMemo(
+    function resetFilters() {
+        setSearchTerm("")
+        setSortField("best")
+        setSortOrder("asc")
+        setSelectedDepartmentId(null)
+    }
+
+    const filterSections: FilterSection[] = useMemo(
         () => [
             {
                 key: "sort",
-                title: "Sort",
-                type: "radio" as const,
+                title: "Sort By",
+                type: "radio",
                 value: sortField,
-                onChange: (value: string) =>
-                    setSortField(value as SortField),
+                onChange: (value) => setSortField(String(value) as SortField),
                 options: [
                     { value: "best", label: "Best Match" },
                     { value: "alpha", label: "Alphabet" },
@@ -30,10 +37,9 @@ export function useCategoryFilters(
             {
                 key: "order",
                 title: "Order",
-                type: "radio" as const,
-                value: sortDirection,
-                onChange: (value: string) =>
-                    setSortDirection(value as SortDirection),
+                type: "radio",
+                value: sortOrder,
+                onChange: (value) => setSortOrder(String(value) as SortOrder),
                 options: [
                     { value: "asc", label: "Ascending" },
                     { value: "desc", label: "Descending" },
@@ -42,10 +48,10 @@ export function useCategoryFilters(
             {
                 key: "department",
                 title: "Department",
-                type: "radio" as const,
+                type: "radio",
                 value: selectedDepartmentId?.toString() ?? "",
-                onChange: (value: string) =>
-                    setSelectedDepartmentId(value ? Number(value) : null),
+                onChange: (value) =>
+                    setSelectedDepartmentId(String(value) ? Number(value) : null),
                 options: [
                     { value: "", label: "All Departments" },
                     ...departments.map((d) => ({
@@ -55,7 +61,7 @@ export function useCategoryFilters(
                 ],
             },
         ],
-        [sortField, sortDirection, selectedDepartmentId, departments],
+        [sortField, sortOrder, selectedDepartmentId, departments]
     )
 
     const visibleCategories = useMemo(() => {
@@ -70,21 +76,22 @@ export function useCategoryFilters(
             next = next.filter((c) => c.departmentId === selectedDepartmentId)
         }
 
-        const direction = sortDirection === "asc" ? 1 : -1
+        const direction = sortOrder === "asc" ? 1 : -1
 
         if (sortField === "alpha") {
             next = next.sort((a, b) => a.name.localeCompare(b.name) * direction)
-        } else if (sortDirection === "desc") {
+        } else if (sortOrder === "desc") {
             next = next.reverse()
         }
 
         return next
-    }, [categories, searchTerm, sortField, sortDirection, selectedDepartmentId])
+    }, [categories, searchTerm, sortField, sortOrder, selectedDepartmentId])
 
     return {
         searchTerm,
         setSearchTerm,
         filterSections,
         visibleCategories,
+        resetFilters,
     }
 }
