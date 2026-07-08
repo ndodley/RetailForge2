@@ -38,13 +38,13 @@ function OrdersPage() {
     }
 
     function handleViewOrder(id: number) {
-        navigate(`/admin/orders/${id}?edit=1`)
+        navigate(`/admin/orders/${id}`)
     }
 
     return (
         <AdminLayout
             title="Manage Orders"
-            subtitle="View all orders across the store, including customer email."
+            subtitle="View all orders across the store, including the customer email."
             tabs={[{ label: "Dashboard", key: "dashboard" }]}
             activeTab="dashboard"
             onTabChange={() => {}}

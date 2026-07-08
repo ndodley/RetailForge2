@@ -2,6 +2,7 @@ import type { OrderRecord } from "../types/store"
 
 export function exportOrdersCsv(orders: OrderRecord[]) {
     const headers = ["Order ID", "User Email", "Status", "Total", "Date", "Shipping Address"]
+
     const rows = orders.map((o) => [
         o.id.toString(),
         o.userEmail,

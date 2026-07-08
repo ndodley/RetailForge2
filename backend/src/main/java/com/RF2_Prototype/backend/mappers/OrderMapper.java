@@ -4,19 +4,32 @@ import com.RF2_Prototype.backend.models.dtos.OrderDto;
 import com.RF2_Prototype.backend.models.dtos.OrderItemDto;
 import com.RF2_Prototype.backend.models.entities.Order;
 import com.RF2_Prototype.backend.models.entities.OrderItem;
+import com.RF2_Prototype.backend.models.entities.User;
+import com.RF2_Prototype.backend.repository.UserRepository;
 import org.springframework.stereotype.Component;
 
 @Component
 public class OrderMapper {
+
+    private final UserRepository userRepository;
+
+    public OrderMapper(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public OrderDto toDto(Order order) {
         if (order == null) {
             return null;
         }
 
+        String userEmail = userRepository.findById(order.getUserId())
+                .map(User::getEmail)
+                .orElse("unknown@example.com");
+
         return new OrderDto(
                 order.getId(),
                 order.getUserId(),
+                userEmail,
                 order.getAddress(),
                 order.getTotal(),
                 order.getStatus(),
@@ -32,7 +45,6 @@ public class OrderMapper {
                         ))
                         .toList()
         );
-
     }
 
     public Order toEntity(OrderDto dto) {
@@ -63,5 +75,4 @@ public class OrderMapper {
 
         return order;
     }
-
 }

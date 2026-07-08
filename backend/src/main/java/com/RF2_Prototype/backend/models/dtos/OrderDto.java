@@ -7,6 +7,7 @@ import java.util.List;
 public record OrderDto(
         Integer id,
         Integer userId,
+        String userEmail,
         String address,
         BigDecimal total,
         String status,

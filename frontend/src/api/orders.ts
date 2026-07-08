@@ -2,9 +2,6 @@ import axios from "axios"
 import api from "./axios"
 import type { OrderRecord, OrderDetailRecord } from "../types/store"
 
-// Shape actually returned by the Spring Boot backend (see OrderDto.java).
-// Kept private to this file so the rest of the app only deals with the
-// frontend's own OrderRecord / OrderDetailRecord shapes (types/store.ts).
 interface BackendOrderItemDto {
     id: number
     productId: number
@@ -17,25 +14,46 @@ interface BackendOrderItemDto {
 interface BackendOrderDto {
     id: number
     userId: number
+    userEmail: string
     address: string
     total: number
     status: string
-    createdAt: string
+    createdAt: string | { year: number; month: number; day: number; hour: number; minute: number; second: number; nano: number }
     items?: BackendOrderItemDto[]
+}
+
+function formatTimestamp(ts: BackendOrderDto["createdAt"]): string {
+    if (typeof ts === "string") {
+        return new Date(ts).toLocaleString("en-US", {
+            month: "numeric",
+            day: "numeric",
+            year: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+            hour12: true,
+        })
+    }
+
+    const date = new Date(ts.year, ts.month - 1, ts.day, ts.hour, ts.minute, ts.second)
+    return date.toLocaleString("en-US", {
+        month: "numeric",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+    })
 }
 
 function mapOrder(dto: BackendOrderDto): OrderRecord {
     return {
         id: dto.id,
         userId: dto.userId,
-        // TODO: backend doesn't return a real email yet (Order only stores
-        // userId, not a join to the Users table). Swap this out once
-        // OrderDto exposes a genuine userEmail field.
-        userEmail: `User #${dto.userId}`,
+        userEmail: dto.userEmail,
         total: dto.total,
         status: dto.status,
         shippingAddress: dto.address,
-        createdAt: new Date(dto.createdAt).toLocaleString(),
+        createdAt: formatTimestamp(dto.createdAt),
     }
 }
 
@@ -63,7 +81,6 @@ export async function fetchOrderById(id: number): Promise<OrderDetailRecord> {
 }
 
 export async function updateOrderStatus(id: number, status: string): Promise<void> {
-    // Backend exposes this as PUT, not PATCH
     await api.put(`/api/admin/orders/${id}/status`, { status })
 }
 
@@ -84,7 +101,7 @@ export function getOrderApiErrorMessage(error: unknown, fallback: string): strin
 export function exportOrderDetailCsv(order: OrderDetailRecord) {
     const rows = [
         ["Order ID", order.id],
-        ["User", order.userEmail],
+        ["User Email", order.userEmail],
         ["Total", `$${order.total.toFixed(2)}`],
         ["Status", order.status],
         ["Date", order.createdAt],
