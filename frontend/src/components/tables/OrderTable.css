@@ -1,54 +1,23 @@
-.rf-order-table {
+.rf-order-card-content {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
 }
 
-.rf-order-card {
-    background: var(--admin-surface-2);
-    border-radius: 8px;
-    padding: 20px;
-    border: 1px solid var(--border);
-    transition: box-shadow 0.2s;
-}
-
-.rf-order-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.rf-order-card-row {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 16px;
-    margin-bottom: 16px;
-}
-
-.rf-order-card-section {
+.rf-order-header {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
 }
 
-.rf-order-card-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.rf-order-card-value {
-    font-size: 14px;
-    font-weight: 500;
+.rf-order-title {
+    font-size: 18px;
+    font-weight: 700;
     color: var(--text);
 }
 
-.rf-order-card-value--price {
-    color: var(--success);
-    font-weight: 600;
-}
-
-.rf-order-status {
+.rf-order-status-badge {
     display: inline-block;
     padding: 4px 12px;
     border-radius: 12px;
@@ -57,29 +26,56 @@
     text-transform: capitalize;
 }
 
-.rf-order-status--pending {
+.rf-order-status-badge[data-status="pending"] {
     background: rgba(255, 193, 7, 0.15);
     color: #ffc107;
 }
 
-.rf-order-status--paid {
+.rf-order-status-badge[data-status="paid"] {
     background: rgba(33, 150, 243, 0.15);
     color: #2196f3;
 }
 
-.rf-order-status--shipped {
+.rf-order-status-badge[data-status="shipped"] {
     background: rgba(76, 175, 80, 0.15);
     color: #4caf50;
 }
 
-.rf-order-status--cancelled {
+.rf-order-status-badge[data-status="cancelled"] {
     background: rgba(244, 67, 54, 0.15);
     color: #f44336;
 }
 
-.rf-order-card-actions {
+.rf-order-info {
     display: flex;
-    gap: 12px;
-    padding-top: 12px;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.rf-order-info-item {
+    display: flex;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.rf-order-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    min-width: 60px;
+}
+
+.rf-order-value {
+    color: var(--text);
+}
+
+.rf-order-value--price {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.rf-order-actions {
+    display: flex;
+    gap: 8px;
+    padding-top: 8px;
     border-top: 1px solid var(--border);
 }

@@ -8,13 +8,13 @@ type SortOrder = "asc" | "desc"
 export function useOrderFilters(orders: OrderRecord[]) {
     const [searchTerm, setSearchTerm] = useState("")
     const [sortBy, setSortBy] = useState<SortKey>("best")
-    const [sortOrder, setSortOrder] = useState<SortOrder>("desc")
+    const [sortOrder, setSortOrder] = useState<SortOrder>("asc")
     const [statusFilter, setStatusFilter] = useState<string>("All")
 
     function resetFilters() {
         setSearchTerm("")
         setSortBy("best")
-        setSortOrder("desc")
+        setSortOrder("asc")
         setStatusFilter("All")
     }
 
