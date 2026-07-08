@@ -1,0 +1,85 @@
+.rf-order-table {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.rf-order-card {
+    background: var(--admin-surface-2);
+    border-radius: 8px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    transition: box-shadow 0.2s;
+}
+
+.rf-order-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.rf-order-card-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.rf-order-card-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.rf-order-card-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.rf-order-card-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+}
+
+.rf-order-card-value--price {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.rf-order-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.rf-order-status--pending {
+    background: rgba(255, 193, 7, 0.15);
+    color: #ffc107;
+}
+
+.rf-order-status--paid {
+    background: rgba(33, 150, 243, 0.15);
+    color: #2196f3;
+}
+
+.rf-order-status--shipped {
+    background: rgba(76, 175, 80, 0.15);
+    color: #4caf50;
+}
+
+.rf-order-status--cancelled {
+    background: rgba(244, 67, 54, 0.15);
+    color: #f44336;
+}
+
+.rf-order-card-actions {
+    display: flex;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+}

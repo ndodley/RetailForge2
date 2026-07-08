@@ -40,6 +40,7 @@ function UsersPage() {
         setSearchTerm,
         filterSections,
         visibleUsers,
+        resetFilters,
     } = useUserFilters(users)
 
     const { setPage, safePage, totalPages, pagedItems } =
@@ -85,6 +86,7 @@ function UsersPage() {
                         searchTerm={searchTerm}
                         setSearchTerm={setSearchTerm}
                         filterSections={filterSections}
+                        onReset={resetFilters}
                         isLoading={isLoading}
                         items={visibleUsers}
                         pagedItems={pagedItems}
@@ -112,12 +114,9 @@ function UsersPage() {
             {activeTab === "upsert" && (
                 <>
                     <UpsertForm
-                        title={
-                            draft && draft.id
-                                ? "Edit User"
-                                : "Add New User"
-                        }
-                        subtitle="Manage user accounts and permissions."
+                        title={draft && draft.id ? "Edit User" : "Add New User"}
+                        subtitle="Create or update a user account."
+                        submitLabel={draft && draft.id ? "Update User" : "Add User"}
                         isSaving={isSaving}
                         isEditing={Boolean(draft && draft.id)}
                         onSubmit={handleSaveChanges}
@@ -127,7 +126,7 @@ function UsersPage() {
                             setActiveTab("dashboard")
                         }}
                     >
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "16px" }}>
                             <div className="admin-field">
                                 <label className="admin-label">First Name</label>
                                 <input
@@ -151,19 +150,35 @@ function UsersPage() {
                                     }
                                 />
                             </div>
-                        </div>
 
-                        <div className="admin-field">
-                            <label className="admin-label">Email</label>
-                            <input
-                                className="admin-input"
-                                type="email"
-                                placeholder="user@example.com"
-                                value={draft.email}
-                                onChange={(e) =>
-                                    setDraft((d) => ({ ...d, email: e.target.value }))
-                                }
-                            />
+                            <div className="admin-field">
+                                <label className="admin-label">Email</label>
+                                <input
+                                    className="admin-input"
+                                    type="email"
+                                    placeholder="user@example.com"
+                                    value={draft.email}
+                                    onChange={(e) =>
+                                        setDraft((d) => ({ ...d, email: e.target.value }))
+                                    }
+                                />
+                            </div>
+
+                            <div className="admin-field">
+                                <label className="admin-label">Role</label>
+                                <select
+                                    className="admin-input"
+                                    value={draft.role}
+                                    onChange={(e) =>
+                                        setDraft((d) => ({ ...d, role: e.target.value }))
+                                    }
+                                >
+                                    <option value="customer">Customer</option>
+                                    <option value="employee">Employee</option>
+                                    <option value="manager">Manager</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div className="admin-field">
@@ -179,23 +194,6 @@ function UsersPage() {
                                     setDraft((d) => ({ ...d, password: e.target.value }))
                                 }
                             />
-                        </div>
-
-                        <div className="admin-field">
-                            <label className="admin-label">Role</label>
-                            <select
-                                className="admin-input"
-                                value={draft.role}
-                                onChange={(e) =>
-                                    setDraft((d) => ({ ...d, role: e.target.value }))
-                                }
-                            >
-                                <option value="">Select a role</option>
-                                <option value="customer">Customer</option>
-                                <option value="employee">Employee</option>
-                                <option value="manager">Manager</option>
-                                <option value="admin">Admin</option>
-                            </select>
                         </div>
 
                         <div className="admin-field">
@@ -227,7 +225,7 @@ function UsersPage() {
 
                     <BulkUpload
                         title="Bulk Upload"
-                        subtitle="Upload a users CSV to create multiple user accounts at once."
+                        subtitle="Upload a users CSV to create multiple user accounts. Password is required for each row."
                         file={draft.uploadFile}
                         onFileChange={(file) =>
                             setDraft((d) => ({

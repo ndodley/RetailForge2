@@ -10,6 +10,9 @@ const adminItems = [
 	{ to: '/admin/departments', label: 'Departments' },
 	{ to: '/admin/categories', label: 'Categories' },
 	{ to: '/admin/products', label: 'Products' },
+	{ to: '/admin/orders', label: 'Orders' },
+	{ to: '/admin/users', label: 'Users' },
+	{ to: '/admin/reviews', label: 'Reviews' },
 ]
 
 function isAuthRoute(pathname: string) {

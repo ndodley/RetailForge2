@@ -1,16 +1,16 @@
 package com.RF2_Prototype.backend.services;
 
+import com.RF2_Prototype.backend.mappers.OrderMapper;
 import com.RF2_Prototype.backend.models.entities.Cart;
 import com.RF2_Prototype.backend.models.entities.CartItem;
 import com.RF2_Prototype.backend.models.entities.Order;
 import com.RF2_Prototype.backend.models.entities.OrderItem;
 import com.RF2_Prototype.backend.models.dtos.OrderDto;
-import com.RF2_Prototype.backend.models.dtos.OrderItemDto;
 import com.RF2_Prototype.backend.repository.CartRepository;
 import com.RF2_Prototype.backend.repository.OrderItemRepository;
 import com.RF2_Prototype.backend.repository.OrderRepository;
 import com.RF2_Prototype.backend.services.iservices.IOrderService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,24 +21,44 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
+@Transactional
 public class OrderService implements IOrderService {
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final CartRepository cartRepository;
+    private final OrderMapper orderMapper;
+
+    public OrderService(
+            OrderRepository orderRepository,
+            OrderItemRepository orderItemRepository,
+            CartRepository cartRepository,
+            OrderMapper orderMapper
+    ) {
+        this.orderRepository = orderRepository;
+        this.orderItemRepository = orderItemRepository;
+        this.cartRepository = cartRepository;
+        this.orderMapper = orderMapper;
+    }
 
     @Override
     @Transactional
     public OrderDto createOrder(Integer userId, String address) {
 
+        // Fetch the cart for the user
         Cart cart = cartRepository.findByUser_Id(userId)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
+        if(cart.getItems() == null || cart.getItems().isEmpty()) {
+            throw new RuntimeException("Cannot create an order from an empty cart");
+        }
+
+        // Calculate the subtotal for the order
         BigDecimal subtotal = cart.getItems().stream()
                 .map(ci -> ci.getPriceAtTime().multiply(BigDecimal.valueOf(ci.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        // Create the order entity and save it
         Order order = Order.builder()
                 .userId(userId)
                 .address(address)
@@ -65,33 +85,64 @@ public class OrderService implements IOrderService {
         cart.getItems().clear();
         cartRepository.save(cart);
 
-        return getOrder(order.getId());
+        return getOrderById(order.getId());
     }
 
     @Override
-    public OrderDto getOrder(Integer orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+    public List<OrderDto> getAllOrders() {
+        return orderRepository.findAll(Sort.by(Sort.Direction.ASC, "id"))
+                .stream()
+                .map(orderMapper::toDto)
+                .collect(Collectors.toList());
+    }
 
-        List<OrderItem> items = orderItemRepository.findByOrderId(orderId);
+    @Override
+    public OrderDto getOrderById(Integer orderId) {
+        return orderMapper.toDto(getOrderEntity(orderId));
+    }
 
-        return new OrderDto(
-                order.getId(),
-                order.getUserId(),
-                order.getAddress(),
-                order.getTotal(),
-                order.getStatus(),
-                order.getCreatedAt(),
-                items.stream()
-                        .map(oi -> new OrderItemDto(
-                                oi.getId(),
-                                oi.getProductId(),
-                                oi.getProductName(),
-                                oi.getImagePath(),
-                                oi.getPrice(),
-                                oi.getQuantity()
-                        ))
-                        .collect(Collectors.toList())
-        );
+    @Override
+    public List<OrderDto> getOrdersByUserId(Integer userId) {
+        return orderRepository.findByUserId(userId)
+                .stream()
+                .map(orderMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<OrderDto> getOrdersByStatus(String status) {
+        return orderRepository.findByStatus(status)
+                .stream()
+                .map(orderMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public OrderDto updateOrder(OrderDto orderDto) {
+        Order order = getOrderEntity(orderDto.id());
+        order.setAddress(orderDto.address());
+        order.setTotal(orderDto.total());
+        order.setStatus(orderDto.status());
+        return orderMapper.toDto(orderRepository.save(order));
+    }
+
+    @Override
+    public OrderDto updateOrderStatus(Integer orderId, String status) {
+        Order order = getOrderEntity(orderId);
+        order.setStatus(status);
+        return orderMapper.toDto(orderRepository.save(order)); // save the updated order and return the DTO
+    }
+
+    @Override
+    public void deleteOrderById(Integer orderId) {
+        if (!orderRepository.existsById(orderId)) {
+            throw new RuntimeException("Order not found: " + orderId);
+        }
+        orderRepository.deleteById(orderId);
+    }
+
+    private Order getOrderEntity(Integer id) {
+        return orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found: " + id));
     }
 }

@@ -2,12 +2,19 @@ import { useMemo, useState } from "react"
 import type { DepartmentRecord } from "../types/store"
 
 type SortField = "best" | "alpha"
-type SortDirection = "asc" | "desc"
+type SortOrder = "asc" | "desc"
 
 export function useDepartmentFilters(departments: DepartmentRecord[]) {
     const [searchTerm, setSearchTerm] = useState("")
     const [sortField, setSortField] = useState<SortField>("best")
-    const [sortDirection, setSortDirection] = useState<SortDirection>("asc")
+    const [sortOrder, setSortOrder] = useState<SortOrder>("asc")
+
+    function resetFilters() {
+        setSearchTerm("")
+        setSortField("best")
+        setSortOrder("asc")
+    }
+
 
     const filterSections = useMemo(
         () => [
@@ -27,16 +34,16 @@ export function useDepartmentFilters(departments: DepartmentRecord[]) {
                 key: "order",
                 title: "Order",
                 type: "radio" as const,
-                value: sortDirection,
+                value: sortOrder,
                 onChange: (value: string | string[]) =>
-                    setSortDirection(String(value) as SortDirection),
+                    setSortOrder(String(value) as SortOrder),
                 options: [
                     { value: "asc", label: "Ascending" },
                     { value: "desc", label: "Descending" },
                 ],
             },
         ],
-        [sortDirection, sortField],
+        [sortOrder, sortField],
     )
 
     const visibleDepartments = useMemo(() => {
@@ -49,23 +56,24 @@ export function useDepartmentFilters(departments: DepartmentRecord[]) {
             )
         }
 
-        const direction = sortDirection === "asc" ? 1 : -1
+        const direction = sortOrder === "asc" ? 1 : -1
 
         if (sortField === "alpha") {
             next = [...next].sort(
                 (left, right) => left.name.localeCompare(right.name) * direction,
             )
-        } else if (sortDirection === "desc") {
+        } else if (sortOrder === "desc") {
             next = [...next].reverse()
         }
 
         return next
-    }, [departments, searchTerm, sortDirection, sortField])
+    }, [departments, searchTerm, sortOrder, sortField])
 
     return {
         searchTerm,
         setSearchTerm,
         filterSections,
         visibleDepartments,
+        resetFilters,
     }
 }

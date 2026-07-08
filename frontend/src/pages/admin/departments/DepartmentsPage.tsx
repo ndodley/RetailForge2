@@ -40,6 +40,7 @@ function DepartmentsPage() {
     setSearchTerm,
     filterSections,
     visibleDepartments,
+    resetFilters,
   } = useDepartmentFilters(departments)
 
   const { setPage, safePage, totalPages, pagedItems } =
@@ -85,6 +86,7 @@ function DepartmentsPage() {
                   searchTerm={searchTerm}
                   setSearchTerm={setSearchTerm}
                   filterSections={filterSections}
+                  onReset={resetFilters}
                   isLoading={isLoading}
                   items={visibleDepartments}
                   pagedItems={pagedItems}
@@ -112,12 +114,9 @@ function DepartmentsPage() {
         {activeTab === "upsert" && (
             <>
               <UpsertForm
-                  title={
-                    draft && draft.name
-                        ? "Edit Department"
-                        : "Add New Department"
-                  }
+                  title={draft && draft.name ? "Edit Department" : "Add New Department"}
                   subtitle="Departments are used to group categories and products."
+                  submitLabel={draft && draft.name ? "Update Department" : "Add Department"}
                   isSaving={isSaving}
                   isEditing={Boolean(draft && draft.name)}
                   onSubmit={handleSaveChanges}

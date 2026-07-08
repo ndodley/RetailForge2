@@ -31,63 +31,66 @@ export function useProductFilters(
         )
     }, [categories, departmentFilter])
 
-    const filterSections: FilterSection[] = [
-        {
-            key: "sort",
-            title: "Sort By",
-            type: "radio",
-            value: sortField,
-            onChange: (v) => setSortField(String(v) as SortField),
-            options: [
-                { label: "Best Match", value: "best" },
-                { label: "Alphabet", value: "alpha" },
-                { label: "Price", value: "price" },
-                { label: "Stock", value: "stock" },
-            ],
-        },
-        {
-            key: "order",
-            title: "Order",
-            type: "radio",
-            value: sortOrder,
-            onChange: (v) => setSortOrder(String(v) as SortOrder),
-            options: [
-                { label: "Ascending", value: "asc" },
-                { label: "Descending", value: "desc" },
-            ],
-        },
-        {
-            key: "department",
-            title: "Department",
-            type: "radio",
-            value: departmentFilter,
-            onChange: (v) => {
-                setDepartmentFilter(String(v))
-                setCategoryFilter("all")
+    const filterSections: FilterSection[] = useMemo(
+        () => [
+            {
+                key: "sort",
+                title: "Sort By",
+                type: "radio",
+                value: sortField,
+                onChange: (v) => setSortField(String(v) as SortField),
+                options: [
+                    { label: "Best Match", value: "best" },
+                    { label: "Alphabet", value: "alpha" },
+                    { label: "Price", value: "price" },
+                    { label: "Stock", value: "stock" },
+                ],
             },
-            options: [
-                { label: "All Departments", value: "all" },
-                ...departments.map((d) => ({
-                    label: d.name,
-                    value: String(d.id),
-                })),
-            ],
-        },
-        {
-            key: "category",
-            title: "Category",
-            type: "radio",
-            value: categoryFilter,
-            onChange: (v) => setCategoryFilter(String(v)),
-            options: [
-                { label: "All Categories", value: "all" },
-                ...filteredCategories.map((c) => ({
-                    label: c.name,
-                    value: String(c.id),
-                })),
-            ],
-        },
-    ]
+            {
+                key: "order",
+                title: "Order",
+                type: "radio",
+                value: sortOrder,
+                onChange: (v) => setSortOrder(String(v) as SortOrder),
+                options: [
+                    { label: "Ascending", value: "asc" },
+                    { label: "Descending", value: "desc" },
+                ],
+            },
+            {
+                key: "department",
+                title: "Department",
+                type: "radio",
+                value: departmentFilter,
+                onChange: (v) => {
+                    setDepartmentFilter(String(v))
+                    setCategoryFilter("all")
+                },
+                options: [
+                    { label: "All Departments", value: "all" },
+                    ...departments.map((d) => ({
+                        label: d.name,
+                        value: String(d.id),
+                    })),
+                ],
+            },
+            {
+                key: "category",
+                title: "Category",
+                type: "radio",
+                value: categoryFilter,
+                onChange: (v) => setCategoryFilter(String(v)),
+                options: [
+                    { label: "All Categories", value: "all" },
+                    ...filteredCategories.map((c) => ({
+                        label: c.name,
+                        value: String(c.id),
+                    })),
+                ],
+            },
+        ],
+        [sortField, sortOrder, departmentFilter, categoryFilter, filteredCategories, departments]
+    )
 
     const visibleProducts = useMemo(() => {
         let filtered = [...products]

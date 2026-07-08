@@ -2,11 +2,43 @@ import Table from "../tables/Table"
 import AdminButton from "../admin/AdminButton"
 import type { UserRecord } from "../../types/store"
 import "./UserTable.css"
+import {useState} from "react";
 
 interface UserTableProps {
     items: UserRecord[]
     onEdit: (id: number) => void
     onDelete: (id: number) => void
+}
+
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080'
+
+interface UserImageProps {
+    imagePath: string | null
+    name: string
+}
+
+function UserImage({ imagePath, name }: UserImageProps) {
+    const [hasLoadError, setHasLoadError] = useState(false)
+
+    if (!imagePath || hasLoadError) {
+        return (
+            <div
+                className="rf-user-img-placeholder"
+                aria-label="No user image available"
+            >
+                No image
+            </div>
+        )
+    }
+
+    return (
+        <img
+            src={`${apiBaseUrl}${imagePath}`}
+            alt={name}
+            className="rf-product-img"
+            onError={() => setHasLoadError(true)}
+        />
+    )
 }
 
 function UserTable({ items, onEdit, onDelete }: UserTableProps) {
@@ -17,6 +49,7 @@ function UserTable({ items, onEdit, onDelete }: UserTableProps) {
                 <div className="rf-user-card">
                     <div className="rf-user-header">
                         <div className="rf-user-icon">👤</div>
+                        <UserImage imagePath={user.avatar_path} name={`${user.first_name} ${user.last_name}`} />
                         <div className="rf-user-title">
                             {user.first_name} {user.last_name}
                         </div>

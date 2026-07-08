@@ -30,10 +30,10 @@ export function useProducts() {
         id: null as number | null,
         name: "",
         brand: "",
-        rating: 0,
+        rating: "",
         description: "",
-        price: 0,
-        stock: 0,
+        price: "",
+        stock: "",
         categoryId: 0,
         departmentId: 0,
         imagePath: "",
@@ -96,10 +96,10 @@ export function useProducts() {
             id: null,
             name: "",
             brand: "",
-            rating: 0,
+            rating: "",
             description: "",
-            price: 0,
-            stock: 0,
+            price: "",
+            stock: "",
             categoryId: 0,
             departmentId: 0,
             imagePath: "",
@@ -119,10 +119,10 @@ export function useProducts() {
             id: product?.id || null,
             name: product?.name ?? "",
             brand: product?.brand ?? "",
-            rating: product?.rating ?? 0,
+            rating: String(product?.rating ?? 0),
             description: product?.description ?? "",
-            price: product?.price ?? 0,
-            stock: product?.stock ?? 0,
+            price: String(product?.price ?? 0),
+            stock: String(product?.stock ?? 0),
             categoryId: product?.categoryId ?? 0,
             departmentId: product?.departmentId ?? 0,
             imagePath: product?.imagePath ?? "",
@@ -150,9 +150,21 @@ export function useProducts() {
     async function handleSaveChanges() {
         const name = draft.name.trim()
         const categoryId = draft.categoryId
+        const price = parseFloat(draft.price)
+        const stock = parseInt(draft.stock)
 
         if (!name || !categoryId) {
             setErrorMessage("Name and category are required.")
+            return
+        }
+
+        if (isNaN(price) || price < 0) {
+            setErrorMessage("Valid price is required.")
+            return
+        }
+
+        if (isNaN(stock) || stock < 0) {
+            setErrorMessage("Valid stock is required.")
             return
         }
 
@@ -163,10 +175,10 @@ export function useProducts() {
             const formData = new FormData()
             formData.append("name", name)
             formData.append("brand", draft.brand.trim())
-            formData.append("rating", String(draft.rating))
+            formData.append("rating", draft.rating)
             formData.append("description", draft.description.trim())
-            formData.append("price", String(draft.price))
-            formData.append("stock", String(draft.stock))
+            formData.append("price", draft.price)
+            formData.append("stock", draft.stock)
             formData.append("categoryId", String(categoryId))
 
             if (draft.imageFile) {

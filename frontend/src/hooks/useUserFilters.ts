@@ -9,23 +9,75 @@ export function useUserFilters(users: UserRecord[]) {
     const [searchTerm, setSearchTerm] = useState("")
     const [sortField, setSortField] = useState<SortField>("best")
     const [sortOrder, setSortOrder] = useState<SortOrder>("asc")
-    const [roleFilter, setRoleFilter] = useState<string | null>(null)
+    const [roleFilter, setRoleFilter] = useState<string>("all")
+
+    function resetFilters() {
+        setSearchTerm("")
+        setSortField("best")
+        setSortOrder("asc")
+        setRoleFilter("all")
+    }
+
+    const filterSections: FilterSection[] = useMemo(
+        () => [
+            {
+                key: "sort",
+                title: "Sort By",
+                type: "radio",
+                value: sortField,
+                onChange: (v) => setSortField(String(v) as SortField),
+                options: [
+                    { label: "Best Match", value: "best" },
+                    { label: "Last Name", value: "last_name" },
+                    { label: "First Name", value: "first_name" },
+                    { label: "Email", value: "email" },
+                    { label: "Role", value: "role" },
+                ],
+            },
+            {
+                key: "order",
+                title: "Order",
+                type: "radio",
+                value: sortOrder,
+                onChange: (v) => setSortOrder(String(v) as SortOrder),
+                options: [
+                    { label: "Ascending", value: "asc" },
+                    { label: "Descending", value: "desc" },
+                ],
+            },
+            {
+                key: "role",
+                title: "Role",
+                type: "radio",
+                value: roleFilter,
+                onChange: (v) => setRoleFilter(String(v)),
+                options: [
+                    { label: "All", value: "all" },
+                    { label: "Customer", value: "CUSTOMER" },
+                    { label: "Employee", value: "EMPLOYEE" },
+                    { label: "Manager", value: "MANAGER" },
+                    //{ label: "Admin", value: "ADMIN" },
+                ],
+            },
+        ],
+        [sortField, sortOrder, roleFilter]
+    )
 
     const visibleUsers = useMemo(() => {
-        let filtered = users
+        let filtered = [...users]
 
         if (searchTerm.trim()) {
             const term = searchTerm.toLowerCase()
             filtered = filtered.filter(
                 (u) =>
-                    u.first_name.toLowerCase().includes(term) ||
-                    u.last_name.toLowerCase().includes(term) ||
-                    u.email.toLowerCase().includes(term) ||
-                    u.role.toLowerCase().includes(term)
+                    (u.first_name || "").toLowerCase().includes(term) ||
+                    (u.last_name || "").toLowerCase().includes(term) ||
+                    (u.email || "").toLowerCase().includes(term) ||
+                    (u.role || "").toLowerCase().includes(term)
             )
         }
 
-        if (roleFilter !== null) {
+        if (roleFilter !== "all") {
             filtered = filtered.filter((u) => u.role === roleFilter)
         }
 
@@ -35,13 +87,13 @@ export function useUserFilters(users: UserRecord[]) {
             if (sortField === "best") {
                 comparison = a.id - b.id
             } else if (sortField === "last_name") {
-                comparison = a.last_name.localeCompare(b.last_name)
+                comparison = (a.last_name || "").localeCompare(b.last_name || "")  // ✅ Add null checks
             } else if (sortField === "first_name") {
-                comparison = a.first_name.localeCompare(b.first_name)
+                comparison = (a.first_name || "").localeCompare(b.first_name || "")  // ✅ Add null checks
             } else if (sortField === "email") {
-                comparison = a.email.localeCompare(b.email)
+                comparison = (a.email || "").localeCompare(b.email || "")
             } else if (sortField === "role") {
-                comparison = a.role.localeCompare(b.role)
+                comparison = (a.role || "").localeCompare(b.role || "")
             }
 
             return sortOrder === "desc" ? -comparison : comparison
@@ -50,100 +102,11 @@ export function useUserFilters(users: UserRecord[]) {
         return filtered
     }, [users, searchTerm, sortField, sortOrder, roleFilter])
 
-    const filterSections: FilterSection[] = [
-        {
-            label: "Sort",
-            options: [
-                {
-                    value: "best",
-                    label: "Best Match",
-                    checked: sortField === "best",
-                    onChange: () => setSortField("best"),
-                },
-                {
-                    value: "last_name",
-                    label: "Last Name",
-                    checked: sortField === "last_name",
-                    onChange: () => setSortField("last_name"),
-                },
-                {
-                    value: "first_name",
-                    label: "First Name",
-                    checked: sortField === "first_name",
-                    onChange: () => setSortField("first_name"),
-                },
-                {
-                    value: "email",
-                    label: "Email",
-                    checked: sortField === "email",
-                    onChange: () => setSortField("email"),
-                },
-                {
-                    value: "role",
-                    label: "Role",
-                    checked: sortField === "role",
-                    onChange: () => setSortField("role"),
-                },
-            ],
-        },
-        {
-            label: "Order",
-            options: [
-                {
-                    value: "asc",
-                    label: "Ascending",
-                    checked: sortOrder === "asc",
-                    onChange: () => setSortOrder("asc"),
-                },
-                {
-                    value: "desc",
-                    label: "Descending",
-                    checked: sortOrder === "desc",
-                    onChange: () => setSortOrder("desc"),
-                },
-            ],
-        },
-        {
-            label: "Role",
-            options: [
-                {
-                    value: "all",
-                    label: "All",
-                    checked: roleFilter === null,
-                    onChange: () => setRoleFilter(null),
-                },
-                {
-                    value: "customer",
-                    label: "Customer",
-                    checked: roleFilter === "customer",
-                    onChange: () => setRoleFilter("customer"),
-                },
-                {
-                    value: "employee",
-                    label: "Employee",
-                    checked: roleFilter === "employee",
-                    onChange: () => setRoleFilter("employee"),
-                },
-                {
-                    value: "manager",
-                    label: "Manager",
-                    checked: roleFilter === "manager",
-                    onChange: () => setRoleFilter("manager"),
-                },
-                {
-                    value: "admin",
-                    label: "Admin",
-                    checked: roleFilter === "admin",
-                    onChange: () => setRoleFilter("admin"),
-                },
-            ],
-        },
-    ]
-
     return {
         searchTerm,
         setSearchTerm,
         filterSections,
         visibleUsers,
+        resetFilters,
     }
 }
