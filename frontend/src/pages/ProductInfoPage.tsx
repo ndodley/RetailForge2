@@ -247,7 +247,7 @@ function ProductInfoPage() {
 									disabled={isOutOfStock}
 									onClick={handleAddToCart}
 								>
-									{isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
+									{isOutOfStock ? 'Out of Stock' : 'Add to CartPage'}
 								</button>
 							)}
 

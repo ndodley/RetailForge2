@@ -4,6 +4,8 @@ import axios from 'axios';
 export interface DepartmentDto {
   id: number;
   name: string;
+  categoryCount: number;
+  productCount: number;
 }
 
 export interface DepartmentWriteDto {
