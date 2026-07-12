@@ -4,8 +4,7 @@ import { fetchCart, addProductToCart, removeFromCart } from '../api/cart'
 import { getApiErrorMessage } from '../api/departments'
 import { buildBackendImageUrl, fetchStoreProductById, type StoreProductDto } from '../api/products'
 import { useAuth } from '../hooks/useAuth'
-import Footer from '../components/common/Footer'
-import Navbar from '../components/common/Navbar'
+import Layout from '../components/common/Layout'
 import './ProductInfoPage.css'
 
 function ProductInfoPage() {
@@ -89,37 +88,31 @@ function ProductInfoPage() {
 
 	if (!hasValidProductId) {
 		return (
-			<>
-				<Navbar />
-				<main className="pi-empty">
+			<Layout isStorefront>
+				<div className="pi-empty">
 					<div className="pi-error">Product not found.</div>
-				</main>
-				<Footer />
-			</>
+				</div>
+			</Layout>
 		)
 	}
 
 	if (loading) {
 		return (
-			<>
-				<Navbar />
-				<main className="pi-empty">
+			<Layout isStorefront>
+				<div className="pi-empty">
 					<div className="pi-loading">Loading product...</div>
-				</main>
-				<Footer />
-			</>
+				</div>
+			</Layout>
 		)
 	}
 
 	if (error || !product) {
 		return (
-			<>
-				<Navbar />
-				<main className="pi-empty">
+			<Layout isStorefront>
+				<div className="pi-empty">
 					<div className="pi-error">{error ?? 'Product not found.'}</div>
-				</main>
-				<Footer />
-			</>
+				</div>
+			</Layout>
 		)
 	}
 
@@ -160,9 +153,8 @@ function ProductInfoPage() {
 	}
 
 	return (
-		<>
-			<Navbar />
-			<main className="pi-main">
+		<Layout isStorefront>
+			<div className="pi-main">
 				<div className="pi-container">
 
 					<Link to="/products" className="pi-back">
@@ -247,16 +239,15 @@ function ProductInfoPage() {
 									disabled={isOutOfStock}
 									onClick={handleAddToCart}
 								>
-									{isOutOfStock ? 'Out of Stock' : 'Add to CartPage'}
+									{isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
 								</button>
 							)}
 
 						</div>
 					</div>
 				</div>
-			</main>
-			<Footer />
-		</>
+			</div>
+		</Layout>
 	)
 }
 

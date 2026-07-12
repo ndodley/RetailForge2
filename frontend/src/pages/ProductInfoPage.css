@@ -1,14 +1,11 @@
 .pi-main {
-    min-height: 100vh;
-    background: var(--app-bg);
     padding: 0;
     color: var(--text);
     font-family: Inter, Segoe UI, Arial, sans-serif;
 }
 
 .pi-empty {
-    min-height: 100vh;
-    background: var(--app-bg);
+    min-height: 50vh;
     display: grid;
     place-items: center;
     padding: 2rem 1rem;

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import Navbar from '../components/common/Navbar'
-import Footer from '../components/common/Footer'
+import Layout from '../components/common/Layout'
 import Button from '../components/common/Button'
 import { useAuth } from '../hooks/useAuth'
 import {
@@ -46,13 +45,11 @@ function CartPage() {
 
 	if (loading || loadingCart || !user) {
 		return (
-			<>
-				<Navbar />
-				<main className="cart-page">
+			<Layout isStorefront>
+				<div className="cart-page">
 					<div style={{ color: 'var(--text)' }}>Loading cart…</div>
-				</main>
-				<Footer />
-			</>
+				</div>
+			</Layout>
 		)
 	}
 
@@ -88,10 +85,8 @@ function CartPage() {
 	}
 
 	return (
-		<>
-			<Navbar />
-
-			<main className="cart-page">
+		<Layout isStorefront>
+			<div className="cart-page">
 				<div className="cart-header fade-in">
 					<h2>🛒 Shopping Cart</h2>
 
@@ -210,10 +205,8 @@ function CartPage() {
 						</aside>
 					</div>
 				)}
-			</main>
-
-			<Footer />
-		</>
+			</div>
+		</Layout>
 	)
 }
 

@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js"
 import { loadStripe } from "@stripe/stripe-js"
-import Navbar from "../components/common/Navbar"
-import Footer from "../components/common/Footer"
+import Layout from "../components/common/Layout"
 import Button from "../components/common/Button"
 import { fetchCart } from "../api/cart"
 import { buildBackendImageUrl } from "../api/products"
@@ -22,11 +21,7 @@ interface CartItemDto {
     categoryName?: string | null
 }
 
-function CheckoutForm({
-                          clientSecret,
-                          cartItems,
-                          cartTotal
-                      }: {
+function CheckoutForm({}: {
     clientSecret: string
     cartItems: CartItemDto[]
     cartTotal: number
@@ -78,12 +73,12 @@ function CheckoutForm({
     return (
         <form onSubmit={handleSubmit} className="payment-form">
             <input id={"shipping_address"}
-                type="text"
-                placeholder="Shipping Address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                required
-                className="address-input"
+                   type="text"
+                   placeholder="Shipping Address"
+                   value={address}
+                   onChange={(e) => setAddress(e.target.value)}
+                   required
+                   className="address-input"
             />
 
             <PaymentElement className="payment-element" />
@@ -140,10 +135,8 @@ export default function CheckoutPage() {
     }, [cartTotal])
 
     return (
-        <>
-            <Navbar />
-
-            <main className="checkout-page">
+        <Layout isStorefront>
+            <div className="checkout-page">
                 <div className="checkout-card fade-in">
                     <h2 className="checkout-title">Checkout</h2>
 
@@ -207,9 +200,7 @@ export default function CheckoutPage() {
 
                     {error && <div className="error-msg">{error}</div>}
                 </div>
-            </main>
-
-            <Footer />
-        </>
+            </div>
+        </Layout>
     )
 }
