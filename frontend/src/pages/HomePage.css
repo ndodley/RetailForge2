@@ -1,0 +1,113 @@
+.home-page {
+    color: var(--text);
+}
+
+.home-landing {
+    text-align: center;
+    padding: 3rem 1rem 2rem;
+}
+
+.home-landing__title {
+    font-size: clamp(32px, 4.5vw, 52px);
+    font-weight: 900;
+    letter-spacing: 0.2px;
+    margin: 0 0 16px 0;
+}
+
+.home-landing__title span {
+    color: var(--accent);
+}
+
+.home-landing__subtitle {
+    max-width: 640px;
+    margin: 0 auto;
+    color: var(--muted);
+    font-size: 1.05rem;
+    line-height: 1.6;
+}
+
+.section-block {
+    padding: 2rem 0;
+}
+
+.home-feature-shell {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    padding: 2rem;
+}
+
+.home-feature-shell__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+}
+
+.home-feature-shell__title {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--text);
+}
+
+.home-feature-shell__subtitle {
+    margin-top: 6px;
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.home-feature-shell__actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.home-cta {
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.home-cta--primary {
+    background: var(--accent);
+    color: var(--surface-2);
+}
+
+.home-cta--secondary {
+    background: var(--nav-pill-bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.home-feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.home-feature-card {
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+}
+
+.home-feature-card__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 8px;
+}
+
+.home-feature-card__description {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.5;
+}

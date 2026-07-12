@@ -1,7 +1,5 @@
 .order-missing,
 .order-loading {
-    min-height: 100vh;
-    background: var(--app-bg);
     padding: 2rem;
     text-align: center;
     color: var(--text);
@@ -13,8 +11,6 @@
 }
 
 .order-confirmation-bg {
-    min-height: 100vh;
-    background: var(--app-bg);
     padding: 2rem 1rem;
     display: flex;
     justify-content: center;

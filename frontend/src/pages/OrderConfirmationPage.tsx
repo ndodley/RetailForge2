@@ -1,18 +1,17 @@
 import { useEffect, useState } from "react"
 import { useLocation, Link } from "react-router-dom"
-import Navbar from "../components/common/Navbar"
-import Footer from "../components/common/Footer"
+import Layout from "../components/common/Layout"
 import axios from "axios"
 import { buildBackendImageUrl } from "../api/products"
 import "./OrderConfirmationPage.css"
 
-interface Order {
+/*interface Order {
     id: number
     total: number
     status: string
     address: string
     createdAt: string
-}
+}*/
 
 interface OrderItem {
     id: number
@@ -54,32 +53,26 @@ export default function OrderConfirmationPage() {
 
     if (!order) {
         return (
-            <>
-                <Navbar />
-                <main className="order-missing">
+            <Layout isStorefront>
+                <div className="order-missing">
                     <h2>Order not found</h2>
                     <Link to="/" className="home-link">Return to Home</Link>
-                </main>
-                <Footer />
-            </>
+                </div>
+            </Layout>
         )
     }
 
     if (loading) {
         return (
-            <>
-                <Navbar />
-                <main className="order-loading">Loading receipt...</main>
-                <Footer />
-            </>
+            <Layout isStorefront>
+                <div className="order-loading">Loading receipt...</div>
+            </Layout>
         )
     }
 
     return (
-        <>
-            <Navbar />
-
-            <main className="order-confirmation-bg">
+        <Layout isStorefront>
+            <div className="order-confirmation-bg">
                 <div className="order-confirmation-container">
 
                     {/* HEADER */}
@@ -200,9 +193,7 @@ export default function OrderConfirmationPage() {
                     </div>
 
                 </div>
-            </main>
-
-            <Footer />
-        </>
+            </div>
+        </Layout>
     )
 }
