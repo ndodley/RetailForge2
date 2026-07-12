@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import Footer from '../components/common/Footer'
 import Navbar from '../components/common/Navbar'
-import HomeProductShowcase from './HomeProductShowcase'
+import HomeProductShowcase from '../components/HomeProductShowcase.tsx'
 
 const featureCards = [
   {

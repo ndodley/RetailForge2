@@ -1,4 +1,5 @@
 import "./Table.css"
+import React from "react";
 
 interface TableProps<T> {
     items: T[]

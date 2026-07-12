@@ -53,8 +53,8 @@ A full-stack e-commerce platform for a modern department store, built with the P
 - **Advanced Search (Compact)**: Collapsible filter panel with search + sort + order
 - **Dependent Filters**: Category options depend on selected Department
 - **Product Details (Modernized)**: Improved dark-mode visuals, fixed-size product image frame (shows full image), availability status based on stock, and description formatting that preserves paragraphs/newlines
-- **Shopping Cart**: Add, update, and remove items; persistent across sessions
-- **Stock-Aware Cart**: Cart add/update prevents exceeding available stock and surfaces friendly errors when stock is insufficient
+- **Shopping CartPage**: Add, update, and remove items; persistent across sessions
+- **Stock-Aware CartPage**: CartPage add/update prevents exceeding available stock and surfaces friendly errors when stock is insufficient
 - **Checkout**: Secure Stripe payment integration
 - **Stock-Safe Checkout**: Product stock is decremented atomically during checkout; checkout fails gracefully if stock is insufficient
 - **Order Confirmation**: Receipt page after successful purchase
@@ -206,7 +206,7 @@ Home (Customer signed in):
 
 ---
 
-### Shopping Cart (`/cart`)
+### Shopping CartPage (`/cart`)
 
 **Purpose**
 
@@ -721,7 +721,7 @@ VITE_PUBLIC_STRIPE_KEY=your_stripe_publishable_key
     - `GET /api/users/me` (get signed-in user profile)
     - `PUT /api/users/me` (update signed-in user profile fields)
     - `PUT /api/users/me/avatar` (upload avatar image)
-- **Cart**: `/api/cart`, `/api/cart/item`
+- **CartPage**: `/api/cart`, `/api/cart/item`
 - **Orders**:
     - `/api/orders/my` (current user)
     - `/api/orders/user/:user_id` (admin)

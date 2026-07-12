@@ -1,8 +1,8 @@
 import { parseCsvLine } from "./csvUtils"
 
 interface UserCsvRow {
-    first_name: string
-    last_name: string
+    firstName: string
+    lastName: string
     email: string
     password: string
     role: string
@@ -20,12 +20,12 @@ export async function parseUserCsv(file: File): Promise<UserCsvRow[]> {
     if (lines.length === 0) return []
 
     const headers = parseCsvLine(lines[0]).map((h) => h.toLowerCase())
-    const firstNameIndex = headers.indexOf("first_name")
-    const lastNameIndex = headers.indexOf("last_name")
+    const firstNameIndex = headers.indexOf("firstName")
+    const lastNameIndex = headers.indexOf("lastName")
     const emailIndex = headers.indexOf("email")
     const passwordIndex = headers.indexOf("password")
     const roleIndex = headers.indexOf("role")
-    const phoneIndex = headers.indexOf("phone_number")
+    const phoneIndex = headers.indexOf("phoneNumber")
     const addressIndex = headers.indexOf("address")
 
     if (
@@ -36,7 +36,7 @@ export async function parseUserCsv(file: File): Promise<UserCsvRow[]> {
         roleIndex === -1
     ) {
         throw new Error(
-            "CSV must include first_name, last_name, email, password, and role columns."
+            "CSV must include firstName, lastName, email, password, and role columns."
         )
     }
 
@@ -44,30 +44,30 @@ export async function parseUserCsv(file: File): Promise<UserCsvRow[]> {
         .slice(1)
         .map((line) => parseCsvLine(line))
         .map((cols) => ({
-            first_name: cols[firstNameIndex]?.trim() ?? "",
-            last_name: cols[lastNameIndex]?.trim() ?? "",
+            firstName: cols[firstNameIndex]?.trim() ?? "",
+            lastName: cols[lastNameIndex]?.trim() ?? "",
             email: cols[emailIndex]?.trim() ?? "",
             password: cols[passwordIndex]?.trim() ?? "",
             role: cols[roleIndex]?.trim() ?? "",
             phoneNumber: phoneIndex !== -1 ? cols[phoneIndex]?.trim() : undefined,
             address: addressIndex !== -1 ? cols[addressIndex]?.trim() : undefined,
         }))
-        .filter((row) => row.first_name && row.last_name && row.email && row.password && row.role)
+        .filter((row) => row.firstName && row.lastName && row.email && row.password && row.role)
 }
 
 export function exportUsersCsv(users: any[]) {
     const headers = [
-        "first_name",
-        "last_name",
+        "firstName",
+        "lastName",
         "email",
         "password",
         "role",
-        "phone_number",
+        "phoneNumber",
         "address",
     ]
     const rows = users.map((u) => [
-        u.first_name,
-        u.last_name,
+        u.firstName,
+        u.lastName,
         u.email,
         "********",
         u.role,
@@ -87,12 +87,12 @@ export function exportUsersCsv(users: any[]) {
 
 export function downloadUsersTemplate() {
     const headers = [
-        "first_name",
-        "last_name",
+        "firstName",
+        "lastName",
         "email",
         "password",
         "role",
-        "phone_number",
+        "phoneNumber",
         "address",
     ]
     const csv = headers.join(",")

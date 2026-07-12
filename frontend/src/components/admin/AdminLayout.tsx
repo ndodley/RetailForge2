@@ -1,5 +1,5 @@
 import Layout from "../common/Layout"
-import "./admin.css"
+import "./AdminLayout.css"
 
 import type { AdminTab } from "../../types/AdminTab"
 
