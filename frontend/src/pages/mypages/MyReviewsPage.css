@@ -1,0 +1,124 @@
+.myrev-page {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-bottom: 40px;
+}
+
+.myrev-title {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--text);
+}
+
+.myrev-controls {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.myrev-search {
+    flex: 1;
+    min-width: 240px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+    font-size: 15px;
+}
+
+.myrev-reset-btn {
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: var(--surface-3);
+    border: 1.5px solid var(--border);
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.myrev-filter-panel {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.myrev-filter-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.myrev-filter-title {
+    font-weight: 900;
+    color: var(--text);
+}
+
+.myrev-filter-options {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.myrev-filter-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: var(--text);
+}
+
+.myrev-error {
+    background: var(--danger-bg);
+    color: var(--danger);
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 700;
+}
+
+.myrev-success {
+    background: var(--success-bg);
+    color: var(--success);
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 700;
+}
+
+.myrev-loading {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+/* Pagination */
+.myrev-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.myrev-page-btn {
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: var(--surface-3);
+    border: 1.5px solid var(--border);
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.myrev-page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.myrev-page-info {
+    font-weight: 900;
+    color: var(--text);
+}

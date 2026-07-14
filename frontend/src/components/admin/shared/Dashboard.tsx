@@ -2,6 +2,7 @@ import AdminButton from "../AdminButton"
 import AdminSearchPanel from "../AdminSearchPanel"
 import type { FilterSection } from "../../common/AdvancedSearchPanel"
 import "./Dashboard.css"
+import React from "react";
 
 interface DashboardProps<T> {
     title: string

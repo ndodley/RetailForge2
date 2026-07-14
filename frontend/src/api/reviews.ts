@@ -43,6 +43,11 @@ export async function fetchReviewsByProduct(productId: number) {
     return data
 }
 
+export async function fetchReviewsByUser(userId: number) {
+    const { data } = await api.get<ReviewDto[]>(`/api/reviews/user/${userId}`)
+    return data
+}
+
 export async function createReview(payload: ReviewWriteDto) {
     const { data } = await api.post<ReviewDto>('/api/reviews', payload)
     return data

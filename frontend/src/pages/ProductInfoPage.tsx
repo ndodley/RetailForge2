@@ -5,6 +5,7 @@ import { getApiErrorMessage } from '../api/departments'
 import { buildBackendImageUrl, fetchStoreProductById, type StoreProductDto } from '../api/products'
 import { useAuth } from '../hooks/useAuth'
 import Layout from '../components/common/Layout'
+import ProductReviews from '../components/ProductReviews'
 import './ProductInfoPage.css'
 
 function ProductInfoPage() {
@@ -246,6 +247,8 @@ function ProductInfoPage() {
 						</div>
 					</div>
 				</div>
+
+				<ProductReviews productId={currentProduct.id} />
 			</div>
 		</Layout>
 	)
