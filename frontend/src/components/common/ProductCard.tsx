@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { addProductToCart, removeFromCart, fetchCart } from '../../api/cart'
 import { buildBackendImageUrl, type StoreProductDto } from '../../api/products'

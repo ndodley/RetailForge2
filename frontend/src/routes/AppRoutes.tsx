@@ -15,7 +15,7 @@ import AdminOrdersPage from '../pages/admin/orders/AdminOrdersPage.tsx'
 import AdminOrderDetailPage from '../pages/admin/orders/AdminOrderDetailPage.tsx'
 //import MyProfilePage from '../pages/mypages/MyProfilePage'
 //import MyFavoritesPage from '../pages/mypages/MyFavoritesPage'
-//import MyReviewsPage from '../pages/mypages/MyReviewsPage'
+import MyReviewsPage from '../pages/mypages/MyReviewsPage'
 //import MyOrdersPage from '../pages/mypages/MyOrdersPage'
 import { RequireRole } from './RequireRole'
 
@@ -39,9 +39,9 @@ function AppRoutes() {
                 <Route path="/cart" element={<CartPage />} />
 
                 // My Personal Pages
+                <Route path="/my-reviews" element={<MyReviewsPage />} />
                 {/*<Route path="/my-profile" element={<MyProfilePage />} />
                 <Route path="/my-favorites" element={<MyFavoritesPage />} />
-                <Route path="/my-reviews" element={<MyReviewsPage />} />
                 <Route path="/my-orders" element={<MyOrdersPage />} />*/}
 
                 {/* ⭐ FIXED: Wrap CheckoutPage in <Elements> */}

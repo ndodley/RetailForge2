@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 import {
     fetchReviews,
     createReview,
@@ -7,11 +7,11 @@ import {
     bulkCreateReviews,
     getReviewApiErrorMessage,
     type ReviewDto,
-} from "../../api/reviews.ts"
-import { fetchUsers } from "../../api/users.ts"
-import { fetchProducts } from "../../api/productAdminApi.ts"
-import type { ReviewRecord } from "../../types/store.ts"
-import { parseReviewCsv } from "../../util/reviewCsv.ts"
+} from "../../api/reviews";
+import { fetchUsers } from "../../api/users";
+import { fetchProducts } from "../../api/productAdminApi";
+import type { ReviewRecord } from "../../types/store";
+import { parseReviewCsv } from "../../util/reviewCsv";
 
 function mapDtoToRecord(dto: ReviewDto): ReviewRecord {
     return {
@@ -22,25 +22,25 @@ function mapDtoToRecord(dto: ReviewDto): ReviewRecord {
         userId: dto.userId,
         userEmail: dto.userEmail,
         userFullName: dto.userFullName,
-        rating: typeof dto.rating === "number" ? dto.rating : Number(dto.rating),
+        rating: Number(dto.rating),
         comment: dto.comment ?? "",
         created_at: dto.created_at,
         updated_at: dto.updated_at,
-    }
+    };
 }
 
 export function useReviews() {
-    const [reviews, setReviews] = useState<ReviewRecord[]>([])
-    const [users, setUsers] = useState<{ id: number; first_name: string; last_name: string; email: string }[]>([])
-    const [products, setProducts] = useState<{ id: number; name: string }[]>([])
+    const [reviews, setReviews] = useState<ReviewRecord[]>([]);
+    const [users, setUsers] = useState<{ id: number; first_name: string; last_name: string; email: string }[]>([]);
+    const [products, setProducts] = useState<{ id: number; name: string }[]>([]);
 
-    const [activeTab, setActiveTab] = useState<"dashboard" | "upsert">("dashboard")
-    const [selectedReviewId, setSelectedReviewId] = useState<number | null>(null)
+    const [activeTab, setActiveTab] = useState<"dashboard" | "upsert">("dashboard");
+    const [selectedReviewId, setSelectedReviewId] = useState<number | null>(null);
 
-    const [isLoading, setIsLoading] = useState(true)
-    const [isSaving, setIsSaving] = useState(false)
-    const [errorMessage, setErrorMessage] = useState("")
-    const [successMessage, setSuccessMessage] = useState("")
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
 
     const [draft, setDraft] = useState({
         id: null as number | null,
@@ -51,37 +51,40 @@ export function useReviews() {
         uploadFile: null as File | null,
         uploadFileName: "",
         isUploading: false,
-    })
+    });
 
     useEffect(() => {
         async function load() {
-            setIsLoading(true)
-            setErrorMessage("")
+            setIsLoading(true);
+            setErrorMessage("");
+
             try {
                 const [reviewRes, userRes, productRes] = await Promise.all([
                     fetchReviews(),
                     fetchUsers(),
                     fetchProducts(),
-                ])
-                setReviews(reviewRes.map(mapDtoToRecord))
-                setUsers(userRes)
-                setProducts(productRes)
+                ]);
+
+                setReviews(reviewRes.map(mapDtoToRecord));
+                setUsers(userRes);
+                setProducts(productRes);
             } catch (error) {
-                setErrorMessage(getReviewApiErrorMessage(error, "Unable to load reviews."))
+                setErrorMessage(getReviewApiErrorMessage(error, "Unable to load reviews."));
             } finally {
-                setIsLoading(false)
+                setIsLoading(false);
             }
         }
-        void load()
-    }, [])
+
+        void load();
+    }, []);
 
     function clearMessages() {
-        setErrorMessage("")
-        setSuccessMessage("")
+        setErrorMessage("");
+        setSuccessMessage("");
     }
 
     function resetUpsertState() {
-        setSelectedReviewId(null)
+        setSelectedReviewId(null);
         setDraft({
             id: null,
             userId: 0,
@@ -91,13 +94,14 @@ export function useReviews() {
             uploadFile: null,
             uploadFileName: "",
             isUploading: false,
-        })
+        });
     }
 
     function handleEditReview(id: number) {
-        clearMessages()
-        const review = reviews.find((r) => r.id === id)
-        setSelectedReviewId(id)
+        clearMessages();
+        const review = reviews.find((r) => r.id === id);
+
+        setSelectedReviewId(id);
         setDraft({
             id: review?.id || null,
             userId: review?.userId ?? 0,
@@ -107,35 +111,38 @@ export function useReviews() {
             uploadFile: null,
             uploadFileName: "",
             isUploading: false,
-        })
-        setActiveTab("upsert")
+        });
+
+        setActiveTab("upsert");
     }
 
     async function handleDeleteReview(id: number) {
-        clearMessages()
+        clearMessages();
+
         try {
-            await deleteReview(id)
-            setReviews((prev) => prev.filter((r) => r.id !== id))
-            setSuccessMessage("Review deleted successfully.")
+            await deleteReview(id);
+            setReviews((prev) => prev.filter((r) => r.id !== id));
+            setSuccessMessage("Review deleted successfully.");
         } catch (error) {
-            setErrorMessage(getReviewApiErrorMessage(error, "Unable to delete review."))
+            setErrorMessage(getReviewApiErrorMessage(error, "Unable to delete review."));
         }
     }
 
     async function handleSaveChanges() {
-        const rating = parseInt(draft.rating)
+        const rating = parseInt(draft.rating);
 
         if (!draft.productId || !draft.userId) {
-            setErrorMessage("Product and user are required.")
-            return
-        }
-        if (isNaN(rating) || rating < 1 || rating > 5) {
-            setErrorMessage("Rating must be between 1 and 5.")
-            return
+            setErrorMessage("Product and user are required.");
+            return;
         }
 
-        clearMessages()
-        setIsSaving(true)
+        if (isNaN(rating) || rating < 1 || rating > 5) {
+            setErrorMessage("Rating must be between 1 and 5.");
+            return;
+        }
+
+        clearMessages();
+        setIsSaving(true);
 
         try {
             const payload = {
@@ -143,56 +150,57 @@ export function useReviews() {
                 userId: draft.userId,
                 rating,
                 comment: draft.comment.trim(),
-            }
+            };
 
             if (selectedReviewId === null) {
-                const created = await createReview(payload)
-                setReviews((prev) => [mapDtoToRecord(created), ...prev])
-                setSuccessMessage("Review created successfully.")
+                const created = await createReview(payload);
+                setReviews((prev) => [mapDtoToRecord(created), ...prev]);
+                setSuccessMessage("Review created successfully.");
             } else {
-                const updated = await updateReview(selectedReviewId, payload)
+                const updated = await updateReview(selectedReviewId, payload);
                 setReviews((prev) =>
                     prev.map((r) => (r.id === selectedReviewId ? mapDtoToRecord(updated) : r))
-                )
-                setSuccessMessage("Review updated successfully.")
+                );
+                setSuccessMessage("Review updated successfully.");
             }
 
-            resetUpsertState()
-            setActiveTab("dashboard")
+            resetUpsertState();
+            setActiveTab("dashboard");
         } catch (error) {
-            setErrorMessage(getReviewApiErrorMessage(error, "Unable to save review."))
+            setErrorMessage(getReviewApiErrorMessage(error, "Unable to save review."));
         } finally {
-            setIsSaving(false)
+            setIsSaving(false);
         }
     }
 
     async function handleBulkUpload() {
         if (!draft.uploadFile) {
-            setErrorMessage("Select a CSV file before uploading.")
-            return
+            setErrorMessage("Select a CSV file before uploading.");
+            return;
         }
 
-        clearMessages()
-        setDraft((d) => ({ ...d, isUploading: true }))
+        clearMessages();
+        setDraft((d) => ({ ...d, isUploading: true }));
 
         try {
-            const rows = await parseReviewCsv(draft.uploadFile)
+            const rows = await parseReviewCsv(draft.uploadFile);
+
             if (rows.length === 0) {
-                throw new Error("No review rows found in CSV.")
+                throw new Error("No review rows found in CSV.");
             }
 
-            const result = await bulkCreateReviews(rows)
-            setSuccessMessage(`Uploaded ${result.inserted} reviews successfully.`)
+            const result = await bulkCreateReviews(rows);
+            setSuccessMessage(`Uploaded ${result.inserted} reviews successfully.`);
 
-            const refreshed = await fetchReviews()
-            setReviews(refreshed.map(mapDtoToRecord))
+            const refreshed = await fetchReviews();
+            setReviews(refreshed.map(mapDtoToRecord));
 
-            resetUpsertState()
-            setActiveTab("dashboard")
+            resetUpsertState();
+            setActiveTab("dashboard");
         } catch (error) {
-            setErrorMessage(getReviewApiErrorMessage(error, "Unable to complete bulk upload."))
+            setErrorMessage(getReviewApiErrorMessage(error, "Unable to complete bulk upload."));
         } finally {
-            setDraft((d) => ({ ...d, isUploading: false }))
+            setDraft((d) => ({ ...d, isUploading: false }));
         }
     }
 
@@ -215,5 +223,5 @@ export function useReviews() {
         handleDeleteReview,
         handleSaveChanges,
         handleBulkUpload,
-    }
+    };
 }

@@ -1,7 +1,9 @@
 .site-footer {
+    width: 100%;
     border-top: 1px solid var(--border);
     background: var(--nav-bg);
     padding: 1.5rem 1rem;
+    box-sizing: border-box;
 }
 
 .site-footer-inner {
