@@ -45,7 +45,7 @@ function AdminProductsPage() {
     } = useAdminProductFilters(products, departments, categories)
 
     const { setPage, safePage, totalPages, pagedItems } =
-        usePagination(visibleProducts, 6)
+        usePagination(visibleProducts, 8)
 
     const [isFilterOpen, setIsFilterOpen] = useState(false)
 
@@ -82,7 +82,7 @@ function AdminProductsPage() {
                         isLoading={isLoading}
                         items={visibleProducts}
                         pagedItems={pagedItems}
-                        pageSize={6}
+                        pageSize={8}
                         safePage={safePage}
                         totalPages={totalPages}
                         setPage={setPage}

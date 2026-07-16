@@ -4,10 +4,18 @@ import {
     deleteOrder,
     getOrderApiErrorMessage,
 } from "../../api/orders.ts"
+import { fetchUsers } from "../../api/users.ts"
 import type { OrderRecord } from "../../types/store.ts"
+
+interface OrderUser {
+    id: number
+    avatar_path: string | null
+    role: string
+}
 
 export function useOrders() {
     const [orders, setOrders] = useState<OrderRecord[]>([])
+    const [users, setUsers] = useState<OrderUser[]>([])
 
     const [isLoading, setIsLoading] = useState(true)
     const [errorMessage, setErrorMessage] = useState("")
@@ -19,8 +27,12 @@ export function useOrders() {
             setErrorMessage("")
 
             try {
-                const data = await fetchOrders()
-                setOrders(data)
+                const [orderData, userData] = await Promise.all([
+                    fetchOrders(),
+                    fetchUsers(),
+                ])
+                setOrders(orderData)
+                setUsers(userData)
             } catch (error) {
                 setErrorMessage(getOrderApiErrorMessage(error, "Unable to load orders."))
             } finally {
@@ -52,6 +64,7 @@ export function useOrders() {
 
     return {
         orders,
+        users,
         isLoading,
         errorMessage,
         successMessage,

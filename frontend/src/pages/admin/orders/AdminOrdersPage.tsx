@@ -4,6 +4,7 @@ import AdminLayout from "../../../components/admin/AdminLayout"
 import Dashboard from "../../../components/admin/shared/Dashboard"
 import AdminOrderTable from "../../../components/tables/order/AdminOrderTable.tsx"
 
+import { useAuth } from "../../../hooks/useAuth"
 import { useOrders } from "../../../hooks/orders/useOrders.ts"
 import { useAdminOrderFilters } from "../../../hooks/orders/useAdminOrderFilters.ts"
 import { usePagination } from "../../../hooks/usePagination"
@@ -11,9 +12,11 @@ import { exportOrdersCsv } from "../../../util/orderCsv"
 
 function AdminOrdersPage() {
     const navigate = useNavigate()
+    const { user: currentUser } = useAuth()
 
     const {
         orders,
+        users,
         isLoading,
         errorMessage,
         successMessage,
@@ -29,7 +32,7 @@ function AdminOrdersPage() {
     } = useAdminOrderFilters(orders)
 
     const { setPage, safePage, totalPages, pagedItems } =
-        usePagination(visibleOrders, 6)
+        usePagination(visibleOrders, 8)
 
     const [isFilterOpen, setIsFilterOpen] = useState(false)
 
@@ -58,7 +61,7 @@ function AdminOrdersPage() {
                 isLoading={isLoading}
                 items={visibleOrders}
                 pagedItems={pagedItems}
-                pageSize={6}
+                pageSize={8}
                 safePage={safePage}
                 totalPages={totalPages}
                 setPage={setPage}
@@ -66,6 +69,8 @@ function AdminOrdersPage() {
                 renderTable={(items) => (
                     <AdminOrderTable
                         items={items}
+                        users={users}
+                        currentUserId={currentUser?.id}   // NEW
                         onEdit={handleViewOrder}
                         onDelete={handleDeleteOrder}
                     />

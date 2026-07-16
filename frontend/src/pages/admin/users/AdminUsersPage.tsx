@@ -5,6 +5,7 @@ import AdminUserTable from "../../../components/tables/user/AdminUserTable.tsx"
 import UpsertForm from "../../../components/admin/shared/UpsertForm"
 import BulkUpload from "../../../components/admin/shared/BulkUpload"
 
+import { useAuth } from "../../../hooks/useAuth"
 import { useUsers } from "../../../hooks/users/useUsers.ts"
 import { useAdminUserFilters } from "../../../hooks/users/useAdminUserFilters.ts"
 import { usePagination } from "../../../hooks/usePagination"
@@ -16,6 +17,8 @@ import {
 import type { AdminTab } from "../../../types/AdminTab"
 
 function AdminUsersPage() {
+    const { user: currentUser } = useAuth()
+
     const {
         users,
         draft,
@@ -43,7 +46,7 @@ function AdminUsersPage() {
     } = useAdminUserFilters(users)
 
     const { setPage, safePage, totalPages, pagedItems } =
-        usePagination(visibleUsers, 6)
+        usePagination(visibleUsers, 8)
 
     const [isFilterOpen, setIsFilterOpen] = useState(false)
 
@@ -76,7 +79,7 @@ function AdminUsersPage() {
                         isLoading={isLoading}
                         items={visibleUsers}
                         pagedItems={pagedItems}
-                        pageSize={6}
+                        pageSize={8}
                         safePage={safePage}
                         totalPages={totalPages}
                         setPage={setPage}
@@ -84,6 +87,7 @@ function AdminUsersPage() {
                         renderTable={(items) => (
                             <AdminUserTable
                                 items={items}
+                                currentUserId={currentUser?.id}
                                 onEdit={handleEditUser}
                                 onDelete={handleDeleteUser}
                             />

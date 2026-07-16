@@ -28,6 +28,8 @@ function AdminReviewsPage() {
     const {
         reviews,
         products,
+        categories,
+        departments,
         users,
         draft,
         setDraft,
@@ -51,10 +53,10 @@ function AdminReviewsPage() {
         filterSections,
         visibleReviews,
         resetFilters,
-    } = useAdminReviewFilters(reviews)
+    } = useAdminReviewFilters(reviews, products, categories, departments)
 
     const { setPage, safePage, totalPages, pagedItems } =
-        usePagination(visibleReviews, 6)
+        usePagination(visibleReviews, 8)
 
     const [isFilterOpen, setIsFilterOpen] = useState(false)
     const [csvPreview, setCsvPreview] = useState<{
@@ -111,7 +113,7 @@ function AdminReviewsPage() {
                         isLoading={isLoading}
                         items={visibleReviews}
                         pagedItems={pagedItems}
-                        pageSize={6}
+                        pageSize={8}
                         safePage={safePage}
                         totalPages={totalPages}
                         setPage={setPage}
@@ -119,6 +121,7 @@ function AdminReviewsPage() {
                         renderTable={(items) => (
                             <AdminReviewTable
                                 items={items}
+                                users={users}
                                 onEdit={handleEditReview}
                                 onDelete={handleDeleteReview}
                             />

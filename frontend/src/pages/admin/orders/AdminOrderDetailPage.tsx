@@ -3,16 +3,44 @@ import { useParams, useNavigate, Link } from "react-router-dom"
 import AdminLayout from "../../../components/admin/AdminLayout"
 import AdminButton from "../../../components/admin/AdminButton"
 import { fetchOrderById, updateOrderStatus, exportOrderDetailCsv } from "../../../api/orders"
+import { fetchUsers } from "../../../api/users"
 import type { OrderDetailRecord } from "../../../types/store"
 import "./AdminOrderDetailPage.css"
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080"
+const DEFAULT_AVATAR = `${apiBaseUrl}/images/other_images/default_avatar.jpg`
+
+interface Customer {
+    id: number
+    avatar_path: string | null
+    role: string
+}
+
+interface UserAvatarProps {
+    avatarPath: string | null | undefined
+    name: string
+}
+
+function UserAvatar({ avatarPath, name }: UserAvatarProps) {
+    const [err, setErr] = useState(false)
+    const src = avatarPath && !err ? `${apiBaseUrl}${avatarPath}` : DEFAULT_AVATAR
+
+    return (
+        <img
+            src={src}
+            alt={name}
+            className="rf-order-detail-customer-avatar"
+            onError={() => setErr(true)}
+        />
+    )
+}
 
 function AdminOrderDetailPage() {
     const { id } = useParams<{ id: string }>()
     const navigate = useNavigate()
 
     const [order, setOrder] = useState<OrderDetailRecord | null>(null)
+    const [customer, setCustomer] = useState<Customer | null>(null)
     const [status, setStatus] = useState("")
     const [isSaving, setIsSaving] = useState(false)
     const [errorMessage, setErrorMessage] = useState("")
@@ -22,9 +50,13 @@ function AdminOrderDetailPage() {
         async function load() {
             if (!id) return
             try {
-                const data = await fetchOrderById(Number(id))
+                const [data, users] = await Promise.all([
+                    fetchOrderById(Number(id)),
+                    fetchUsers(),
+                ])
                 setOrder(data)
                 setStatus(data.status)
+                setCustomer(users.find((u: Customer) => u.id === data.userId) ?? null)
             } catch (error) {
                 setErrorMessage("Unable to load order: " + error)
             }
@@ -80,19 +112,35 @@ function AdminOrderDetailPage() {
                 ← Back to Orders
             </Link>
 
-            <div style={{ marginBottom: "24px" }}>
-                <h1 style={{ fontSize: "32px", fontWeight: "700", margin: "8px 0" }}>
-                    Order #{order.id}
-                </h1>
-                <p className="rf-order-detail-subtitle">
-                    Customer: {order.userEmail}
-                </p>
-            </div>
+            <div className="rf-order-detail-header">
+                <div className="rf-order-detail-heading">
+                    <div className="rf-order-detail-heading-main">
+                        <h1 className="rf-order-detail-title">Order #{order.id}</h1>
+                        <span className="rf-order-status-badge" data-status={order.status}>
+                            {order.status}
+                        </span>
+                    </div>
 
-            <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}>
-                <AdminButton variant="surface" onClick={handleExportCsv}>
-                    Download CSV
-                </AdminButton>
+                    <div className="rf-order-detail-customer">
+                        <UserAvatar avatarPath={customer?.avatar_path} name={order.userEmail} />
+                        <div className="rf-order-detail-customer-info">
+                            <span className="rf-order-detail-customer-email">{order.userEmail}</span>
+                            {customer?.role && (
+                                <span
+                                    className={`rf-order-role-badge rf-order-role-badge--${customer.role.toLowerCase()}`}
+                                >
+                                    {customer.role}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="rf-order-detail-actions">
+                    <AdminButton variant="surface" onClick={handleExportCsv}>
+                        Download CSV
+                    </AdminButton>
+                </div>
             </div>
 
             {errorMessage && (
@@ -162,7 +210,7 @@ function AdminOrderDetailPage() {
                             <td>
                                 <Link
                                     to={`/products/${item.productId}`}
-                                    style={{ color: "var(--primary)", fontWeight: "600" }}
+                                    className="rf-order-item-link"
                                 >
                                     {item.productName}
                                 </Link>
@@ -170,15 +218,24 @@ function AdminOrderDetailPage() {
                             <td>
                                 <Link to={`/products/${item.productId}`}>
                                     <img
-                                        src={`${apiBaseUrl}${item.imagePath}`}
+                                        src={
+                                            item.imagePath
+                                                ? `${apiBaseUrl}${item.imagePath}`
+                                                : `${apiBaseUrl}/images/other_images/dummy_product.jpg`
+                                        }
                                         alt={item.productName}
                                         className="rf-order-item-image"
+                                        onError={(e) => {
+                                            const img = e.target as HTMLImageElement
+                                            img.onerror = null
+                                            img.src = `${apiBaseUrl}/images/other_images/dummy_product.jpg`
+                                        }}
                                     />
                                 </Link>
                             </td>
                             <td>${item.price.toFixed(2)}</td>
                             <td>{item.quantity}</td>
-                            <td style={{ color: "var(--success)", fontWeight: "600" }}>
+                            <td className="rf-order-item-line-total">
                                 ${(item.price * item.quantity).toFixed(2)}
                             </td>
                         </tr>
