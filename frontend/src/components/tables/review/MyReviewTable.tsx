@@ -4,6 +4,9 @@ import type { ReviewRecord } from "../../../types/store";
 import { Link } from "react-router-dom";
 import "./MyReviewTable.css";
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080";
+const FALLBACK_IMAGE = `${apiBaseUrl}/images/other_images/dummy_product.jpg`;
+
 interface MyReviewTableProps {
     items: ReviewRecord[];
     editingId: number | null;
@@ -73,14 +76,15 @@ const MyReviewTable: React.FC<MyReviewTableProps> = ({
                                 <img
                                     src={
                                         r.productImagePath
-                                            ? `http://localhost:5000${r.productImagePath}`
-                                            : "http://localhost:5000/images/other_images/dummy_product.jpg"
+                                            ? `${apiBaseUrl}${r.productImagePath}`
+                                            : FALLBACK_IMAGE
                                     }
                                     alt={r.productName}
                                     className="myrev-img"
                                     onError={(e) => {
-                                        (e.target as HTMLImageElement).src =
-                                            "http://localhost:5000/images/other_images/dummy_product.jpg";
+                                        const img = e.target as HTMLImageElement;
+                                        img.onerror = null; // prevent loop if fallback also fails
+                                        img.src = FALLBACK_IMAGE;
                                     }}
                                 />
                             </Link>

@@ -33,6 +33,10 @@ export interface ReviewBulkResultDto {
     inserted: number
 }
 
+// Shared review-domain constants (used by any review form/list, admin or storefront)
+export const RATING_OPTIONS = [5, 4, 3, 2, 1]
+export const COMMENT_PREVIEW_LENGTH = 120
+
 export async function fetchReviews() {
     const { data } = await api.get<ReviewDto[]>('/api/reviews')
     return data

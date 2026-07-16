@@ -5,7 +5,7 @@ function Footer() {
 	return (
 		<footer className="site-footer">
 			<div className="site-footer-inner">
-				<div className="site-footer-brand">RetailForge</div>
+				<div className="site-footer-brand">RF2_P2</div>
 
 				<div className="site-footer-links">
 					<Link to="/products" className="site-footer-link">Products</Link>
@@ -15,7 +15,7 @@ function Footer() {
 				</div>
 
 				<div className="site-footer-copy">
-					© {new Date().getFullYear()} RetailForge. All rights reserved.
+					© {new Date().getFullYear()} RF2_P2. All rights reserved.
 				</div>
 			</div>
 		</footer>

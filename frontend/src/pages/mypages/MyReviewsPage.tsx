@@ -1,16 +1,24 @@
 import { useState } from "react";
+import { Navigate, useLocation, Link } from "react-router-dom";
 import "./MyReviewsPage.css";
 
 import Layout from "../../components/common/Layout";
+import AdvancedSearchPanel from "../../components/common/AdvancedSearchPanel";
+import { useAuth } from "../../hooks/useAuth";
 import { useMyReviews } from "../../hooks/reviews/useMyReviews";
 import { useMyReviewFilters } from "../../hooks/reviews/useMyReviewFilters";
 import { usePagination } from "../../hooks/usePagination";
+import { useStorefrontData } from "../../hooks/products/useStorefrontData";
 import MyReviewTable from "../../components/tables/review/MyReviewTable";
 import type { ReviewRecord } from "../../types/store";
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 6;
 
 function MyReviewsPage() {
+    const { user, loading } = useAuth();
+    const location = useLocation();
+    const { products, categories, departments } = useStorefrontData();
+
     const {
         reviews,
         isLoading,
@@ -28,9 +36,10 @@ function MyReviewsPage() {
         filterSections,
         visibleReviews,
         resetFilters,
-    } = useMyReviewFilters(reviews);
+    } = useMyReviewFilters(reviews, products, categories, departments);
 
-    // Pagination AFTER filtering
+    const [filtersOpen, setFiltersOpen] = useState(false);
+
     const {
         setPage,
         safePage,
@@ -61,96 +70,117 @@ function MyReviewsPage() {
         setEditingId(null);
     }
 
+    if (loading) {
+        return <div className="myrev-fullscreen">Loading...</div>;
+    }
+
+    if (!user) {
+        return <Navigate to="/login" state={{ from: location }} replace />;
+    }
+
+    if (isLoading) {
+        return <div className="myrev-fullscreen">Loading your reviews...</div>;
+    }
+
     return (
         <Layout isStorefront>
             <div className="myrev-page">
-                <h1 className="myrev-title">My Reviews</h1>
-
-                {/* Search + Filters */}
-                <div className="myrev-controls">
-                    <input
-                        type="text"
-                        className="myrev-search"
-                        placeholder="Search your reviews…"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-
-                    <button className="myrev-reset-btn" onClick={resetFilters}>
-                        Reset Filters
-                    </button>
+                <div className="myrev-browse-row">
+                    <Link to="/products" className="myrev-browse-link">
+                        Browse products
+                    </Link>
                 </div>
 
-                {/* Filter Sections */}
-                <div className="myrev-filter-panel">
-                    {filterSections.map((section) => (
-                        <div key={section.key} className="myrev-filter-section">
-                            <div className="myrev-filter-title">{section.title}</div>
-                            <div className="myrev-filter-options">
-                                {section.options.map((opt) => (
-                                    <label key={opt.value} className="myrev-filter-option">
-                                        <input
-                                            type="radio"
-                                            name={section.key}
-                                            value={opt.value}
-                                            checked={section.value === opt.value}
-                                            onChange={() => section.onChange(opt.value)}
-                                        />
-                                        {opt.label}
-                                    </label>
-                                ))}
+                <div className="myrev-panel">
+                    <div className="myrev-panel-header">
+                        <h2 className="myrev-title">My Reviews</h2>
+                        <div className="myrev-subtitle">
+                            View, edit, or delete the reviews you&rsquo;ve written.
+                        </div>
+                    </div>
+
+                    <div className="myrev-panel-body">
+                        {reviews.length > 0 && (
+                            <div className="myrev-search-wrap">
+                                <AdvancedSearchPanel
+                                    title="Advanced Search"
+                                    query={searchTerm}
+                                    onQueryChange={setSearchTerm}
+                                    isOpen={filtersOpen}
+                                    onToggleOpen={() => setFiltersOpen((v) => !v)}
+                                    onSearch={() => setFiltersOpen(false)}
+                                    onReset={resetFilters}
+                                    sections={filterSections}
+                                />
                             </div>
-                        </div>
-                    ))}
+                        )}
+
+                        {errorMessage && <div className="myrev-error">{errorMessage}</div>}
+                        {successMessage && <div className="myrev-success">{successMessage}</div>}
+
+                        {!errorMessage && reviews.length === 0 && (
+                            <div className="myrev-empty">
+                                You haven&rsquo;t written any reviews yet.
+                            </div>
+                        )}
+
+                        {!errorMessage && reviews.length > 0 && visibleReviews.length === 0 && (
+                            <div className="myrev-empty">
+                                No reviews match your search.
+                            </div>
+                        )}
+
+                        {!errorMessage && visibleReviews.length > 0 && (
+                            <div className="myrev-results-bar">
+                                <div className="myrev-results-copy">
+                                    Showing {(safePage - 1) * PAGE_SIZE + 1}-
+                                    {Math.min(safePage * PAGE_SIZE, visibleReviews.length)} of{" "}
+                                    {visibleReviews.length}
+                                </div>
+
+                                <div className="myrev-pagination">
+                                    <button
+                                        type="button"
+                                        className="myrev-page-btn"
+                                        disabled={safePage <= 1}
+                                        onClick={() => setPage((p) => p - 1)}
+                                    >
+                                        Prev
+                                    </button>
+
+                                    <span className="myrev-page-info">
+                                        Page {safePage} / {totalPages}
+                                    </span>
+
+                                    <button
+                                        type="button"
+                                        className="myrev-page-btn"
+                                        disabled={safePage >= totalPages}
+                                        onClick={() => setPage((p) => p + 1)}
+                                    >
+                                        Next
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {pagedItems.length > 0 && (
+                            <MyReviewTable
+                                items={pagedItems}
+                                editingId={editingId}
+                                editRating={editRating}
+                                editComment={editComment}
+                                saving={isSaving}
+                                onStartEdit={startEdit}
+                                onCancelEdit={cancelEdit}
+                                onSaveEdit={saveEdit}
+                                onDeleteReview={handleDeleteReview}
+                                onChangeRating={setEditRating}
+                                onChangeComment={setEditComment}
+                            />
+                        )}
+                    </div>
                 </div>
-
-                {/* Messages */}
-                {errorMessage && <div className="myrev-error">{errorMessage}</div>}
-                {successMessage && <div className="myrev-success">{successMessage}</div>}
-
-                {/* Loading */}
-                {isLoading && <div className="myrev-loading">Loading your reviews…</div>}
-
-                {/* Table + Pagination */}
-                {!isLoading && (
-                    <>
-                        <MyReviewTable
-                            items={pagedItems}
-                            editingId={editingId}
-                            editRating={editRating}
-                            editComment={editComment}
-                            saving={isSaving}
-                            onStartEdit={startEdit}
-                            onCancelEdit={cancelEdit}
-                            onSaveEdit={saveEdit}
-                            onDeleteReview={handleDeleteReview}
-                            onChangeRating={setEditRating}
-                            onChangeComment={setEditComment}
-                        />
-
-                        <div className="myrev-pagination">
-                            <button
-                                className="myrev-page-btn"
-                                disabled={safePage <= 1}
-                                onClick={() => setPage((p) => p - 1)}
-                            >
-                                Prev
-                            </button>
-
-                            <span className="myrev-page-info">
-                                Page {safePage} of {totalPages}
-                            </span>
-
-                            <button
-                                className="myrev-page-btn"
-                                disabled={safePage >= totalPages}
-                                onClick={() => setPage((p) => p + 1)}
-                            >
-                                Next
-                            </button>
-                        </div>
-                    </>
-                )}
             </div>
         </Layout>
     );
