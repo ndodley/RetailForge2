@@ -1,107 +1,118 @@
 .myrev-page {
     width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 12px;
     padding-bottom: 40px;
 }
 
-.myrev-title {
-    font-size: 28px;
-    font-weight: 900;
+.myrev-fullscreen {
+    background: var(--app-bg);
+    padding: 2rem;
+    text-align: center;
     color: var(--text);
 }
 
-.myrev-controls {
+.myrev-browse-row {
     display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
 }
 
-.myrev-search {
-    flex: 1;
-    min-width: 240px;
-    padding: 10px 12px;
-    border-radius: 12px;
-    border: 1.5px solid var(--border);
-    background: var(--surface-2);
-    color: var(--text);
-    font-size: 15px;
-}
-
-.myrev-reset-btn {
-    padding: 10px 14px;
-    border-radius: 12px;
+.myrev-browse-link {
     background: var(--surface-3);
-    border: 1.5px solid var(--border);
-    font-weight: 900;
-    cursor: pointer;
-}
-
-.myrev-filter-panel {
-    background: var(--surface-2);
+    color: var(--text);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-}
-
-.myrev-filter-section {
-    display: flex;
-    flex-direction: column;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-weight: 900;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
     gap: 8px;
 }
 
-.myrev-filter-title {
+.myrev-panel {
+    background: var(--surface-2);
+    border-radius: 18px;
+    box-shadow: var(--shadow-2);
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.myrev-panel-header {
+    padding: 1.75rem 1.5rem 1.25rem;
+    background: var(--nav-bg);
+    border-bottom: 1px solid var(--border);
+}
+
+.myrev-title {
     font-weight: 900;
+    margin: 0;
     color: var(--text);
+    letter-spacing: 0.3px;
+    font-size: 22px;
 }
 
-.myrev-filter-options {
-    display: flex;
-    gap: 14px;
-    flex-wrap: wrap;
+.myrev-subtitle {
+    margin-top: 10px;
+    color: var(--muted);
+    font-weight: 700;
 }
 
-.myrev-filter-option {
+.myrev-panel-body {
+    padding: 1.5rem;
     display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 14px;
-    color: var(--text);
+    flex-direction: column;
+    gap: 16px;
+}
+
+.myrev-search-wrap {
+    margin-bottom: 4px;
 }
 
 .myrev-error {
     background: var(--danger-bg);
     color: var(--danger);
-    padding: 12px;
+    padding: 12px 14px;
     border-radius: 12px;
-    font-weight: 700;
+    font-weight: 800;
 }
 
 .myrev-success {
     background: var(--success-bg);
     color: var(--success);
-    padding: 12px;
+    padding: 12px 14px;
     border-radius: 12px;
-    font-weight: 700;
+    font-weight: 800;
 }
 
-.myrev-loading {
-    font-size: 16px;
+.myrev-empty {
+    color: var(--muted-2);
     font-weight: 700;
-    color: var(--muted);
+    padding: 4px 0;
 }
 
-/* Pagination */
+/* Results bar */
+.myrev-results-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.myrev-results-copy {
+    color: var(--muted-2);
+    font-weight: 800;
+}
+
 .myrev-pagination {
     display: flex;
-    justify-content: center;
     align-items: center;
-    gap: 14px;
-    margin-top: 20px;
+    gap: 10px;
 }
 
 .myrev-page-btn {

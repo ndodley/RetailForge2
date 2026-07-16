@@ -133,7 +133,7 @@ function Navbar() {
 				<div className="navbar-left">
 					<div className="navbar-logo">
 						<Link to="/" className={location.pathname === '/' ? 'active' : ''}>
-							RetailForge
+							RF2_P2
 						</Link>
 					</div>
 
@@ -184,8 +184,9 @@ function Navbar() {
 					>
 						<span className="cart-icon">🛒</span>
 						<span className="cart-text">
-              Cart{cartCount > 0 ? ` (${cartCount})` : ''}
-            </span>
+              				Cart{cartCount > 0 ? ` (${cartCount})` : ''}
+            			</span>
+
 					</Link>
 
 					{user ? (
@@ -198,9 +199,9 @@ function Navbar() {
 								<span className="navbar-avatar">{accountInitials}</span>
 
 								<span className="account-info">
-                  <span className="account-name">{accountDisplayName}</span>
-                  <span className="account-role">{userRoleLabel}</span>
-                </span>
+									<span className="account-name">{accountDisplayName}</span>
+									<span className="account-role">{userRoleLabel}</span>
+								</span>
 
 								<span className="caret accent">▼</span>
 							</button>
@@ -214,32 +215,52 @@ function Navbar() {
 								</li>
 
 								<li>
-									<Link to="/" onClick={() => setAccountOpen(false)} className="navbar-menu-item">
-										<span>🏠</span> Home
+									<Link
+										to="/my-profile"
+										onClick={() => setAccountOpen(false)}
+										className={`navbar-menu-item ${
+											location.pathname === '/my-profile' ? 'navbar-menu-item--active' : ''
+										}`}
+									>
+										<span>👤</span> Profile
 									</Link>
 								</li>
 
 								<li>
 									<Link
-										to="/products"
+										to="/my-orders"
 										onClick={() => setAccountOpen(false)}
-										className="navbar-menu-item"
+										className={`navbar-menu-item ${
+											location.pathname === '/my-orders' ? 'navbar-menu-item--active' : ''
+										}`}
 									>
-										<span>🛍️</span> Products
+										<span>📦</span> My Orders
 									</Link>
 								</li>
 
-								{canAccessAdmin && (
-									<li>
-										<Link
-											to="/admin/products"
-											onClick={() => setAccountOpen(false)}
-											className="navbar-menu-item"
-										>
-											<span>🧰</span> Admin catalog
-										</Link>
-									</li>
-								)}
+								<li>
+									<Link
+										to="/my-reviews"
+										onClick={() => setAccountOpen(false)}
+										className={`navbar-menu-item ${
+											location.pathname === '/my-reviews' ? 'navbar-menu-item--active' : ''
+										}`}
+									>
+										<span>⭐</span> My Reviews
+									</Link>
+								</li>
+
+								<li>
+									<Link
+										to="/my-favorites"
+										onClick={() => setAccountOpen(false)}
+										className={`navbar-menu-item ${
+											location.pathname === '/my-favorites' ? 'navbar-menu-item--active' : ''
+										}`}
+									>
+										<span>❤️</span> My Favorites
+									</Link>
+								</li>
 
 								<li>
 									<button

@@ -35,6 +35,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/departments/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
+
+                        // reviews: any authenticated user can write/edit/delete their own
+                        .requestMatchers(HttpMethod.POST, "/api/reviews/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/reviews/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/reviews/**").authenticated()
 
                         // admin writes
                         .requestMatchers(HttpMethod.POST, "/api/products/**").hasAnyRole("MANAGER", "EMPLOYEE")
