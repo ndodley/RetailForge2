@@ -9,9 +9,19 @@ import {
     type ReviewDto,
 } from "../../api/reviews";
 import { fetchUsers } from "../../api/users";
-import { fetchProducts } from "../../api/productAdminApi";
+import { fetchProducts, type ProductAdminDto } from "../../api/productAdminApi";
+import { fetchCategories, type CategoryDto } from "../../api/categories";
+import { fetchDepartments, type DepartmentDto } from "../../api/departments";
 import type { ReviewRecord } from "../../types/store";
 import { parseReviewCsv } from "../../util/reviewCsv";
+
+interface ReviewUser {
+    id: number;
+    first_name: string;
+    last_name: string;
+    email: string;
+    avatar_path: string | null;
+}
 
 function mapDtoToRecord(dto: ReviewDto): ReviewRecord {
     return {
@@ -31,8 +41,10 @@ function mapDtoToRecord(dto: ReviewDto): ReviewRecord {
 
 export function useReviews() {
     const [reviews, setReviews] = useState<ReviewRecord[]>([]);
-    const [users, setUsers] = useState<{ id: number; first_name: string; last_name: string; email: string }[]>([]);
-    const [products, setProducts] = useState<{ id: number; name: string }[]>([]);
+    const [users, setUsers] = useState<ReviewUser[]>([]);
+    const [products, setProducts] = useState<ProductAdminDto[]>([]);
+    const [categories, setCategories] = useState<CategoryDto[]>([]);
+    const [departments, setDepartments] = useState<DepartmentDto[]>([]);
 
     const [activeTab, setActiveTab] = useState<"dashboard" | "upsert">("dashboard");
     const [selectedReviewId, setSelectedReviewId] = useState<number | null>(null);
@@ -59,15 +71,19 @@ export function useReviews() {
             setErrorMessage("");
 
             try {
-                const [reviewRes, userRes, productRes] = await Promise.all([
+                const [reviewRes, userRes, productRes, categoryRes, departmentRes] = await Promise.all([
                     fetchReviews(),
                     fetchUsers(),
                     fetchProducts(),
+                    fetchCategories(),
+                    fetchDepartments(),
                 ]);
 
                 setReviews(reviewRes.map(mapDtoToRecord));
                 setUsers(userRes);
                 setProducts(productRes);
+                setCategories(categoryRes);
+                setDepartments(departmentRes);
             } catch (error) {
                 setErrorMessage(getReviewApiErrorMessage(error, "Unable to load reviews."));
             } finally {
@@ -208,6 +224,8 @@ export function useReviews() {
         reviews,
         users,
         products,
+        categories,
+        departments,
         draft,
         setDraft,
         activeTab,

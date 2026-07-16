@@ -4,13 +4,20 @@ import AdminButton from "../../admin/AdminButton.tsx"
 import type { ReviewRecord } from "../../../types/store.ts"
 import "./AdminReviewTable.css"
 
+interface ReviewUser {
+    id: number
+    avatar_path: string | null
+}
+
 interface ReviewTableProps {
     items: ReviewRecord[]
+    users: ReviewUser[]
     onEdit: (id: number) => void
     onDelete: (id: number) => void
 }
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080"
+const DEFAULT_AVATAR = `${apiBaseUrl}/images/other_images/default_avatar.jpg`
 
 function Stars({ rating }: { rating: number }) {
     const filled = Math.round(rating)
@@ -57,38 +64,65 @@ function ProductThumb({ imagePath, name }: ProductThumbProps) {
     )
 }
 
-function AdminReviewTable({ items, onEdit, onDelete }: ReviewTableProps) {
+interface UserAvatarProps {
+    avatarPath: string | null | undefined
+    name: string
+}
+
+function UserAvatar({ avatarPath, name }: UserAvatarProps) {
+    const [err, setErr] = useState(false)
+    const src = avatarPath && !err ? `${apiBaseUrl}${avatarPath}` : DEFAULT_AVATAR
+
+    return (
+        <img
+            src={src}
+            alt={name}
+            className="rf-review-user-avatar"
+            onError={() => setErr(true)}
+        />
+    )
+}
+
+function AdminReviewTable({ items, users, onEdit, onDelete }: ReviewTableProps) {
     return (
         <Table
             items={items}
-            renderItem={(review) => (
-                <div className="rf-review-card">
-                    <div className="rf-review-top">
-                        <ProductThumb imagePath={review.productImagePath} name={review.productName} />
-                        <div className="rf-review-product-name">{review.productName}</div>
-                        <div className="rf-review-date">{formatDate(review.updated_at)}</div>
-                    </div>
+            renderItem={(review) => {
+                const avatarPath = users.find((u) => u.id === review.userId)?.avatar_path
 
-                    <div className="rf-review-user-row">
-                        <span className="rf-review-user-icon">👤</span>
-                        <span className="rf-review-user-email">User: {review.userEmail}</span>
-                        <Stars rating={review.rating} />
-                    </div>
+                return (
+                    <div className="rf-review-card">
+                        <div className="rf-review-top">
+                            <ProductThumb imagePath={review.productImagePath} name={review.productName} />
+                            <div className="rf-review-product-name">{review.productName}</div>
+                            <div className="rf-review-date">{formatDate(review.updated_at)}</div>
+                        </div>
 
-                    <div className="rf-review-comment">
-                        {review.comment || <em>No comment</em>}
-                    </div>
+                        <div className="rf-review-user-row">
+                            <UserAvatar avatarPath={avatarPath} name={review.userEmail} />
+                            <div className="rf-review-user-info">
+                                <Stars rating={review.rating} />
+                                <span className="rf-review-user-email" title={review.userEmail}>
+                                    {review.userEmail}
+                                </span>
+                            </div>
+                        </div>
 
-                    <div className="rf-review-actions">
-                        <AdminButton variant="pill" icon="edit" onClick={() => onEdit(review.id)}>
-                            Edit
-                        </AdminButton>
-                        <AdminButton variant="danger" icon="delete" onClick={() => onDelete(review.id)}>
-                            Delete
-                        </AdminButton>
+                        <div className="rf-review-comment">
+                            {review.comment || <em>No comment</em>}
+                        </div>
+
+                        <div className="rf-review-actions">
+                            <AdminButton variant="pill" icon="edit" onClick={() => onEdit(review.id)}>
+                                Edit
+                            </AdminButton>
+                            <AdminButton variant="danger" icon="delete" onClick={() => onDelete(review.id)}>
+                                Delete
+                            </AdminButton>
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }}
         />
     )
 }

@@ -1,7 +1,40 @@
 .rf-order-card-content {
+    position: relative;
+}
+
+.rf-order-card-content--current::before {
+    content: "";
+    position: absolute;
+    inset: -16px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--success, #2e7d32) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--success, #2e7d32) 40%, transparent);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.rf-order-card-content > * {
+    position: relative;
+    z-index: 1;
+}
+
+.rf-order-you-badge {
+    flex-shrink: 0;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: #fff;
+    background: var(--success, #2e7d32);
+    padding: 2px 8px;
+    border-radius: 999px;
+}
+
+.rf-order-user-name-row {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
 }
 
 .rf-order-header {
@@ -12,18 +45,19 @@
 }
 
 .rf-order-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text);
+    font-size: 17px;
+    font-weight: 900;
+    color: var(--admin-text-strong, var(--text));
 }
 
 .rf-order-status-badge {
     display: inline-block;
     padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: capitalize;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
 }
 
 .rf-order-status-badge[data-status="pending"] {
@@ -46,6 +80,80 @@
     color: #f44336;
 }
 
+.rf-order-user-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--admin-border, var(--border));
+}
+
+.rf-order-user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    margin-top: 2px;
+    border: 2px solid var(--admin-surface-3);
+}
+
+.rf-order-user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    flex: 1;
+}
+
+.rf-order-user-email {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--admin-text, var(--text));
+    overflow-wrap: anywhere;
+    white-space: normal;
+    line-height: 1.35;
+}
+
+.rf-order-role-badge {
+    align-self: flex-start;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: var(--admin-surface-3);
+    color: var(--admin-text-muted);
+}
+
+.rf-order-badge-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.rf-order-role-badge--manager {
+    background: color-mix(in srgb, var(--accent, #ff9800) 18%, transparent);
+    color: var(--accent, #ff9800);
+}
+
+.rf-order-role-badge--admin {
+    background: color-mix(in srgb, var(--danger, #e53935) 18%, transparent);
+    color: var(--danger, #e53935);
+}
+
+.rf-order-role-badge--employee {
+    background: color-mix(in srgb, #3b82f6 18%, transparent);
+    color: #3b82f6;
+}
+
+.rf-order-role-badge--customer {
+    background: color-mix(in srgb, #8b5cf6 18%, transparent);
+    color: #8b5cf6;
+}
+
 .rf-order-info {
     display: flex;
     flex-direction: column;
@@ -54,28 +162,43 @@
 
 .rf-order-info-item {
     display: flex;
-    gap: 8px;
-    font-size: 14px;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
 }
 
 .rf-order-label {
-    font-weight: 600;
-    color: var(--text-secondary);
-    min-width: 60px;
+    font-weight: 700;
+    color: var(--admin-text-muted, var(--text-secondary));
 }
 
 .rf-order-value {
-    color: var(--text);
+    color: var(--admin-text, var(--text));
+    font-weight: 600;
 }
 
 .rf-order-value--price {
     color: var(--success);
-    font-weight: 600;
+    font-weight: 800;
 }
 
 .rf-order-actions {
     display: flex;
     gap: 8px;
-    padding-top: 8px;
-    border-top: 1px solid var(--border);
+    padding-top: 10px;
+    border-top: 1px solid var(--admin-border, var(--border));
+}
+
+.rf-order-actions .rf-admin-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 8px 8px;
+    font-size: 12.5px;
+    gap: 4px;
+    white-space: nowrap;
+    box-shadow: none;
+}
+
+.rf-order-actions .rf-admin-btn .rf-admin-btn-label {
+    white-space: nowrap;
 }

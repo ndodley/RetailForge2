@@ -43,7 +43,7 @@ function AdminDepartmentsPage() {
   } = useAdminDepartmentFilters(departments)
 
   const { setPage, safePage, totalPages, pagedItems } =
-      usePagination(visibleDepartments, 6)
+      usePagination(visibleDepartments, 8)
 
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
@@ -76,7 +76,7 @@ function AdminDepartmentsPage() {
                   isLoading={isLoading}
                   items={visibleDepartments}
                   pagedItems={pagedItems}
-                  pageSize={6}
+                  pageSize={8}
                   safePage={safePage}
                   totalPages={totalPages}
                   setPage={setPage}

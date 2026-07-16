@@ -44,7 +44,7 @@ function AdminCategoriesPage() {
   } = useAdminCategoryFilters(categories, departments)
 
   const { setPage, safePage, totalPages, pagedItems } =
-      usePagination(visibleCategories, 6)
+      usePagination(visibleCategories, 8)
 
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
@@ -79,7 +79,7 @@ function AdminCategoriesPage() {
                   isLoading={isLoading}
                   items={visibleCategories}
                   pagedItems={pagedItems}
-                  pageSize={6}
+                  pageSize={8}
                   safePage={safePage}
                   totalPages={totalPages}
                   setPage={setPage}

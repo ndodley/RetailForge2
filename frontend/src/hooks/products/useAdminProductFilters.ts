@@ -31,8 +31,8 @@ export function useAdminProductFilters(
         )
     }, [categories, departmentFilter])
 
-    const filterSections: FilterSection[] = useMemo(
-        () => [
+    const filterSections: FilterSection[] = useMemo(() => {
+        const sections: FilterSection[] = [
             {
                 key: "sort",
                 title: "Sort By",
@@ -74,7 +74,11 @@ export function useAdminProductFilters(
                     })),
                 ],
             },
-            {
+        ]
+
+        // Category only becomes accessible once a real department is picked
+        if (departmentFilter !== "all") {
+            sections.push({
                 key: "category",
                 title: "Category",
                 type: "radio",
@@ -87,10 +91,11 @@ export function useAdminProductFilters(
                         value: String(c.id),
                     })),
                 ],
-            },
-        ],
-        [sortField, sortOrder, departmentFilter, categoryFilter, filteredCategories, departments]
-    )
+            })
+        }
+
+        return sections
+    }, [sortField, sortOrder, departmentFilter, categoryFilter, filteredCategories, departments])
 
     const visibleProducts = useMemo(() => {
         let filtered = [...products]

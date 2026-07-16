@@ -1,16 +1,26 @@
 import { useMemo, useState } from "react"
 import type { ReviewRecord } from "../../types/store.ts"
 import type { FilterSection } from "../../components/common/AdvancedSearchPanel.tsx"
+import type { ProductAdminDto } from "../../api/productAdminApi.ts"
+import type { CategoryDto } from "../../api/categories.ts"
+import type { DepartmentDto } from "../../api/departments.ts"
 
 type SortField = "best" | "date" | "rating" | "product" | "user"
 type SortOrder = "asc" | "desc"
 
-export function useAdminReviewFilters(reviews: ReviewRecord[]) {
+export function useAdminReviewFilters(
+    reviews: ReviewRecord[],
+    products: ProductAdminDto[] = [],
+    categories: CategoryDto[] = [],
+    departments: DepartmentDto[] = []
+) {
     const [searchTerm, setSearchTerm] = useState("")
     const [sortField, setSortField] = useState<SortField>("best")
     const [sortOrder, setSortOrder] = useState<SortOrder>("asc")
     const [productFilter, setProductFilter] = useState<string>("all")
     const [ratingFilter, setRatingFilter] = useState<string>("all")
+    const [departmentFilter, setDepartmentFilter] = useState<string>("all")
+    const [categoryFilter, setCategoryFilter] = useState<string>("all")
 
     function resetFilters() {
         setSearchTerm("")
@@ -18,21 +28,42 @@ export function useAdminReviewFilters(reviews: ReviewRecord[]) {
         setSortOrder("asc")
         setProductFilter("all")
         setRatingFilter("all")
+        setDepartmentFilter("all")
+        setCategoryFilter("all")
     }
+
+    // productId -> product metadata, so a review can be traced to its department/category
+    const productMetaById = useMemo(() => {
+        const map = new Map<number, ProductAdminDto>()
+        products.forEach((p) => map.set(p.id, p))
+        return map
+    }, [products])
 
     const reviewProductOptions = useMemo(() => {
         const seen = new Set<number>()
-        return reviews
-            .filter((r) => {
-                if (seen.has(r.productId)) return false
-                seen.add(r.productId)
-                return true
-            })
-            .map((r) => ({ value: String(r.productId), label: r.productName }))
-    }, [reviews])
+        const options: { value: string; label: string }[] = []
 
-    const filterSections: FilterSection[] = useMemo(
-        () => [
+        for (const r of reviews) {
+            if (seen.has(r.productId)) continue
+
+            const meta = productMetaById.get(r.productId)
+            if (departmentFilter !== "all" && String(meta?.departmentId) !== departmentFilter) continue
+            if (categoryFilter !== "all" && String(meta?.categoryId) !== categoryFilter) continue
+
+            seen.add(r.productId)
+            options.push({ value: String(r.productId), label: r.productName })
+        }
+
+        return options
+    }, [reviews, productMetaById, departmentFilter, categoryFilter])
+
+    const availableCategories = useMemo(() => {
+        if (departmentFilter === "all") return categories
+        return categories.filter((c) => String(c.departmentId) === departmentFilter)
+    }, [categories, departmentFilter])
+
+    const filterSections: FilterSection[] = useMemo(() => {
+        const sections: FilterSection[] = [
             {
                 key: "sort",
                 title: "Sort By",
@@ -59,6 +90,43 @@ export function useAdminReviewFilters(reviews: ReviewRecord[]) {
                 ],
             },
             {
+                key: "department",
+                title: "Department",
+                type: "radio",
+                value: departmentFilter,
+                onChange: (v) => {
+                    setDepartmentFilter(String(v))
+                    setCategoryFilter("all")
+                    setProductFilter("all")
+                },
+                options: [
+                    { value: "all", label: "All Departments" },
+                    ...departments.map((d) => ({ value: String(d.id), label: d.name })),
+                ],
+            },
+        ]
+
+        // Category only becomes accessible once a real department is picked
+        if (departmentFilter !== "all") {
+            sections.push({
+                key: "category",
+                title: "Category",
+                type: "radio",
+                value: categoryFilter,
+                onChange: (v) => {
+                    setCategoryFilter(String(v))
+                    setProductFilter("all")
+                },
+                options: [
+                    { value: "all", label: "All Categories" },
+                    ...availableCategories.map((c) => ({ value: String(c.id), label: c.name })),
+                ],
+            })
+        }
+
+        // Product only becomes accessible once a real category is picked
+        if (categoryFilter !== "all") {
+            sections.push({
                 key: "product",
                 title: "Product",
                 type: "radio",
@@ -68,25 +136,30 @@ export function useAdminReviewFilters(reviews: ReviewRecord[]) {
                     { value: "all", label: "All" },
                     ...reviewProductOptions,
                 ],
-            },
-            {
-                key: "rating",
-                title: "Rating",
-                type: "radio",
-                value: ratingFilter,
-                onChange: (v) => setRatingFilter(String(v)),
-                options: [
-                    { value: "all", label: "All" },
-                    { value: "5", label: "5 Stars" },
-                    { value: "4", label: "4 Stars" },
-                    { value: "3", label: "3 Stars" },
-                    { value: "2", label: "2 Stars" },
-                    { value: "1", label: "1 Star" },
-                ],
-            },
-        ],
-        [sortField, sortOrder, productFilter, ratingFilter, reviewProductOptions]
-    )
+            })
+        }
+
+        sections.push({
+            key: "rating",
+            title: "Rating",
+            type: "radio",
+            value: ratingFilter,
+            onChange: (v) => setRatingFilter(String(v)),
+            options: [
+                { value: "all", label: "All" },
+                { value: "5", label: "5 Stars" },
+                { value: "4", label: "4 Stars" },
+                { value: "3", label: "3 Stars" },
+                { value: "2", label: "2 Stars" },
+                { value: "1", label: "1 Star" },
+            ],
+        })
+
+        return sections
+    }, [
+        sortField, sortOrder, productFilter, ratingFilter, reviewProductOptions,
+        departmentFilter, categoryFilter, departments, availableCategories,
+    ])
 
     const visibleReviews = useMemo(() => {
         let filtered = [...reviews]
@@ -110,6 +183,18 @@ export function useAdminReviewFilters(reviews: ReviewRecord[]) {
             filtered = filtered.filter((r) => Math.round(r.rating) === target)
         }
 
+        if (categoryFilter !== "all") {
+            filtered = filtered.filter((r) => {
+                const meta = productMetaById.get(r.productId)
+                return meta ? String(meta.categoryId) === categoryFilter : false
+            })
+        } else if (departmentFilter !== "all") {
+            filtered = filtered.filter((r) => {
+                const meta = productMetaById.get(r.productId)
+                return meta ? String(meta.departmentId) === departmentFilter : false
+            })
+        }
+
         filtered = [...filtered].sort((a, b) => {
             let cmp = 0
             if (sortField === "best") cmp = b.rating - a.rating
@@ -121,7 +206,10 @@ export function useAdminReviewFilters(reviews: ReviewRecord[]) {
         })
 
         return filtered
-    }, [reviews, searchTerm, sortField, sortOrder, productFilter, ratingFilter])
+    }, [
+        reviews, searchTerm, sortField, sortOrder, productFilter, ratingFilter,
+        categoryFilter, departmentFilter, productMetaById,
+    ])
 
     return {
         searchTerm,
