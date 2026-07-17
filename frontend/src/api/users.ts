@@ -50,6 +50,11 @@ export async function fetchUsers() {
     return data.map(mapDtoToRecord)
 }
 
+export async function fetchUserById(id: number) {
+    const { data } = await apiClient.get<UserDto>(`/api/users/${id}`)
+    return mapDtoToRecord(data)
+}
+
 export async function createUser(payload: any) {
     // Map frontend fields to backend fields
     const backendPayload = {
@@ -90,6 +95,16 @@ export async function updateUser(id: number, payload: any) {
 
 export async function deleteUser(id: number) {
     await apiClient.delete(`/api/users/${id}`)
+}
+
+export async function uploadUserAvatar(id: number, file: File) {
+    const form = new FormData()
+    form.append("avatar", file)
+
+    const { data } = await apiClient.put<UserDto>(`/api/users/${id}/avatar`, form, {
+        headers: { "Content-Type": "multipart/form-data" },
+    })
+    return mapDtoToRecord(data)
 }
 
 export async function bulkCreateUsers(rows: UserBulkRowDto[]) {

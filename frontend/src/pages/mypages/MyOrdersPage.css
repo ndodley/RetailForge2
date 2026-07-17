@@ -1,0 +1,138 @@
+.myord-page {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 40px;
+}
+
+.myord-fullscreen {
+    background: var(--app-bg);
+    padding: 2rem;
+    text-align: center;
+    color: var(--text);
+}
+
+.myord-browse-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.myord-browse-link {
+    background: var(--surface-3);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-weight: 900;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.myord-browse-link:hover {
+    transform: translateY(-1px);
+    background: var(--surface-2);
+}
+
+.myord-panel {
+    background: var(--surface-2);
+    border-radius: 18px;
+    box-shadow: var(--shadow-2);
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.myord-panel-header {
+    padding: 1.75rem 1.5rem 1.25rem;
+    background: var(--nav-bg);
+    border-bottom: 1px solid var(--border);
+}
+
+.myord-title {
+    font-weight: 900;
+    margin: 0;
+    color: var(--text);
+    letter-spacing: 0.3px;
+    font-size: 22px;
+}
+
+.myord-subtitle {
+    margin-top: 10px;
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.myord-panel-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.myord-search-wrap {
+    margin-bottom: 4px;
+}
+
+.myord-error {
+    background: var(--danger-bg);
+    color: var(--danger);
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-weight: 800;
+}
+
+.myord-empty {
+    color: var(--muted-2);
+    font-weight: 700;
+    padding: 4px 0;
+}
+
+.myord-empty-link {
+    color: var(--link);
+    font-weight: 800;
+    text-decoration: underline;
+}
+
+.myord-results-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.myord-results-copy {
+    color: var(--muted-2);
+    font-weight: 800;
+}
+
+.myord-pagination {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.myord-page-btn {
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: var(--surface-3);
+    border: 1.5px solid var(--border);
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.myord-page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.myord-page-info {
+    font-weight: 900;
+    color: var(--text);
+}
