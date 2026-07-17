@@ -2,14 +2,18 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getApiErrorMessage } from '../api/departments.ts'
 import { buildBackendImageUrl, fetchStoreProducts, type StoreProductDto } from '../api/products.ts'
+import { useAuth } from '../hooks/useAuth'
+import { useFavorites } from '../hooks/useFavorites'
+import './HomeProductShowcase.css'
 
 function HomeProductShowcase() {
   const scrollerRef = useRef<HTMLDivElement | null>(null)
   const navigate = useNavigate()
+  const { user } = useAuth()
+  const { isFavorite, toggleFavorite } = useFavorites()
   const [products, setProducts] = useState<StoreProductDto[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [favoriteIds, setFavoriteIds] = useState<number[]>([])
 
   useEffect(() => {
     let isMounted = true
@@ -101,18 +105,19 @@ function HomeProductShowcase() {
             <div className="home-showcase__cardFrame">
               <button
                 type="button"
-                className="home-showcase__favorite"
+                className={`home-showcase__favorite${isFavorite(product.id) ? ' home-showcase__favorite--active' : ''}`}
                 onClick={(event) => {
                   event.stopPropagation()
-                  setFavoriteIds((currentIds) =>
-                    currentIds.includes(product.id)
-                      ? currentIds.filter((id) => id !== product.id)
-                      : [...currentIds, product.id],
-                  )
+                  if (!user) {
+                    navigate('/auth?tab=login')
+                    return
+                  }
+                  void toggleFavorite(product.id)
                 }}
-                title={favoriteIds.includes(product.id) ? 'Remove from favorites' : 'Add to favorites'}
+                title={isFavorite(product.id) ? 'Remove from favorites' : 'Add to favorites'}
+                aria-label={isFavorite(product.id) ? 'Remove from favorites' : 'Add to favorites'}
               >
-                {favoriteIds.includes(product.id) ? '★' : '☆'}
+                {isFavorite(product.id) ? '♥' : '♡'}
               </button>
 
               <div className="home-showcase__imageWrap">

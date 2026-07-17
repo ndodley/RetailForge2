@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { addProductToCart, removeFromCart, fetchCart } from '../../api/cart'
 import { buildBackendImageUrl, type StoreProductDto } from '../../api/products'
 import { useAuth } from '../../hooks/useAuth'
+import { useFavorites } from '../../hooks/useFavorites'
 import './ProductCard.css'
 
 interface ProductCardProps {
@@ -16,8 +17,9 @@ function formatPrice(price: number) {
 function ProductCard({ product }: ProductCardProps) {
 	const navigate = useNavigate()
 	const { user } = useAuth()
+	const { isFavorite, toggleFavorite } = useFavorites()
 
-	const [favorite, setFavorite] = useState(false)
+	const favorite = isFavorite(product.id)
 	const [failedImageSrc, setFailedImageSrc] = useState<string | null>(null)
 	const [cartCount, setCartCount] = useState(0)
 
@@ -109,12 +111,16 @@ function ProductCard({ product }: ProductCardProps) {
 				className={`store-product-card__favorite${favorite ? ' store-product-card__favorite--active' : ''}`}
 				onClick={(event) => {
 					event.stopPropagation()
-					setFavorite((currentValue) => !currentValue)
+					if (!user) {
+						navigate('/auth?tab=login')
+						return
+					}
+					void toggleFavorite(product.id)
 				}}
 				title={favorite ? 'Remove from favorites' : 'Add to favorites'}
 				aria-label={favorite ? 'Remove from favorites' : 'Add to favorites'}
 			>
-				{favorite ? '★' : '☆'}
+				{favorite ? '♥' : '♡'}
 			</button>
 
 			<div className="store-product-card__image-shell">
