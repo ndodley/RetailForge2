@@ -1,0 +1,144 @@
+.myfav-page {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 40px;
+}
+
+.myfav-fullscreen {
+    background: var(--app-bg);
+    padding: 2rem;
+    text-align: center;
+    color: var(--text);
+}
+
+.myfav-browse-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.myfav-browse-link {
+    background: var(--surface-3);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-weight: 900;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.myfav-browse-link:hover {
+    transform: translateY(-1px);
+    background: var(--surface-2);
+}
+
+.myfav-panel {
+    background: var(--surface-2);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.myfav-panel-header {
+    padding: 1.75rem 1.5rem 1.25rem;
+    background: var(--nav-bg);
+    border-bottom: 1px solid var(--border);
+}
+
+.myfav-title {
+    font-weight: 900;
+    margin: 0;
+    color: var(--text);
+    letter-spacing: 0.3px;
+    font-size: 22px;
+}
+
+.myfav-panel-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.myfav-search-wrap {
+    margin-bottom: 4px;
+}
+
+.myfav-error {
+    background: var(--danger-soft);
+    color: var(--danger);
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-weight: 800;
+}
+
+.myfav-empty {
+    color: var(--muted-2);
+    font-weight: 700;
+    padding: 4px 0;
+}
+
+.myfav-empty-link {
+    color: var(--link);
+    font-weight: 800;
+    text-decoration: underline;
+}
+
+.myfav-results-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.myfav-results-copy {
+    color: var(--muted-2);
+    font-weight: 800;
+}
+
+.myfav-pagination {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.myfav-page-btn {
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: var(--surface-3);
+    border: 1.5px solid var(--border);
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.myfav-page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.myfav-page-info {
+    font-weight: 900;
+    color: var(--text);
+}
+
+.myfav-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 18px;
+    align-items: stretch;
+}
+
+.myfav-grid-item {
+    display: flex;
+    justify-content: center;
+}

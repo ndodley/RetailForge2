@@ -32,7 +32,7 @@ function HomePage() {
 			<div className="home-page">
 				<section className="home-landing">
 					<h1 className="home-landing__title">
-						Welcome to <span>RetailForge</span>
+						Welcome to <span>RF2_P2</span>
 					</h1>
 					<p className="home-landing__subtitle">
 						Discover the best deals on electronics, games, fashion, and more. Shop with confidence and

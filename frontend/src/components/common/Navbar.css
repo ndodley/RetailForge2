@@ -87,9 +87,12 @@
   padding: 8px;
   margin: 0;
   min-width: 190px;
+  max-width: min(320px, calc(100vw - 32px));
+  box-sizing: border-box;
   z-index: 1000;
   display: none;
   list-style: none;
+  overflow: hidden;
 }
 
 .navbar-menu.open {
@@ -114,6 +117,14 @@
   font-weight: 900;
   border-radius: 10px;
   transition: background 0.2s;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+}
+
+.navbar-menu-item span:not(.account-role) {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .navbar-menu-item:hover {
@@ -213,7 +224,18 @@
 
 /* MOBILE */
 @media (max-width: 768px) {
-  .navbar .site-header__inner {
+  .navbar-inner {
+    flex-wrap: wrap;
     align-items: flex-start;
+  }
+
+  .navbar-right {
+    margin-left: 0;
+    flex-shrink: 1;
+    flex-wrap: wrap;
+  }
+
+  .account-name {
+    max-width: 140px;
   }
 }

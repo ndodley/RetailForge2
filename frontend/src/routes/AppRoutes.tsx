@@ -14,7 +14,7 @@ import AdminUsersPage from '../pages/admin/users/AdminUsersPage.tsx'
 import AdminOrdersPage from '../pages/admin/orders/AdminOrdersPage.tsx'
 import AdminOrderDetailPage from '../pages/admin/orders/AdminOrderDetailPage.tsx'
 import MyProfilePage from '../pages/mypages/MyProfilePage'
-//import MyFavoritesPage from '../pages/mypages/MyFavoritesPage'
+import MyFavoritesPage from '../pages/mypages/MyFavoritesPage'
 import MyReviewsPage from '../pages/mypages/MyReviewsPage'
 import MyOrdersPage from '../pages/mypages/MyOrdersPage'
 import OrderDetailsPage from "../pages/mypages/OrderDetailsPage.tsx";
@@ -44,8 +44,7 @@ function AppRoutes() {
                 <Route path="/my-orders" element={<MyOrdersPage />} />
                 <Route path="/order-details/:id" element={<OrderDetailsPage />} />
                 <Route path="/my-profile" element={<MyProfilePage />} />
-                {/*<Route path="/my-favorites" element={<MyFavoritesPage />} />
-                */}
+                <Route path="/my-favorites" element={<MyFavoritesPage />} />
 
                 {/* ⭐ FIXED: Wrap CheckoutPage in <Elements> */}
                 <Route path="/checkout"

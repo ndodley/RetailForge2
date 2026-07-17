@@ -127,6 +127,7 @@
 body {
   margin: 0;
   background: var(--app-bg);
+  overflow-x: hidden;
 }
 
 h1,

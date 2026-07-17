@@ -43,7 +43,7 @@ export function useMyReviewFilters(
         return categories.filter((c) => String(c.departmentId) === selectedDepartment);
     }, [categories, selectedDepartment]);
 
-    // Products narrow to dept/category, and only ones you've actually reviewed
+    // Product options narrow to dept/category, and only ones you've actually reviewed
     const availableProducts = useMemo(() => {
         const reviewedIds = new Set(reviews.map((r) => r.productId));
 
@@ -55,8 +55,8 @@ export function useMyReviewFilters(
         });
     }, [products, reviews, selectedDepartment, selectedCategory]);
 
-    const filterSections: FilterSection[] = useMemo(
-        () => [
+    const filterSections: FilterSection[] = useMemo(() => {
+        const sections: FilterSection[] = [
             {
                 key: "rating",
                 title: "Rating",
@@ -87,7 +87,11 @@ export function useMyReviewFilters(
                     ...departments.map((d) => ({ value: String(d.id), label: d.name })),
                 ],
             },
-            {
+        ];
+
+        // Category only becomes accessible once a real department is picked
+        if (selectedDepartment !== "all") {
+            sections.push({
                 key: "category",
                 title: "Category",
                 type: "radio",
@@ -100,8 +104,12 @@ export function useMyReviewFilters(
                     { value: "all", label: "All Categories" },
                     ...availableCategories.map((c) => ({ value: String(c.id), label: c.name })),
                 ],
-            },
-            {
+            });
+        }
+
+        // Product only becomes accessible once a real category is picked
+        if (selectedCategory !== "all") {
+            sections.push({
                 key: "product",
                 title: "Product",
                 type: "radio",
@@ -111,13 +119,16 @@ export function useMyReviewFilters(
                     { value: "all", label: "All Products" },
                     ...availableProducts.map((p) => ({ value: String(p.id), label: p.name })),
                 ],
-            },
+            });
+        }
+
+        sections.push(
             {
                 key: "sort",
                 title: "Sort",
                 type: "radio",
                 value: sortField,
-                onChange: (v) => setSortField(String(v) as any),
+                onChange: (v) => setSortField(String(v) as "date" | "rating" | "product"),
                 options: [
                     { value: "date", label: "Date" },
                     { value: "rating", label: "Rating" },
@@ -129,19 +140,20 @@ export function useMyReviewFilters(
                 title: "Order",
                 type: "radio",
                 value: sortOrder,
-                onChange: (v) => setSortOrder(String(v) as any),
+                onChange: (v) => setSortOrder(String(v) as "asc" | "desc"),
                 options: [
                     { value: "asc", label: "Ascending" },
                     { value: "desc", label: "Descending" },
                 ],
-            },
-        ],
-        [
-            ratingFilter, sortField, sortOrder,
-            selectedDepartment, selectedCategory, selectedProduct,
-            departments, availableCategories, availableProducts,
-        ]
-    );
+            }
+        );
+
+        return sections;
+    }, [
+        ratingFilter, sortField, sortOrder,
+        selectedDepartment, selectedCategory, selectedProduct,
+        departments, availableCategories, availableProducts,
+    ]);
 
     const visibleReviews = useMemo(() => {
         let filtered = [...reviews];

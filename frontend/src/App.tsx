@@ -1,11 +1,14 @@
 import './App.css'
 import AppRoutes from './routes/AppRoutes'
 import {AuthProvider} from "./context/AuthContext.tsx";
+import {FavoritesProvider} from "./context/FavoritesContext.tsx";
 
 function App() {
   return (
       <AuthProvider>
-        <AppRoutes />
+        <FavoritesProvider>
+          <AppRoutes />
+        </FavoritesProvider>
       </AuthProvider>
   )
 }
