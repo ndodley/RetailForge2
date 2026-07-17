@@ -1,0 +1,128 @@
+.my-order-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-decoration: none;
+    color: inherit;
+    margin: -16px;
+    padding: 16px 16px 16px 13px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--border);
+    background: var(--surface-2);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.my-order-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
+.my-order-card[data-status="pending"] { border-left-color: #ffc107; }
+.my-order-card[data-status="paid"] { border-left-color: #2196f3; }
+.my-order-card[data-status="shipped"] { border-left-color: #4caf50; }
+.my-order-card[data-status="cancelled"] { border-left-color: #f44336; }
+
+.my-order-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.my-order-title {
+    font-size: 17px;
+    font-weight: 900;
+    color: var(--text);
+}
+
+.my-order-status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.my-order-status-badge[data-status="pending"] {
+    background: rgba(255, 193, 7, 0.15);
+    color: #ffc107;
+}
+
+.my-order-status-badge[data-status="paid"] {
+    background: rgba(33, 150, 243, 0.15);
+    color: #2196f3;
+}
+
+.my-order-status-badge[data-status="shipped"] {
+    background: rgba(76, 175, 80, 0.15);
+    color: #4caf50;
+}
+
+.my-order-status-badge[data-status="cancelled"] {
+    background: rgba(244, 67, 54, 0.15);
+    color: #f44336;
+}
+
+.my-order-date {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+.my-order-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+}
+
+.my-order-meta-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 13px;
+}
+
+.my-order-label {
+    font-weight: 700;
+    color: var(--muted);
+    flex-shrink: 0;
+}
+
+.my-order-value {
+    color: var(--text);
+    font-weight: 700;
+    text-align: right;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+.my-order-value--price {
+    color: var(--success);
+    font-weight: 900;
+}
+
+.my-order-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.my-order-items-chip {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: var(--muted-2);
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 999px;
+}

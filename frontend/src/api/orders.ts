@@ -54,6 +54,7 @@ function mapOrder(dto: BackendOrderDto): OrderRecord {
         status: dto.status,
         shippingAddress: dto.address,
         createdAt: formatTimestamp(dto.createdAt),
+        itemCount: dto.items?.length ?? 0,
     }
 }
 
@@ -78,6 +79,11 @@ export async function fetchOrders(): Promise<OrderRecord[]> {
 export async function fetchOrderById(id: number): Promise<OrderDetailRecord> {
     const { data } = await api.get<BackendOrderDto>(`/api/admin/orders/${id}`)
     return mapOrderDetail(data)
+}
+
+export async function fetchOrdersByUserId(userId: number): Promise<OrderRecord[]> {
+    const { data } = await api.get<BackendOrderDto[]>(`/api/admin/orders/user/${userId}`)
+    return data.map(mapOrder)
 }
 
 export async function updateOrderStatus(id: number, status: string): Promise<void> {

@@ -70,6 +70,7 @@ export interface OrderRecord {
   status: string
   shippingAddress: string
   createdAt: string
+  itemCount: number
 }
 
 export interface OrderDetailRecord extends OrderRecord {
