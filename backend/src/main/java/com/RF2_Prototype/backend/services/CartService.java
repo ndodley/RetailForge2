@@ -1,7 +1,7 @@
 package com.RF2_Prototype.backend.services;
 
+import com.RF2_Prototype.backend.mappers.CartMapper;
 import com.RF2_Prototype.backend.models.dtos.CartDto;
-import com.RF2_Prototype.backend.models.dtos.CartItemDto;
 import com.RF2_Prototype.backend.models.entities.*;
 import com.RF2_Prototype.backend.repository.*;
 import com.RF2_Prototype.backend.security.AuthenticatedUser;
@@ -12,9 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class CartService implements ICartService {
@@ -22,6 +19,7 @@ public class CartService implements ICartService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
+    private final CartMapper cartMapper;
 
     private User getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -46,7 +44,7 @@ public class CartService implements ICartService {
         User user = getCurrentUser();
         Cart cart = getOrCreateCart(user);
 
-        return toDto(cart);
+        return cartMapper.toDto(cart);
     }
 
     @Override
@@ -72,7 +70,7 @@ public class CartService implements ICartService {
         item.setQuantity(item.getQuantity() + quantity);
         cartItemRepository.save(item);
 
-        return toDto(cart);
+        return cartMapper.toDto(cart);
     }
 
     @Override
@@ -92,7 +90,7 @@ public class CartService implements ICartService {
             cartItemRepository.save(item);
         }
 
-        return toDto(cart);
+        return cartMapper.toDto(cart);
     }
 
     @Override
@@ -119,37 +117,7 @@ public class CartService implements ICartService {
         cart.getItems().clear();
         cartRepository.save(cart);
 
-        return toDto(cart);
+        return cartMapper.toDto(cart);
     }
 
-    private CartDto toDto(Cart cart) {
-        var items = cart.getItems().stream()
-                .map(ci -> new CartItemDto(
-                        ci.getId(),
-                        ci.getProduct().getId(),
-                        ci.getProduct().getName(),
-                        ci.getProduct().getImagePath(),
-                        ci.getPriceAtTime(),
-                        ci.getQuantity(),
-                        ci.getProduct().getStock()
-                ))
-                .collect(Collectors.toList());
-
-        // BigDecimal subtotal calculation
-        BigDecimal subtotal = items.stream()
-                .map(i -> i.priceAtTime().multiply(BigDecimal.valueOf(i.quantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        int totalItems = items.stream()
-                .mapToInt(CartItemDto::quantity)
-                .sum();
-
-        return new CartDto(
-                cart.getId(),
-                cart.getUser().getId(),
-                items,
-                subtotal,
-                totalItems
-        );
-    }
 }

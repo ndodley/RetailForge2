@@ -6,13 +6,13 @@ export function useMyOrderFilters(orders: OrderRecord[]) {
     const [searchTerm, setSearchTerm] = useState("")
     const [statusFilter, setStatusFilter] = useState<string>("any")
     const [sortField, setSortField] = useState<"date" | "total" | "id">("date")
-    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
+    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
 
     function resetFilters() {
         setSearchTerm("")
         setStatusFilter("any")
         setSortField("date")
-        setSortOrder("desc")
+        setSortOrder("asc")
     }
 
     const filterSections: FilterSection[] = useMemo(
@@ -50,8 +50,8 @@ export function useMyOrderFilters(orders: OrderRecord[]) {
                 value: sortOrder,
                 onChange: (v) => setSortOrder(String(v) as "asc" | "desc"),
                 options: [
-                    { value: "desc", label: "Descending" },
                     { value: "asc", label: "Ascending" },
+                    { value: "desc", label: "Descending" },
                 ],
             },
         ],

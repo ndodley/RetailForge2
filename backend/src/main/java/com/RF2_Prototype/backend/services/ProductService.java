@@ -2,6 +2,7 @@ package com.RF2_Prototype.backend.services;
 
 import com.RF2_Prototype.backend.exception.CategoryNotFoundException;
 import com.RF2_Prototype.backend.exception.ProductNotFoundException;
+import com.RF2_Prototype.backend.mappers.ProductMapper;
 import com.RF2_Prototype.backend.models.dtos.ProductBulkUploadRowDto;
 import com.RF2_Prototype.backend.models.dtos.ProductDto;
 import com.RF2_Prototype.backend.models.dtos.ProductUpsertRequest;
@@ -38,6 +39,7 @@ public class ProductService implements IProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final ProductMapper productMapper;
     private final Path mediaRoot;
     private final Path productImagesDir;
     private final Path otherImagesDir;
@@ -45,10 +47,12 @@ public class ProductService implements IProductService {
     public ProductService(
             ProductRepository productRepository,
             CategoryRepository categoryRepository,
+            ProductMapper productMapper,
             @Value("${app.media.root:${user.dir}/media}") String mediaRoot
     ) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.productMapper = productMapper;
         this.mediaRoot = Path.of(mediaRoot).toAbsolutePath().normalize();
         this.productImagesDir = this.mediaRoot.resolve("product_images");
         this.otherImagesDir = this.mediaRoot.resolve("other_images");
@@ -59,20 +63,20 @@ public class ProductService implements IProductService {
     public List<ProductDto> getProducts() {
         return productRepository.findAll(Sort.by(Sort.Direction.ASC, "id"))
                 .stream()
-                .map(this::toDto)
+                .map(productMapper::toDto)
                 .toList();
     }
 
     @Override
     public ProductDto getProductById(Integer id) {
-        return toDto(getProductEntity(id));
+        return productMapper.toDto(getProductEntity(id));
     }
 
     @Override
     public ProductDto createProduct(ProductUpsertRequest request) {
         Product product = new Product();
         applyProductValues(product, request, null);
-        return toDto(productRepository.save(product));
+        return productMapper.toDto(productRepository.save(product));
     }
 
     @Override
@@ -82,7 +86,7 @@ public class ProductService implements IProductService {
         applyProductValues(product, request, previousImagePath);
         Product savedProduct = productRepository.saveAndFlush(product);
         deleteProductImageIfReplaced(previousImagePath, savedProduct.getImagePath());
-        return toDto(savedProduct);
+        return productMapper.toDto(savedProduct);
     }
 
     @Override
@@ -133,25 +137,6 @@ public class ProductService implements IProductService {
         product.setCategory(category);
         product.setImagePath(normalizeBulkImagePath(row.imagePath()));
         return product;
-    }
-
-    private ProductDto toDto(Product product) {
-        Category category = product.getCategory();
-        Department department = category == null ? null : category.getDepartment();
-        return new ProductDto(
-                product.getId(),
-                product.getName(),
-                product.getBrand(),
-                normalizeRating(product.getRating()),
-                product.getPrice(),
-                product.getDescription(),
-                product.getStock(),
-                product.getImagePath(),
-                category == null ? null : category.getId(),
-                category == null ? null : category.getName(),
-                department == null ? null : department.getId(),
-                department == null ? null : department.getName()
-        );
     }
 
     private Product getProductEntity(Integer id) {

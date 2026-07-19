@@ -1,6 +1,7 @@
 package com.RF2_Prototype.backend.services;
 
 import com.RF2_Prototype.backend.exception.UserNotFoundException;
+import com.RF2_Prototype.backend.mappers.UserMapper;
 import com.RF2_Prototype.backend.models.dtos.AuthUserDto;
 import com.RF2_Prototype.backend.models.dtos.UserBulkUploadRowDto;
 import com.RF2_Prototype.backend.models.entities.User;
@@ -29,14 +30,17 @@ public class UserService implements IUserService {
     private static final String AVATAR_IMAGE_PREFIX = "/images/avatar_images/";
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
     private final Path mediaRoot;
     private final Path avatarImagesDir;
 
     public UserService(
             UserRepository userRepository,
+            UserMapper userMapper,
             @Value("${app.media.root:${user.dir}/media}") String mediaRoot
     ) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
         this.mediaRoot = Path.of(mediaRoot).toAbsolutePath().normalize();
         this.avatarImagesDir = this.mediaRoot.resolve("avatar_images");
         ensureAvatarDirectory();
@@ -46,20 +50,20 @@ public class UserService implements IUserService {
     public List<AuthUserDto> getUsers() {
         return userRepository.findAll(Sort.by(Sort.Direction.ASC, "id"))
                 .stream()
-                .map(this::toDto)
+                .map(userMapper::toDto)
                 .toList();
     }
 
     @Override
     public AuthUserDto getUserById(Integer id) {
-        return toDto(getUserEntity(id));
+        return userMapper.toDto(getUserEntity(id));
     }
 
     @Override
     public AuthUserDto createUser(AuthUserDto userDto) {
         User user = new User();
         applyUserValues(user, userDto);
-        return toDto(userRepository.save(user));
+        return userMapper.toDto(userRepository.save(user));
     }
 
     @Override
@@ -76,7 +80,7 @@ public class UserService implements IUserService {
     public AuthUserDto updateUser(Integer id, AuthUserDto userDto) {
         User user = getUserEntity(id);
         applyUserValues(user, userDto);
-        return toDto(userRepository.save(user));
+        return userMapper.toDto(userRepository.save(user));
     }
 
     @Override
@@ -94,7 +98,7 @@ public class UserService implements IUserService {
 
         deleteAvatarIfReplaced(previousPath, newPath);
 
-        return toDto(saved);
+        return userMapper.toDto(saved);
     }
 
     @Override
@@ -204,19 +208,4 @@ public class UserService implements IUserService {
                 .orElseThrow(() -> new UserNotFoundException(id));
     }
 
-    private AuthUserDto toDto(User user) {
-        return new AuthUserDto(
-                user.getId(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.getPasswordHash(),
-                user.getRole(),
-                user.getPhoneNumber(),
-                user.getAddress(),
-                user.getAvatar_path(),
-                user.getCreatedAt(),
-                user.getUpdatedAt()
-        );
-    }
 }
