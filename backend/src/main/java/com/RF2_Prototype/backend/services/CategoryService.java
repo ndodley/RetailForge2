@@ -2,6 +2,7 @@ package com.RF2_Prototype.backend.services;
 
 import com.RF2_Prototype.backend.exception.CategoryNotFoundException;
 import com.RF2_Prototype.backend.exception.DepartmentNotFoundException;
+import com.RF2_Prototype.backend.mappers.CategoryMapper;
 import com.RF2_Prototype.backend.models.dtos.CategoryBulkUploadRowDto;
 import com.RF2_Prototype.backend.models.dtos.CategoryDto;
 import com.RF2_Prototype.backend.models.entities.Category;
@@ -23,37 +24,43 @@ public class CategoryService implements ICategoryService {
 
     private final CategoryRepository categoryRepository;
     private final DepartmentRepository departmentRepository;
+    private final CategoryMapper categoryMapper;
 
-    public CategoryService(CategoryRepository categoryRepository, DepartmentRepository departmentRepository) {
+    public CategoryService(
+            CategoryRepository categoryRepository,
+            DepartmentRepository departmentRepository,
+            CategoryMapper categoryMapper
+    ) {
         this.categoryRepository = categoryRepository;
         this.departmentRepository = departmentRepository;
+        this.categoryMapper = categoryMapper;
     }
 
     @Override
     public List<CategoryDto> getCategories() {
         return categoryRepository.findAll(Sort.by(Sort.Direction.ASC, "id"))
                 .stream()
-                .map(this::toDto)
+                .map(categoryMapper::toDto)
                 .toList();
     }
 
     @Override
     public CategoryDto getCategoryById(Integer id) {
-        return toDto(getCategoryEntity(id));
+        return categoryMapper.toDto(getCategoryEntity(id));
     }
 
     @Override
     public CategoryDto createCategory(CategoryDto categoryDto) {
         Category category = new Category();
         applyCategoryValues(category, categoryDto);
-        return toDto(categoryRepository.save(category));
+        return categoryMapper.toDto(categoryRepository.save(category));
     }
 
     @Override
     public CategoryDto updateCategory(Integer id, CategoryDto categoryDto) {
         Category category = getCategoryEntity(id);
         applyCategoryValues(category, categoryDto);
-        return toDto(categoryRepository.save(category));
+        return categoryMapper.toDto(categoryRepository.save(category));
     }
 
     @Override
@@ -136,15 +143,5 @@ public class CategoryService implements ICategoryService {
                 .orElseThrow(() -> new DepartmentNotFoundException(id));
     }
 
-    private CategoryDto toDto(Category category) {
-        Department department = category.getDepartment();
-        return new CategoryDto(
-                category.getId(),
-                category.getName(),
-                category.getDescription(),
-                department == null ? null : department.getId(),
-                department == null ? null : department.getName()
-        );
-    }
 }
 

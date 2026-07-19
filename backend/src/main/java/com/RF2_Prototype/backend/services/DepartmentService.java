@@ -1,6 +1,7 @@
 package com.RF2_Prototype.backend.services;
 
 import com.RF2_Prototype.backend.exception.DepartmentNotFoundException;
+import com.RF2_Prototype.backend.mappers.DepartmentMapper;
 import com.RF2_Prototype.backend.models.dtos.DepartmentBulkUploadRowDto;
 import com.RF2_Prototype.backend.models.dtos.DepartmentDto;
 import com.RF2_Prototype.backend.models.entities.Department;
@@ -17,27 +18,29 @@ import java.util.List;
 public class DepartmentService implements IDepartmentService {
 
     private final DepartmentRepository departmentRepository;
+    private final DepartmentMapper departmentMapper;
 
-    public DepartmentService(DepartmentRepository departmentRepository) {
+    public DepartmentService(DepartmentRepository departmentRepository, DepartmentMapper departmentMapper) {
         this.departmentRepository = departmentRepository;
+        this.departmentMapper = departmentMapper;
     }
 
     @Override
     public List<DepartmentDto> getDepartments() {
         return departmentRepository.findAll(Sort.by(Sort.Direction.ASC, "id"))
                 .stream()
-                .map(this::toDto)
+                .map(departmentMapper::toDto)
                 .toList();
     }
 
     @Override
     public DepartmentDto getDepartmentById(Integer id) {
-        return toDto(getDepartmentEntity(id));
+        return departmentMapper.toDto(getDepartmentEntity(id));
     }
 
     @Override
     public DepartmentDto createDepartment(DepartmentDto departmentDto) {
-        return toDto(departmentRepository.save(buildDepartment(departmentDto.name())));
+        return departmentMapper.toDto(departmentRepository.save(buildDepartment(departmentDto.name())));
     }
 
     @Override
@@ -55,7 +58,7 @@ public class DepartmentService implements IDepartmentService {
         Department department = getDepartmentEntity(id);
         department.setName(normalizeName(departmentDto.name()));
 
-        return toDto(departmentRepository.save(department));
+        return departmentMapper.toDto(departmentRepository.save(department));
     }
 
     @Override
@@ -77,9 +80,5 @@ public class DepartmentService implements IDepartmentService {
 
     private String normalizeName(String name) {
         return name.trim();
-    }
-
-    private DepartmentDto toDto(Department department) {
-        return new DepartmentDto(department.getId(), department.getName());
     }
 }
