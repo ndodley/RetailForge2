@@ -1,4 +1,5 @@
 import { parseCsvLine } from "./csvUtils"
+import type { ReviewRecord } from "../types/store"
 
 export async function parseReviewCsv(file: File) {
     const text = await file.text()
@@ -66,7 +67,7 @@ export function parseCsvPreview(text: string) {
         .map((line) => {
             const values = parseCsvLine(line)
             const row: Record<string, string | number> = {}
-            headers.forEach((header, i) => {
+            headers.forEach((_, i) => {
                 row[`col_${i}`] = values[i] ?? ""
             })
             return row
@@ -75,7 +76,7 @@ export function parseCsvPreview(text: string) {
     return { columns, rows }
 }
 
-export function exportReviewsCsv(reviews: any[]) {
+export function exportReviewsCsv(reviews: ReviewRecord[]) {
     const headers = [
         "product_name",
         "email",

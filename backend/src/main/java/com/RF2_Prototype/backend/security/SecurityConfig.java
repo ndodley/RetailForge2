@@ -37,6 +37,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/departments/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
 
+                        // chat widget: available to guests, same as product browsing.
+                        // No rate limiting yet - revisit before this is publicly deployed.
+                        .requestMatchers(HttpMethod.POST, "/api/chat").permitAll()
+
                         // reviews: any authenticated user can write/edit/delete their own
                         .requestMatchers(HttpMethod.POST, "/api/reviews/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/reviews/**").authenticated()

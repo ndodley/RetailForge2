@@ -7,7 +7,7 @@ import org.springframework.boot.webmvc.autoconfigure.error.ErrorMvcAutoConfigura
 @SpringBootApplication(exclude = {ErrorMvcAutoConfiguration.class})
 public class BackendApplication {
 
-	static void main(String[] args) {
+	public static void main(String[] args) {
 		SpringApplication.run(BackendApplication.class, args);
 	}
 

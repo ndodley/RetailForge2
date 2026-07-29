@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useParams, useNavigate, Link } from "react-router-dom"
+import { useParams, Link } from "react-router-dom"
 import AdminLayout from "../../../components/admin/AdminLayout"
 import AdminButton from "../../../components/admin/AdminButton"
 import { fetchOrderById, updateOrderStatus, exportOrderDetailCsv } from "../../../api/orders"
@@ -37,7 +37,6 @@ function UserAvatar({ avatarPath, name }: UserAvatarProps) {
 
 function AdminOrderDetailPage() {
     const { id } = useParams<{ id: string }>()
-    const navigate = useNavigate()
 
     const [order, setOrder] = useState<OrderDetailRecord | null>(null)
     const [customer, setCustomer] = useState<Customer | null>(null)

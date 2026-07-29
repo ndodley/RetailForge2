@@ -1,4 +1,5 @@
 import axios from "axios"
+import type { UserRecord } from "../types/store"
 
 export interface UserDto {
     id: number
@@ -26,13 +27,24 @@ export interface UserBulkResultDto {
     inserted: number
 }
 
+export interface UserUpsertPayload {
+    first_name: string
+    last_name: string
+    email: string
+    password?: string
+    role: string
+    phoneNumber: string
+    address: string
+    avatar_path?: string | null
+}
+
 const apiClient = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080",
     withCredentials: true,
 })
 
 // ✅ Add mapper function to convert backend DTO to frontend Record
-function mapDtoToRecord(dto: any): any {
+function mapDtoToRecord(dto: UserDto): UserRecord {
     return {
         id: dto.id,
         first_name: dto.firstName,  // Map camelCase to snake_case
@@ -55,7 +67,7 @@ export async function fetchUserById(id: number) {
     return mapDtoToRecord(data)
 }
 
-export async function createUser(payload: any) {
+export async function createUser(payload: UserUpsertPayload) {
     // Map frontend fields to backend fields
     const backendPayload = {
         firstName: payload.first_name,
@@ -72,9 +84,9 @@ export async function createUser(payload: any) {
     return mapDtoToRecord(data)
 }
 
-export async function updateUser(id: number, payload: any) {
+export async function updateUser(id: number, payload: UserUpsertPayload) {
     // Map frontend fields to backend fields
-    const backendPayload: any = {
+    const backendPayload: Partial<UserDto> = {
         firstName: payload.first_name,
         lastName: payload.last_name,
         email: payload.email,

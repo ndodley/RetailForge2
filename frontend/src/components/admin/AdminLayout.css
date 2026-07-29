@@ -17,6 +17,13 @@
   margin: 0;
 }
 
+.rf-admin-subtitle {
+  font-size: 14px;
+  color: var(--admin-text-muted);
+  font-weight: 500;
+  margin: 4px 0 0;
+}
+
 .rf-admin-content {
   margin-top: 20px;
 }

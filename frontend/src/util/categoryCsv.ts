@@ -28,11 +28,11 @@ export async function parseCategoryCsv(file: File) {
         .filter((row) => row.name.length > 0)
 }
 
-export function exportCategoriesCsv(rows: any[]) {
+export function exportCategoriesCsv(rows: (string | number | null)[][]) {
     const headers = ["name", "departmentId"]
     const csv = [headers, ...rows]
         .map((row) =>
-            row.map((v: any) => `"${String(v).replaceAll('"', '""')}"`).join(","),
+            row.map((v) => `"${String(v).replaceAll('"', '""')}"`).join(","),
         )
         .join("\n")
 

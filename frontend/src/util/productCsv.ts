@@ -1,4 +1,5 @@
 import type { ProductAdminBulkRowDto } from "../api/productAdminApi"
+import type { ProductRecord } from "../types/store"
 import { parseCsvLine } from "./csvUtils"
 
 export async function parseProductCsv(file: File): Promise<ProductAdminBulkRowDto[]> {
@@ -51,7 +52,7 @@ export async function parseProductCsv(file: File): Promise<ProductAdminBulkRowDt
         .filter((row) => row.name.length > 0 && row.categoryName.length > 0)
 }
 
-export function exportProductsCsv(products: any[]) {
+export function exportProductsCsv(products: ProductRecord[]) {
     const headers = [
         "name",
         "brand",

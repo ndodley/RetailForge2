@@ -5,18 +5,20 @@ import type { AdminTab } from "../../types/AdminTab"
 
 interface AdminLayoutProps {
 	title: string
+	subtitle?: string
 	tabs: { label: string; key: AdminTab }[]
 	activeTab: AdminTab
 	onTabChange: (key: AdminTab) => void
 	children: React.ReactNode
 }
 
-function AdminLayout({ title, tabs = [], activeTab, onTabChange, children }: AdminLayoutProps) {
+function AdminLayout({ title, subtitle, tabs = [], activeTab, onTabChange, children }: AdminLayoutProps) {
 	return (
 		<Layout isAdmin={true}>
 			<div className="rf-admin-page">
 				<header className="rf-admin-header">
 					<h1 className="rf-admin-title">{title}</h1>
+					{subtitle && <p className="rf-admin-subtitle">{subtitle}</p>}
 				</header>
 
 				{tabs.length > 0 && (

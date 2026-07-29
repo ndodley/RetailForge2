@@ -1,4 +1,5 @@
 import { parseCsvLine } from "./csvUtils"
+import type { UserRecord } from "../types/store"
 
 interface UserCsvRow {
     firstName: string
@@ -55,7 +56,7 @@ export async function parseUserCsv(file: File): Promise<UserCsvRow[]> {
         .filter((row) => row.firstName && row.lastName && row.email && row.password && row.role)
 }
 
-export function exportUsersCsv(users: any[]) {
+export function exportUsersCsv(users: UserRecord[]) {
     const headers = [
         "firstName",
         "lastName",
@@ -66,8 +67,8 @@ export function exportUsersCsv(users: any[]) {
         "address",
     ]
     const rows = users.map((u) => [
-        u.firstName,
-        u.lastName,
+        u.first_name,
+        u.last_name,
         u.email,
         "********",
         u.role,
