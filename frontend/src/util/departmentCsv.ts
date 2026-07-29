@@ -1,4 +1,5 @@
 import { parseCsvLine } from "./csvUtils"
+import type { DepartmentRecord } from "../types/store"
 
 export async function parseDepartmentCsv(file: File) {
     const text = await file.text()
@@ -23,7 +24,7 @@ export async function parseDepartmentCsv(file: File) {
         .filter((row) => row.name.length > 0)
 }
 
-export function exportDepartmentsCsv(departments: any[]) {
+export function exportDepartmentsCsv(departments: DepartmentRecord[]) {
     const headers = ["name"]
     const rows = departments.map((d) => [d.name])
 

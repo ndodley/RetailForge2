@@ -21,11 +21,7 @@ interface CartItemDto {
     categoryName?: string | null
 }
 
-function CheckoutForm({}: {
-    clientSecret: string
-    cartItems: CartItemDto[]
-    cartTotal: number
-}) {
+function CheckoutForm() {
     const stripe = useStripe()
     const elements = useElements()
     const navigate = useNavigate()
@@ -190,11 +186,7 @@ export default function CheckoutPage() {
                             stripe={stripePromise}
                             options={{ clientSecret }}
                         >
-                            <CheckoutForm
-                                clientSecret={clientSecret}
-                                cartItems={cartItems}
-                                cartTotal={cartTotal}
-                            />
+                            <CheckoutForm />
                         </Elements>
                     )}
 

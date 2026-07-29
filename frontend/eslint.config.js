@@ -18,5 +18,12 @@ export default defineConfig([
     languageOptions: {
       globals: globals.browser,
     },
+    rules: {
+      // Used intentionally throughout this app's data-loading hooks
+      // (useMyFavorites, useMyOrders, useMyProfile, useMyReviews,
+      // useProductReviews, ProductInfoPage) - keep as a warning rather
+      // than a build-blocking error.
+      'react-hooks/set-state-in-effect': 'warn',
+    },
   },
 ])

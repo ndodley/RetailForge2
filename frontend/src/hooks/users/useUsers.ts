@@ -8,6 +8,7 @@ import {
     getUserApiErrorMessage,
 } from "../../api/users.ts"
 import type { UserRecord } from "../../types/store.ts"
+import type { UserUpsertPayload } from "../../api/users.ts"
 import { parseUserCsv } from "../../util/userCsv.ts"
 
 export function useUsers() {
@@ -129,7 +130,7 @@ export function useUsers() {
         setIsSaving(true)
 
         try {
-            const payload: any = {
+            const payload: UserUpsertPayload = {
                 first_name,
                 last_name,
                 email,

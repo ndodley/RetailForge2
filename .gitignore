@@ -14,6 +14,7 @@
 /backend/build/
 /backend/.mvn/wrapper/maven-wrapper.jar
 /backend/HELP.md
+/backend/application-secrets.properties
 
 # IDE settings
 .idea/
