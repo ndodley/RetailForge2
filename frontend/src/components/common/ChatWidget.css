@@ -23,10 +23,14 @@
 }
 
 .chat-panel {
+    /* Positioned independently of .chat-widget's bottom-right anchor so it
+       can be dragged anywhere on screen - left/top/width/height come from
+       useDraggableResizable's inline style, these are just safe fallbacks. */
+    position: fixed;
     width: 340px;
-    max-width: calc(100vw - 48px);
+    max-width: calc(100vw - 24px);
     height: 460px;
-    max-height: calc(100vh - 120px);
+    max-height: calc(100vh - 24px);
     background: var(--surface-2);
     border: 1px solid var(--border);
     border-radius: 14px;
@@ -44,6 +48,8 @@
     background: var(--nav-bg);
     font-weight: 600;
     color: var(--text-h);
+    cursor: move;
+    user-select: none;
 }
 
 .chat-panel-header button {
@@ -207,4 +213,27 @@
     font-size: 16px;
     cursor: pointer;
     flex-shrink: 0;
+}
+
+/* Resize grip in the panel's bottom-right corner. Diagonal-stripe look via
+   gradient rather than an icon dependency, since this is a small one-off. */
+.chat-resize-handle {
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    width: 14px;
+    height: 14px;
+    cursor: nwse-resize;
+    opacity: 0.55;
+    background:
+        linear-gradient(135deg,
+            transparent 0 40%,
+            var(--muted-2) 40% 55%,
+            transparent 55% 65%,
+            var(--muted-2) 65% 80%,
+            transparent 80% 100%);
+}
+
+.chat-resize-handle:hover {
+    opacity: 1;
 }
