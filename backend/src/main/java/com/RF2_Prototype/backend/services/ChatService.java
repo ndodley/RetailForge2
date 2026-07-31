@@ -1,9 +1,12 @@
 package com.RF2_Prototype.backend.services;
 
 import com.RF2_Prototype.backend.exception.AiProviderException;
+import com.RF2_Prototype.backend.services.iservices.IChatToolsService;
 import com.RF2_Prototype.backend.services.iservices.IChatService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -15,7 +18,7 @@ public class ChatService implements IChatService {
     // The active provider (Anthropic vs OpenAI) is selected via
     // spring.ai.model.chat in application.properties, so this plain
     // ChatClient.Builder injection resolves without ambiguity.
-    public ChatService(ChatClient.Builder chatClientBuilder, ChatProductTools productTools) {
+    public ChatService(ChatClient.Builder chatClientBuilder, IChatToolsService chatToolsService, ChatMemory chatMemory) {
         this.chatClient = chatClientBuilder
                 .defaultSystem("""
                         You are a helpful shopping assistant for this store.
@@ -29,15 +32,17 @@ public class ChatService implements IChatService {
                         Markdown table when the user explicitly asks for one, or when comparing
                         several items across several attributes makes a list hard to read.
                         """)
-                .defaultTools(productTools)
+                .defaultTools(chatToolsService)
+                .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
                 .build();
     }
 
     @Override
-    public String getReply(String message) {
+    public String getReply(String message, String conversationId) {
         try {
             return chatClient.prompt()
                     .user(message)
+                    .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
                     .call()
                     .content();
         } catch (Exception e) {

@@ -1,10 +1,12 @@
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { useChat } from '../../hooks/useChat'
+import { useDraggableResizable } from '../../hooks/useDraggableResizable'
 import './ChatWidget.css'
 
 function ChatWidget() {
     const { open, setOpen, messages, input, setInput, sending, error, scrollRef, sendMessage } = useChat()
+    const { style, onDragMouseDown, onResizeMouseDown } = useDraggableResizable()
 
     function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
         if (e.key === 'Enter') void sendMessage()
@@ -13,10 +15,16 @@ function ChatWidget() {
     return (
         <div className="chat-widget">
             {open && (
-                <div className="chat-panel">
-                    <div className="chat-panel-header">
+                <div className="chat-panel" style={style}>
+                    <div className="chat-panel-header" onMouseDown={onDragMouseDown}>
                         <span>Store Assistant</span>
-                        <button aria-label="Close chat" onClick={() => setOpen(false)}>✕</button>
+                        <button
+                            aria-label="Close chat"
+                            onMouseDown={(e) => e.stopPropagation()}
+                            onClick={() => setOpen(false)}
+                        >
+                            ✕
+                        </button>
                     </div>
 
                     <div className="chat-panel-body" ref={scrollRef}>
@@ -72,6 +80,12 @@ function ChatWidget() {
                             🤖
                         </button>
                     </div>
+
+                    <div
+                        className="chat-resize-handle"
+                        onMouseDown={onResizeMouseDown}
+                        aria-hidden="true"
+                    />
                 </div>
             )}
 

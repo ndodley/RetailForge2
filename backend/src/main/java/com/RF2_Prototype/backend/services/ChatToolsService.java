@@ -2,6 +2,7 @@ package com.RF2_Prototype.backend.services;
 
 import com.RF2_Prototype.backend.models.dtos.ProductAvailabilityDto;
 import com.RF2_Prototype.backend.models.dtos.ProductDto;
+import com.RF2_Prototype.backend.services.iservices.IChatToolsService;
 import com.RF2_Prototype.backend.services.iservices.IProductService;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
@@ -14,7 +15,7 @@ import java.util.List;
 // invokes this automatically mid-conversation whenever it decides a question
 // needs catalog data - nothing else in the app calls it directly.
 @Component
-public class ChatProductTools {
+public class ChatToolsService implements IChatToolsService {
 
     // Keeps a single tool call's response (and therefore token cost) bounded
     // even if the catalog grows large or a keyword matches broadly.
@@ -22,10 +23,11 @@ public class ChatProductTools {
 
     private final IProductService productService;
 
-    public ChatProductTools(IProductService productService) {
+    public ChatToolsService(IProductService productService) {
         this.productService = productService;
     }
 
+    @Override
     @Tool(description = "Search the store's product catalog for real-time name, brand, price, stock quantity, and department. " +
             "Use this whenever a customer asks what's in stock, what something costs, or whether a product/brand/category is available.")
     public List<ProductAvailabilityDto> searchProducts(
