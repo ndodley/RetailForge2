@@ -1,9 +1,11 @@
 package com.RF2_Prototype.backend.controllers;
 
+import com.RF2_Prototype.backend.controllers.ChatOwnerResolver.ChatOwner;
 import com.RF2_Prototype.backend.exception.AiProviderException;
 import com.RF2_Prototype.backend.models.dtos.ChatRequest;
 import com.RF2_Prototype.backend.models.dtos.ChatResponse;
 import com.RF2_Prototype.backend.services.iservices.IChatService;
+import com.RF2_Prototype.backend.services.iservices.IChatSessionService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -13,25 +15,37 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/chat")
 public class ChatController {
 
     private final IChatService chatService;
+    private final IChatSessionService chatSessionService;
+    private final ChatOwnerResolver chatOwnerResolver;
 
-    public ChatController(IChatService chatService) {
+    public ChatController(IChatService chatService, IChatSessionService chatSessionService, ChatOwnerResolver chatOwnerResolver) {
         this.chatService = chatService;
+        this.chatSessionService = chatSessionService;
+        this.chatOwnerResolver = chatOwnerResolver;
     }
 
     @PostMapping
     public ChatResponse chat(@Valid @RequestBody ChatRequest request, HttpServletRequest httpRequest) {
-        // Scopes chat memory to this browser's existing session (the same one
-        // Spring Session already tracks for every request), so one shopper's
-        // conversation history never mixes with another's. No frontend change
-        // needed - the session cookie is already sent with every request.
-        String conversationId = httpRequest.getSession(true).getId();
-        return new ChatResponse(chatService.getReply(request.message(), conversationId));
+        ChatOwner owner = chatOwnerResolver.resolve(httpRequest);
+
+        // The frontend always creates a session via POST /api/chat/sessions
+        // first and sends its conversationId with every message - verify it
+        // actually belongs to this caller rather than trusting it blindly,
+        // so nobody can post messages into someone else's chat thread.
+        if (!chatSessionService.isOwnedByCaller(request.conversationId(), owner.userId(), owner.guestSessionKey())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This chat session does not belong to you.");
+        }
+
+        String reply = chatService.getReply(request.message(), request.conversationId());
+        chatSessionService.touchSession(request.conversationId(), request.message());
+        return new ChatResponse(reply);
     }
 
     @ExceptionHandler(AiProviderException.class)
