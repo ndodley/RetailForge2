@@ -4,6 +4,7 @@ import Dashboard from "../../../components/admin/shared/Dashboard"
 import AdminDepartmentTable from "../../../components/tables/department/AdminDepartmentTable.tsx"
 import UpsertForm from "../../../components/admin/shared/UpsertForm"
 import BulkUpload from "../../../components/admin/shared/BulkUpload"
+import AdminButton from "../../../components/admin/AdminButton"
 
 import { useDepartments } from "../../../hooks/departments/useDepartments.ts"
 import { useAdminDepartmentFilters } from "../../../hooks/departments/useAdminDepartmentFilters.ts"
@@ -43,7 +44,7 @@ function AdminDepartmentsPage() {
   } = useAdminDepartmentFilters(departments)
 
   const { setPage, safePage, totalPages, pagedItems } =
-      usePagination(visibleDepartments, 8)
+      usePagination(visibleDepartments, 6)
 
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
@@ -64,6 +65,13 @@ function AdminDepartmentsPage() {
             resetUpsertState()
             setActiveTab(key)
           }}
+          headerActions={
+            activeTab === "dashboard" && (
+                <AdminButton variant="pill" onClick={handleExportCsv}>
+                  Download CSV
+                </AdminButton>
+            )
+          }
       >
         {activeTab === "dashboard" && (
             <div className="admin-dashboard-header">
@@ -76,11 +84,10 @@ function AdminDepartmentsPage() {
                   isLoading={isLoading}
                   items={visibleDepartments}
                   pagedItems={pagedItems}
-                  pageSize={8}
+                  pageSize={6}
                   safePage={safePage}
                   totalPages={totalPages}
                   setPage={setPage}
-                  onExportCsv={handleExportCsv}
                   renderTable={(items) => (
                       <AdminDepartmentTable
                           items={items}

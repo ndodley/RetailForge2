@@ -4,6 +4,7 @@ import Dashboard from "../../../components/admin/shared/Dashboard"
 import AdminReviewTable from "../../../components/tables/review/AdminReviewTable.tsx"
 import UpsertForm from "../../../components/admin/shared/UpsertForm"
 import BulkUpload, {type BulkPreviewColumn} from "../../../components/admin/shared/BulkUpload"
+import AdminButton from "../../../components/admin/AdminButton"
 
 import { useReviews } from "../../../hooks/reviews/useReviews.ts"
 import { useAdminReviewFilters } from "../../../hooks/reviews/useAdminReviewFilters.ts"
@@ -56,7 +57,7 @@ function AdminReviewsPage() {
     } = useAdminReviewFilters(reviews, products, categories, departments)
 
     const { setPage, safePage, totalPages, pagedItems } =
-        usePagination(visibleReviews, 8)
+        usePagination(visibleReviews, 6)
 
     const [isFilterOpen, setIsFilterOpen] = useState(false)
     const [csvPreview, setCsvPreview] = useState<{
@@ -101,6 +102,13 @@ function AdminReviewsPage() {
                 resetUpsertState()
                 setActiveTab(key)
             }}
+            headerActions={
+                activeTab === "dashboard" && (
+                    <AdminButton variant="pill" onClick={handleExportCsv}>
+                        Download CSV
+                    </AdminButton>
+                )
+            }
         >
             {activeTab === "dashboard" && (
                 <div className="admin-dashboard-header">
@@ -113,11 +121,10 @@ function AdminReviewsPage() {
                         isLoading={isLoading}
                         items={visibleReviews}
                         pagedItems={pagedItems}
-                        pageSize={8}
+                        pageSize={6}
                         safePage={safePage}
                         totalPages={totalPages}
                         setPage={setPage}
-                        onExportCsv={handleExportCsv}
                         renderTable={(items) => (
                             <AdminReviewTable
                                 items={items}

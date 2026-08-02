@@ -80,7 +80,15 @@
 }
 
 .adv-search-btn--ghost {
-  background: var(--surface-3);
+  background: var(--accent-bg);
+  border: 1.5px solid var(--accent-border);
+  color: var(--text);
+}
+
+.adv-search-btn--ghost:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #000;
 }
 
 .adv-search-grid {
@@ -115,7 +123,7 @@
 }
 
 .adv-search-card {
-  border: 1px solid var(--border);
+  border: 1px solid var(--accent-border);
   border-radius: 12px;
   background: var(--surface-2);
   box-shadow: var(--shadow-1);
@@ -132,6 +140,7 @@
   padding: 10px 10px;
   cursor: pointer;
   user-select: none;
+  background: var(--accent-bg);
 }
 
 .adv-search-cardSummary::-webkit-details-marker {
@@ -146,8 +155,8 @@
 .adv-search-caret {
   width: 10px;
   height: 10px;
-  border-right: 2px solid var(--muted-2);
-  border-bottom: 2px solid var(--muted-2);
+  border-right: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
   transform: rotate(45deg);
   transition: transform 160ms ease;
 }
@@ -157,7 +166,7 @@
 }
 
 .adv-search-cardBody {
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--accent-border);
   padding: 8px 10px 10px;
 }
 
@@ -173,12 +182,25 @@
   color: var(--muted);
   font-weight: 800;
   cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 8px;
+  transition: background 120ms ease, color 120ms ease;
 }
+
+.adv-search-option:hover {
+  background: var(--accent-bg);
+  color: var(--text);
+}
+
+.adv-search-option:has(.adv-search-control:checked) {
+  color: var(--accent);
+}
+
 
 .adv-search-control {
   width: 16px;
   height: 16px;
-  accent-color: var(--link);
+  accent-color: var(--accent);
 }
 
 .adv-search-label {
@@ -209,4 +231,13 @@
 .adv-search-btn--reset {
   height: 30px;
   font-weight: 700;
+  background: var(--danger-soft);
+  border: 1.5px solid var(--danger);
+  color: var(--danger);
+}
+
+.adv-search-btn--reset:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
 }
