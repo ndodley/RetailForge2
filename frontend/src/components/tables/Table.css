@@ -1,7 +1,8 @@
 .rf-table-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    align-items: start;
+    gap: 18px;
 }
 
 /* Card wrapper — now theme-aware */

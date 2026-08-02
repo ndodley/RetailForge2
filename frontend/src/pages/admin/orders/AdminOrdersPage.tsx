@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import AdminLayout from "../../../components/admin/AdminLayout"
 import Dashboard from "../../../components/admin/shared/Dashboard"
 import AdminOrderTable from "../../../components/tables/order/AdminOrderTable.tsx"
+import AdminButton from "../../../components/admin/AdminButton"
 
 import { useAuth } from "../../../hooks/useAuth"
 import { useOrders } from "../../../hooks/orders/useOrders.ts"
@@ -32,7 +33,7 @@ function AdminOrdersPage() {
     } = useAdminOrderFilters(orders)
 
     const { setPage, safePage, totalPages, pagedItems } =
-        usePagination(visibleOrders, 8)
+        usePagination(visibleOrders, 6)
 
     const [isFilterOpen, setIsFilterOpen] = useState(false)
 
@@ -51,6 +52,11 @@ function AdminOrdersPage() {
             tabs={[{ label: "Dashboard", key: "dashboard" }]}
             activeTab="dashboard"
             onTabChange={() => {}}
+            headerActions={
+                <AdminButton variant="pill" onClick={handleExportCsv}>
+                    Download CSV
+                </AdminButton>
+            }
         >
             <Dashboard
                 title="Orders"
@@ -61,11 +67,10 @@ function AdminOrdersPage() {
                 isLoading={isLoading}
                 items={visibleOrders}
                 pagedItems={pagedItems}
-                pageSize={8}
+                pageSize={6}
                 safePage={safePage}
                 totalPages={totalPages}
                 setPage={setPage}
-                onExportCsv={handleExportCsv}
                 renderTable={(items) => (
                     <AdminOrderTable
                         items={items}

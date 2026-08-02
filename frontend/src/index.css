@@ -45,6 +45,11 @@
   --admin-text-strong: #0f172a;
   --admin-text-muted: #64748b;
 
+  /* ⭐ Aliases so the admin redesign's CSS variable names resolve */
+  --text-secondary: var(--admin-text-muted);
+  --primary: var(--link);
+  --admin-accent: #1a6bbf;
+
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
   --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
@@ -112,6 +117,11 @@
   --admin-text: #cbd5e1;
   --admin-text-strong: #f1f5f9;
   --admin-text-muted: #94a3b8;
+
+  /* ⭐ Aliases so the admin redesign's CSS variable names resolve */
+  --text-secondary: var(--admin-text-muted);
+  --primary: var(--link);
+  --admin-accent: #4d9fe0;
 }
 
 #root {

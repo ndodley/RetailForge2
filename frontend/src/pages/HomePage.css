@@ -3,19 +3,52 @@
 }
 
 .home-landing {
+    position: relative;
     text-align: center;
-    padding: 3rem 1rem 2rem;
+    padding: 3.5rem 1rem 2.5rem;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.home-landing__glow {
+    position: absolute;
+    inset: -20% -10% auto -10%;
+    height: 420px;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(60% 60% at 22% 30%, rgba(255, 152, 0, 0.22), transparent 70%),
+        radial-gradient(50% 50% at 78% 20%, rgba(37, 99, 235, 0.18), transparent 70%);
+    filter: blur(10px);
+}
+
+.home-landing__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 16px;
+    border-radius: 999px;
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-border);
+    color: var(--accent);
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    margin-bottom: 18px;
 }
 
 .home-landing__title {
-    font-size: clamp(32px, 4.5vw, 52px);
+    font-size: clamp(32px, 4.5vw, 56px);
     font-weight: 900;
     letter-spacing: 0.2px;
     margin: 0 0 16px 0;
 }
 
 .home-landing__title span {
-    color: var(--accent);
+    background: linear-gradient(120deg, var(--accent), #f43f5e 65%, var(--link));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
 }
 
 .home-landing__subtitle {
@@ -24,6 +57,41 @@
     color: var(--muted);
     font-size: 1.05rem;
     line-height: 1.6;
+}
+
+.home-landing__actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-top: 28px;
+}
+
+.home-trust-strip {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+    margin: 28px auto 0;
+    padding: 0;
+    max-width: 720px;
+}
+
+.home-trust-strip__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--text);
 }
 
 .section-block {
@@ -80,17 +148,25 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 20px;
+    padding: 12px 24px;
     border-radius: 999px;
     font-weight: 800;
     text-decoration: none;
     white-space: nowrap;
     box-shadow: var(--shadow);
+    transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+}
+
+.home-cta:hover,
+.home-cta:focus-visible {
+    transform: translateY(-1px);
+    filter: brightness(1.04);
+    outline: none;
 }
 
 .home-cta--primary {
-    background: var(--accent);
-    color: var(--surface-2);
+    background: linear-gradient(120deg, var(--accent), #f97316);
+    color: #1a1200;
 }
 
 .home-cta--secondary {
@@ -111,14 +187,32 @@
     box-sizing: border-box;
     background: var(--surface-3);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 18px;
+    border-radius: 16px;
+    padding: 20px;
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.home-feature-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent-border);
+    box-shadow: var(--shadow);
+}
+
+.home-feature-card__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--accent-bg);
+    color: var(--accent);
+    font-size: 20px;
+    font-weight: 900;
+    margin-bottom: 14px;
 }
 
 .home-feature-card__title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
     font-weight: 800;
     color: var(--text);
     margin-bottom: 8px;
@@ -128,4 +222,19 @@
     color: var(--muted);
     font-size: 14px;
     line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+    .home-landing {
+        padding: 2.5rem 0.5rem 1.75rem;
+    }
+
+    .home-feature-shell__header {
+        padding: 1.25rem;
+    }
+
+    .home-feature-grid {
+        padding: 1rem 1.25rem 1.25rem;
+        grid-template-columns: 1fr;
+    }
 }

@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Link } from "react-router-dom"
 import Table from "../Table.tsx"
 import AdminButton from "../../admin/AdminButton.tsx"
 import type { ReviewRecord } from "../../../types/store.ts"
@@ -39,28 +40,36 @@ function formatDate(dt: string) {
 }
 
 interface ProductThumbProps {
+    productId: number
     imagePath: string | null
     name: string
 }
 
-function ProductThumb({ imagePath, name }: ProductThumbProps) {
+function ProductThumb({ productId, imagePath, name }: ProductThumbProps) {
     const [err, setErr] = useState(false)
 
     if (!imagePath || err) {
         return (
-            <div className="rf-review-thumb rf-review-thumb--placeholder" aria-label="No image">
+            <Link
+                to={`/products/${productId}`}
+                className="rf-review-thumb rf-review-thumb--placeholder"
+                aria-label={`View ${name}`}
+                title={`View ${name}`}
+            >
                 ?
-            </div>
+            </Link>
         )
     }
 
     return (
-        <img
-            src={`${apiBaseUrl}${imagePath}`}
-            alt={name}
-            className="rf-review-thumb"
-            onError={() => setErr(true)}
-        />
+        <Link to={`/products/${productId}`} className="rf-review-thumb-link" aria-label={`View ${name}`} title={`View ${name}`}>
+            <img
+                src={`${apiBaseUrl}${imagePath}`}
+                alt={name}
+                className="rf-review-thumb"
+                onError={() => setErr(true)}
+            />
+        </Link>
     )
 }
 
@@ -93,7 +102,7 @@ function AdminReviewTable({ items, users, onEdit, onDelete }: ReviewTableProps) 
                 return (
                     <div className="rf-review-card">
                         <div className="rf-review-top">
-                            <ProductThumb imagePath={review.productImagePath} name={review.productName} />
+                            <ProductThumb productId={review.productId} imagePath={review.productImagePath} name={review.productName} />
                             <div className="rf-review-product-name">{review.productName}</div>
                             <div className="rf-review-date">{formatDate(review.updated_at)}</div>
                         </div>

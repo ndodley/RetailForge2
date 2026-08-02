@@ -3,7 +3,10 @@
     border-radius: 999px;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
+    padding: 11px 20px;
+    font-size: 15px;
 }
 
 .rf-admin-btn-icon {
@@ -26,16 +29,26 @@
 /* Danger */
 .rf-btn--danger.rf-admin-btn {
     background: var(--danger);
-    border-color: var(--danger);
+    border: 1.5px solid var(--danger);
     color: #fff;
     border-radius: 999px;
 }
 
-/* Pill */
+.rf-btn--danger.rf-admin-btn:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--danger) 88%, black);
+}
+
+/* Pill (Edit) - accent-tinted so it stays clearly visible in both themes */
 .rf-btn--pill.rf-admin-btn {
-    background: var(--surface-3);
-    border-color: var(--border);
+    background: var(--accent-bg);
+    border: 1.5px solid var(--accent-border);
     color: var(--text);
+}
+
+.rf-btn--pill.rf-admin-btn:hover:not(:disabled) {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #000;
 }
 
 /* Surface */

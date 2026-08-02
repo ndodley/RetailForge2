@@ -2,7 +2,31 @@
 
 `RF2_P2` is the current full-stack prototype for rebuilding the original RetailForge project with a modern React frontend, a Spring Boot backend, and PostgreSQL.
 
-At the moment, this repo includes a working storefront shell, product browsing/detail pages, browser-local cart behavior, and admin CRUD/bulk upload flows for departments, categories, and products.
+This repo now goes well beyond an initial storefront shell: it includes browsing/search, a backend-persisted cart, Stripe-powered checkout, order history, product reviews, favorites, a floating AI shopping/admin chat assistant, and full admin CRUD/bulk-upload flows for departments, categories, products, users, orders, and reviews. Authentication is backend-persisted via Spring Security and server-side sessions (Spring Session JDBC), replacing the earlier frontend-only auth prototype.
+
+---
+
+## 📌 Table of Contents
+
+- [Current stack](#current-stack)
+- [What is implemented now](#what-is-implemented-now)
+- [What is still in progress](#what-is-still-in-progress)
+- [Project structure](#project-structure)
+- [Local requirements](#local-requirements)
+- [Environment files](#environment-files)
+- [Quick start](#quick-start)
+- [App routes](#app-routes)
+- [Auth](#auth)
+- [AI chat assistant](#ai-chat-assistant)
+- [Payments](#payments)
+- [Media and image handling](#media-and-image-handling)
+- [Database and migrations](#database-and-migrations)
+- [Development commands](#development-commands)
+- [Security / local dev notes](#security--local-dev-notes)
+- [Related docs](#related-docs)
+- [Notes before committing](#notes-before-committing)
+
+---
 
 ## Current stack
 
@@ -14,16 +38,21 @@ At the moment, this repo includes a working storefront shell, product browsing/d
 - React Router 7
 - Axios
 - MUI / Emotion
+- Stripe.js / React Stripe.js (`@stripe/stripe-js`, `@stripe/react-stripe-js`)
+- react-markdown / remark-gfm (renders AI chat responses)
+- Bootstrap, styled-components
 
 ### Backend
 
-- Spring Boot 4.0.6
+- Spring Boot 4.1.0
 - Spring Web MVC
 - Spring Data JPA
-- Spring Security
+- Spring Security (session-based auth, BCrypt password hashing)
 - Spring Validation
 - Flyway
 - Spring Session JDBC
+- Spring AI (Anthropic Claude + OpenAI starters, JDBC-backed chat memory)
+- Stripe Java SDK (payments)
 - PostgreSQL
 
 ### Infrastructure
@@ -36,62 +65,57 @@ At the moment, this repo includes a working storefront shell, product browsing/d
 
 ### Storefront
 
-- Home page
-- Merged authentication page with Login/Register tabs
+- Home page with product showcase
+- Merged authentication page with Login/Register tabs, now backed by real server sessions
 - Product listing page with search, filters, sorting, and pagination
-- Product detail page
-- Product cards with image fallback handling and improved dedicated styling
-- Browser-local cart stored in `localStorage`
+- Product detail page with reviews
+- Product cards with image fallback handling and dedicated styling
+- Server-persisted cart tied to the logged-in user (`/api/cart`)
+- Stripe Elements checkout flow and order confirmation page
+- Order history and order detail pages (`/my-orders`, `/order-details/:id`)
+- Favorites (`/my-favorites`) backed by `/api/favorites`
+- Customer profile page (`/my-profile`), including avatar upload
+- Product reviews: view, create, edit, and delete your own reviews (`/my-reviews`)
+- Floating AI chat widget available to both guests and logged-in users, with persistent chat history/sessions and multi-turn memory
 
 ### Admin
 
 - Departments dashboard + create/update flow
 - Categories dashboard + create/update flow
 - Products dashboard + create/update flow
-- CSV bulk upload for departments, categories, and products
-- Optional multipart image upload for products
+- Users dashboard + create/update flow, including avatar upload
+- Orders dashboard + order detail/status update flow
+- Reviews dashboard + create/update/delete flow
+- CSV bulk upload for departments, categories, products, users, and reviews
+- Optional multipart image upload for products and user avatars
 - Filesystem-backed image serving through `/images/**`
-- Admin routes guarded for `manager` and `employee` roles in the current frontend auth prototype
+- Admin routes guarded for `manager` and `employee` roles
+- The AI chat assistant exposes extra admin-only tools (top sellers, inventory levels, out-of-stock/low-stock products, order status breakdown) in addition to the shopper tools (search, cart, favorites, orders, reviews)
 
 ### Backend API
 
-- `GET /api/departments`
-- `GET /api/departments/{id}`
-- `POST /api/departments`
-- `POST /api/departments/bulk`
-- `PUT /api/departments/{id}`
-- `DELETE /api/departments/{id}`
-- `GET /api/categories`
-- `GET /api/categories/{id}`
-- `POST /api/categories`
-- `POST /api/categories/bulk`
-- `PUT /api/categories/{id}`
-- `DELETE /api/categories/{id}`
-- `GET /api/products`
-- `GET /api/products/{id}`
-- `POST /api/products` (multipart form data)
-- `POST /api/products/bulk`
-- `PUT /api/products/{id}` (multipart form data)
-- `DELETE /api/products/{id}`
+- **Auth**: `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/me`
+- **Departments**: `GET/POST/PUT/DELETE /api/departments`, `POST /api/departments/bulk`
+- **Categories**: `GET/POST/PUT/DELETE /api/categories`, `POST /api/categories/bulk`
+- **Products**: `GET/POST/PUT/DELETE /api/products` (multipart form data for create/update), `POST /api/products/bulk`
+- **Users**: `GET/POST/PUT/DELETE /api/users`, `POST /api/users/bulk`, `PUT /api/users/{id}/avatar`
+- **Cart**: `GET/POST/PATCH/DELETE /api/cart`, `/api/cart/items/{productId}`
+- **Reviews**: `GET/POST/PUT/DELETE /api/reviews`, `/api/reviews/product/{id}`, `/api/reviews/user/{id}`, `POST /api/reviews/bulk`
+- **Favorites**: `GET/POST/DELETE /api/favorites/user/{userId}`, `/api/favorites/user/{userId}/product/{productId}`
+- **Orders (admin)**: `GET/POST/PUT/DELETE /api/admin/orders`, `/api/admin/orders/user/{id}`, `/api/admin/orders/status/{status}`, `PUT /api/admin/orders/{id}/status`
+- **Order details**: `GET /api/order-details/order/{orderId}`
+- **Payments**: `POST /api/payment/create-payment-intent`, `POST /api/payment/complete-checkout` (Stripe)
+- **AI chat**: `POST /api/chat`, `POST/GET/DELETE /api/chat/sessions`, `/api/chat/sessions/{id}/messages`, `/api/chat/sessions/{id}/clear`
 
 ## What is still in progress
 
-This repo is still a prototype. Some original RetailForge concepts are not fully rebuilt yet.
+This repo is still a prototype. Some original RetailForge concepts are not fully rebuilt yet:
 
-Examples:
-
-- backend-persisted authentication/session flows
-- persistent server-side cart and checkout
-- persistent favorites
-- order history and reviews
-
-The current cart is intentionally browser-local and lives in `frontend/src/api/cartStore.ts`.
-
-The current auth implementation is also prototype-level and frontend-local:
-
-- users and the active session are stored in browser `localStorage`
-- roles currently supported in the frontend are `customer`, `manager`, and `employee`
-- this is intended as a temporary bridge until the Spring Boot backend gets the full auth/session implementation
+- Password reset / email verification flows
+- Rate limiting on the public chat endpoint
+- Production-hardened Stripe key management (see [Security / local dev notes](#security--local-dev-notes))
+- Broader automated test coverage across the newer order/payment/chat flows
+- Kafka-based event visibility and Artillery load-testing scenarios from the original project have not been rebuilt here yet
 
 ## Project structure
 
@@ -108,17 +132,19 @@ RF2_P2/
 Important app folders:
 
 - `frontend/src/pages/` - storefront and admin pages
-- `frontend/src/components/` - shared UI and admin tables/layout
-- `frontend/src/api/` - frontend API clients and local cart store
-- `frontend/src/context/` - auth provider state
-- `frontend/src/hooks/` - shared hooks such as `useAuth`
-- `backend/src/main/java/` - controllers, services, entities, config, security
+- `frontend/src/pages/mypages/` - customer account pages (profile, favorites, reviews, orders, order details)
+- `frontend/src/components/` - shared UI (chat widget, navbar, product cards) and admin tables/layout
+- `frontend/src/api/` - frontend API clients (cart, orders, favorites, reviews, chat, users, products)
+- `frontend/src/context/` - auth and favorites provider state
+- `frontend/src/hooks/` - shared hooks such as `useAuth`, `useChat`, `useFavorites`
+- `frontend/src/routes/AppRoutes.tsx` - route table, including the Stripe `Elements` wrapper for checkout
+- `backend/src/main/java/.../controllers/` - REST controllers (auth, cart, orders, payments, chat, etc.)
+- `backend/src/main/java/.../services/` - service layer, including the chat tool implementations used by the AI assistant
+- `backend/src/main/java/.../security/` - Spring Security config and session-based auth setup
 - `backend/src/main/resources/db/migration/` - Flyway migrations
-- `backend/media/` - local media storage for uploaded/shared product images
+- `backend/media/` - local media storage for uploaded/shared product and avatar images
 
 ## Local requirements
-
-Verified from the current project files:
 
 - Docker Desktop / Docker Compose
 - Node.js + npm
@@ -132,8 +158,7 @@ The repo includes:
 
 - root example: `.env.example`
 - frontend example: `frontend/.env.example`
-
-Current example values:
+- backend AI key template: `backend/application-secrets.properties.example`
 
 ### Root `.env.example`
 
@@ -147,8 +172,14 @@ Current example values:
 ### Frontend `frontend/.env.example`
 
 - `VITE_API_BASE_URL=http://localhost:8080`
+- You will also need `VITE_STRIPE_PUBLISHABLE_KEY` set locally (not yet listed in `.env.example`) for the checkout page's Stripe Elements provider to initialize.
 
-You can copy these into local `.env` files if you want, but keep real local overrides uncommitted.
+### Backend AI keys
+
+- Copy `backend/application-secrets.properties.example` to `backend/application-secrets.properties` (gitignored) and set `spring.ai.openai.api-key` to a real key.
+- The active chat provider is controlled by `spring.ai.model.chat` in `application.properties` (currently `openai`; can be switched to `anthropic` since both starters are on the classpath).
+
+You can copy the root/frontend examples into local `.env` files if you want, but keep real local overrides uncommitted.
 
 ## Quick start
 
@@ -157,7 +188,6 @@ You can copy these into local `.env` files if you want, but keep real local over
 From the project root:
 
 ```powershell
-# from the repository root
 docker compose up -d
 ```
 
@@ -178,7 +208,7 @@ Current backend defaults from `backend/src/main/resources/application.properties
 - datasource: `jdbc:postgresql://localhost:5434/rf2_p2`
 - media root: `${user.dir}/media`
 
-Important: start the backend from the `backend` folder so `${user.dir}/media` resolves to `backend/media`.
+Important: start the backend from the `backend` folder so `${user.dir}/media` resolves to `backend/media`. Make sure `application-secrets.properties` exists if you want the AI chat assistant to work locally.
 
 ### 3. Start the frontend
 
@@ -197,30 +227,49 @@ The frontend expects the backend at `http://localhost:8080` unless `VITE_API_BAS
 Current frontend routes:
 
 - `/` - home page
-- `/auth?tab=login|register` - merged authentication page
-- `/login` - compatibility route for the login tab
-- `/register` - compatibility route for the register tab
+- `/auth`, `/login`, `/register` - merged authentication page
 - `/products` - storefront product listing
 - `/products/:id` - product detail page
-- `/cart` - browser-local cart page
+- `/cart` - server-persisted cart page
+- `/checkout` - Stripe Elements checkout, wrapped in the Stripe `<Elements>` provider
+- `/order-confirmation` - post-checkout confirmation/receipt page
+- `/my-profile` - customer profile + avatar upload
+- `/my-favorites` - saved favorite products
+- `/my-reviews` - reviews you've written
+- `/my-orders` - order history
+- `/order-details/:id` - customer-facing order detail page
 - `/admin/departments` - department management
 - `/admin/categories` - category management
 - `/admin/products` - product management
+- `/admin/users` - user management
+- `/admin/reviews` - review management
+- `/admin/orders`, `/admin/orders/:id` - order management + order detail/status updates
 
-## Current auth prototype behavior
+## Auth
 
-The merged auth page follows the same overall login/register flow from the original project, but the initial implementation in this repo is frontend-local for now.
+Authentication is now backend-persisted rather than frontend-local:
 
-- Login and Register are now combined into a single tabbed page
-- Register signs the user in immediately after account creation
-- The navbar switches between guest actions and an authenticated account menu
-- The admin catalog routes currently require `manager` or `employee`
+- Spring Security handles login/logout with BCrypt-hashed passwords
+- Sessions are stored server-side via Spring Session JDBC (cookie-based; the frontend sends `credentials: include` and the backend CORS config allows `http://localhost:5173` with credentials)
+- Roles: `CUSTOMER`, `MANAGER`, `EMPLOYEE` (`UserRole` enum) — the admin catalog routes require `MANAGER` or `EMPLOYEE`
+- Demo users are seeded via the `V6__seed_demo_users.sql` Flyway migration
+- Register signs the user in immediately after account creation, and the navbar switches between guest actions and an authenticated account menu
 
-For quick local testing, the frontend seeds demo accounts in browser storage:
+## AI chat assistant
 
-- `cust1@dummy.com` / `password123` (`customer`)
-- `manager@dummy.com` / `password123` (`manager`)
-- `employee@dummy.com` / `password123` (`employee`)
+A floating chat widget (`ChatWidget.tsx`) is available site-wide for both guests and logged-in users:
+
+- Chat history is session-scoped and persisted server-side (`chat_sessions` table plus Spring AI's JDBC-backed chat memory tables)
+- Guests get their own recent-chats list, scoped by a guest session key; logged-in users get theirs scoped by user id
+- Shopper-facing tools: product search, cart/favorites management, order lookup, popular products, product reviews
+- Admin-only extra tools (when logged in as `manager`/`employee`): top sellers, current inventory, out-of-stock/low-stock products, order status breakdown
+
+## Payments
+
+Checkout uses Stripe, similar to the original project:
+
+- The frontend wraps `CheckoutPage` in Stripe's `<Elements>` provider using `VITE_STRIPE_PUBLISHABLE_KEY`
+- The backend creates a PaymentIntent via `/api/payment/create-payment-intent` and finalizes the order (creating the order + order items) via `/api/payment/complete-checkout`
 
 ## Media and image handling
 
@@ -252,6 +301,16 @@ Current migration files in this repo:
 - `V2__create_departments_table.sql`
 - `V3__create_categories_table.sql`
 - `V4__create_products_table.sql`
+- `V5__create_users_table.sql`
+- `V6__seed_demo_users.sql`
+- `V7__create_carts_table.sql`
+- `V8__create_cart_items_table.sql`
+- `V9__create_orders_table.sql`
+- `V10__create_order_items_table.sql`
+- `V11__create_reviews_table.sql`
+- `V12__create_favorites_table.sql`
+- `V13__create_ai_chat_memory_tables.sql`
+- `V14__create_chat_sessions_table.sql`
 
 JPA is configured with `spring.jpa.hibernate.ddl-auto=validate`, so the schema is expected to come from Flyway.
 
@@ -275,14 +334,12 @@ Set-Location .\backend
 .\mvnw.cmd test
 ```
 
-## Security / local dev note
+## Security / local dev notes
 
-The current `SecurityConfig` is intentionally permissive for local development:
-
-- all requests are currently permitted
-- CORS allows `http://localhost:*` and `http://127.0.0.1:*`
-
-That is useful while rebuilding the stack, but it should be tightened later if this prototype moves toward production-style auth.
+- CORS is restricted to `http://localhost:5173` with credentials enabled (required for session cookies) — this is tighter than the earlier "allow all localhost" prototype configuration
+- Public (unauthenticated) reads are allowed for products/categories/departments/reviews and the chat endpoints; writes require authentication, and catalog admin writes require the `MANAGER` or `EMPLOYEE` role
+- **Note:** `application.properties` currently contains hardcoded Stripe *test-mode* keys (`sk_test_...` / `pk_test_...`). These should be moved to `application-secrets.properties` (gitignored) or environment variables before this prototype moves toward production use, the same way the AI provider API keys are already handled
+- Do not commit local `.env` or `application-secrets.properties` files with real secrets
 
 ## Related docs
 
@@ -292,7 +349,6 @@ That is useful while rebuilding the stack, but it should be tightened later if t
 
 ## Notes before committing
 
-- Do not commit local `.env` files with machine-specific secrets
+- Do not commit local `.env` files or `application-secrets.properties` with machine-specific secrets
 - Do not commit generated output such as `frontend/dist/`, `frontend/node_modules/`, or `backend/target/`
 - If Docker volumes already contain older database state, review `docs/postgres-setup.md` before resetting or recreating the database
-

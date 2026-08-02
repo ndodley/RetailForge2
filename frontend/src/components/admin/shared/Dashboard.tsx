@@ -17,7 +17,6 @@ interface DashboardProps<T> {
     safePage: number
     totalPages: number
     setPage: (value: number | ((prev: number) => number)) => void
-    onExportCsv: () => void
     renderTable: (items: T[]) => React.ReactNode
     emptyMessage: string
     errorMessage?: string
@@ -39,7 +38,6 @@ function Dashboard<T>({
                           safePage,
                           totalPages,
                           setPage,
-                          onExportCsv,
                           renderTable,
                           emptyMessage,
                           errorMessage,
@@ -71,15 +69,6 @@ function Dashboard<T>({
                     onReset={onReset}      // ⭐ ADDED
                     sections={filterSections}
                 />
-            </div>
-
-            <div className="rf-admin-toolbar">
-                <AdminButton
-                    variant="pill"
-                    onClick={onExportCsv}
-                >
-                    Download CSV
-                </AdminButton>
             </div>
 
             {isLoading ? (

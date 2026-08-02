@@ -40,6 +40,10 @@ public class SecurityConfig {
                         // chat widget: available to guests, same as product browsing.
                         // No rate limiting yet - revisit before this is publicly deployed.
                         .requestMatchers(HttpMethod.POST, "/api/chat").permitAll()
+                        // chat session management (new/list/open/clear/delete chats) -
+                        // guests get their own recent-chats list too, scoped to their
+                        // browser session, same as the chat widget itself.
+                        .requestMatchers("/api/chat/sessions/**").permitAll()
 
                         // reviews: any authenticated user can write/edit/delete their own
                         .requestMatchers(HttpMethod.POST, "/api/reviews/**").authenticated()
