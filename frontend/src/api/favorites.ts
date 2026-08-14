@@ -1,6 +1,5 @@
-import axios from "axios"
-import api from "./axios"
-import type { StoreProductDto } from "./products"
+import api, { getApiErrorMessage } from "./apiClient"
+import type { ProductDto } from "./products"
 
 export interface FavoriteDto {
     id: number
@@ -10,7 +9,7 @@ export interface FavoriteDto {
 }
 
 export async function fetchFavoriteProducts(userId: number) {
-    const { data } = await api.get<StoreProductDto[]>(`/api/favorites/user/${userId}`)
+    const { data } = await api.get<ProductDto[]>(`/api/favorites/user/${userId}`)
     return data
 }
 
@@ -28,12 +27,4 @@ export async function removeFavorite(userId: number, productId: number) {
     await api.delete(`/api/favorites/user/${userId}/product/${productId}`)
 }
 
-export function getFavoriteApiErrorMessage(error: unknown, fallback: string): string {
-    if (axios.isAxiosError(error)) {
-        return error.response?.data?.message ?? fallback
-    }
-    if (error instanceof Error) {
-        return error.message
-    }
-    return fallback
-}
+export const getFavoriteApiErrorMessage = getApiErrorMessage

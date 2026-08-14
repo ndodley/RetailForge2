@@ -2,6 +2,7 @@ import { useState } from "react"
 import Table from "../Table.tsx"
 import AdminButton from "../../admin/AdminButton.tsx"
 import type { UserRecord } from "../../../types/store.ts"
+import { buildAvatarUrl } from "../../../api/users.ts"
 import "./AdminUserTable.css"
 
 interface UserTableProps {
@@ -11,9 +12,6 @@ interface UserTableProps {
     onDelete: (id: number) => void
 }
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080"
-const DEFAULT_AVATAR = `${apiBaseUrl}/images/other_images/default_avatar.jpg`
-
 interface UserAvatarProps {
     avatarPath: string | null
     name: string
@@ -21,7 +19,7 @@ interface UserAvatarProps {
 
 function UserAvatar({ avatarPath, name }: UserAvatarProps) {
     const [err, setErr] = useState(false)
-    const src = avatarPath && !err ? `${apiBaseUrl}${avatarPath}` : DEFAULT_AVATAR
+    const src = buildAvatarUrl(err ? null : avatarPath)
 
     return (
         <img

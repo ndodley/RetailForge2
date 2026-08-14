@@ -1,5 +1,4 @@
-import api from './axios'
-import axios from 'axios'
+import api, { getApiErrorMessage, type BulkOperationResultDto } from './apiClient'
 
 export interface CategoryDto {
   id: number
@@ -7,6 +6,7 @@ export interface CategoryDto {
   description: string
   departmentId: number | null
   departmentName: string | null
+  productCount: number
 }
 
 export interface CategoryWriteDto {
@@ -20,10 +20,6 @@ export interface CategoryBulkRowDto {
   description: string
   departmentId?: number
   departmentName?: string
-}
-
-export interface BulkOperationResultDto {
-  inserted: number
 }
 
 export async function fetchCategories() {
@@ -55,40 +51,5 @@ export async function bulkCreateCategories(rows: CategoryBulkRowDto[]) {
   return data
 }
 
-export function getCategoryApiErrorMessage(error: unknown, fallback: string) {
-  if (axios.isAxiosError(error)) {
-    const responseData = error.response?.data
-
-    if (typeof responseData === 'string' && responseData.trim()) {
-      const trimmed = responseData.trim()
-      if (trimmed.startsWith('<!doctype html') || trimmed.startsWith('<html')) {
-        return fallback
-      }
-      return trimmed
-    }
-
-    if (responseData && typeof responseData === 'object') {
-      const record = responseData as Record<string, unknown>
-      const message = record.message
-      const errorMessage = record.error
-      const detail = record.detail
-      const title = record.title
-
-      if (typeof message === 'string' && message.trim()) return message
-      if (typeof errorMessage === 'string' && errorMessage.trim()) return errorMessage
-      if (typeof detail === 'string' && detail.trim()) return detail
-      if (typeof title === 'string' && title.trim()) return title
-    }
-
-    if (typeof error.message === 'string' && error.message.trim()) {
-      return error.message
-    }
-  }
-
-  if (error instanceof Error && error.message.trim()) {
-    return error.message
-  }
-
-  return fallback
-}
+export const getCategoryApiErrorMessage = getApiErrorMessage
 

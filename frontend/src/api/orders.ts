@@ -1,5 +1,4 @@
-import axios from "axios"
-import api from "./axios"
+import api, { getApiErrorMessage } from "./apiClient"
 import type { OrderRecord, OrderDetailRecord } from "../types/store"
 
 interface BackendOrderItemDto {
@@ -94,40 +93,4 @@ export async function deleteOrder(id: number): Promise<void> {
     await api.delete(`/api/admin/orders/${id}`)
 }
 
-export function getOrderApiErrorMessage(error: unknown, fallback: string): string {
-    if (axios.isAxiosError(error)) {
-        return error.response?.data?.message ?? fallback
-    }
-    if (error instanceof Error) {
-        return error.message
-    }
-    return fallback
-}
-
-export function exportOrderDetailCsv(order: OrderDetailRecord) {
-    const rows = [
-        ["Order ID", order.id],
-        ["User Email", order.userEmail],
-        ["Total", `$${order.total.toFixed(2)}`],
-        ["Status", order.status],
-        ["Date", order.createdAt],
-        ["Shipping Address", order.shippingAddress],
-        [],
-        ["Product", "Price", "Quantity", "Subtotal"],
-        ...order.items.map((item) => [
-            item.productName,
-            `$${item.price.toFixed(2)}`,
-            item.quantity.toString(),
-            `$${(item.price * item.quantity).toFixed(2)}`,
-        ]),
-    ]
-
-    const csv = rows.map((row) => row.join(",")).join("\n")
-    const blob = new Blob([csv], { type: "text/csv" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = `order-${order.id}.csv`
-    a.click()
-    URL.revokeObjectURL(url)
-}
+export const getOrderApiErrorMessage = getApiErrorMessage

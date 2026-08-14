@@ -2,10 +2,8 @@ import React from "react";
 import Table from "../Table";
 import type { ReviewRecord } from "../../../types/store";
 import { Link } from "react-router-dom";
+import { buildBackendImageUrl } from "../../../api/products";
 import "./MyReviewTable.css";
-
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080";
-const FALLBACK_IMAGE = `${apiBaseUrl}/images/other_images/dummy_product.jpg`;
 
 interface MyReviewTableProps {
     items: ReviewRecord[];
@@ -74,17 +72,13 @@ const MyReviewTable: React.FC<MyReviewTableProps> = ({
                         <div className="myrev-top">
                             <Link to={`/products/${r.productId}`} className="myrev-img-link">
                                 <img
-                                    src={
-                                        r.productImagePath
-                                            ? `${apiBaseUrl}${r.productImagePath}`
-                                            : FALLBACK_IMAGE
-                                    }
+                                    src={buildBackendImageUrl(r.productImagePath)}
                                     alt={r.productName}
                                     className="myrev-img"
                                     onError={(e) => {
                                         const img = e.target as HTMLImageElement;
                                         img.onerror = null; // prevent loop if fallback also fails
-                                        img.src = FALLBACK_IMAGE;
+                                        img.src = buildBackendImageUrl(null);
                                     }}
                                 />
                             </Link>
@@ -131,7 +125,7 @@ const MyReviewTable: React.FC<MyReviewTableProps> = ({
                                         disabled={saving}
                                         onClick={onCancelEdit}
                                     >
-                                        Cancel
+                                        ✕ Cancel
                                     </button>
                                     <button
                                         type="button"
@@ -139,7 +133,7 @@ const MyReviewTable: React.FC<MyReviewTableProps> = ({
                                         disabled={saving}
                                         onClick={() => onSaveEdit(r.id)}
                                     >
-                                        {saving ? "Saving…" : "Save"}
+                                        {saving ? "Saving…" : "✓ Save"}
                                     </button>
                                 </>
                             ) : (
@@ -149,14 +143,14 @@ const MyReviewTable: React.FC<MyReviewTableProps> = ({
                                         className="myrev-btn edit"
                                         onClick={() => onStartEdit(r)}
                                     >
-                                        Edit
+                                        ✏️ Edit
                                     </button>
                                     <button
                                         type="button"
                                         className="myrev-btn delete"
                                         onClick={() => onDeleteReview(r.id)}
                                     >
-                                        Delete
+                                        🗑️ Delete
                                     </button>
                                 </>
                             )}

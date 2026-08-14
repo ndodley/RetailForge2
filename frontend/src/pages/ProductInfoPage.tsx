@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { fetchCart, addProductToCart, removeFromCart } from '../api/cart'
-import { getApiErrorMessage } from '../api/departments'
-import { buildBackendImageUrl, fetchStoreProductById, type StoreProductDto } from '../api/products'
+import { buildBackendImageUrl, fetchStoreProductById, getProductApiErrorMessage, type ProductDto } from '../api/products'
 import { useAuth } from '../hooks/useAuth'
 import Layout from '../components/common/Layout'
-import ProductReviews from '../components/ProductReviews'
+import ProductReviews from '../components/reviews/ProductReviews'
+import StarRating from '../components/common/StarRating'
 import './ProductInfoPage.css'
 
 function ProductInfoPage() {
@@ -16,7 +16,7 @@ function ProductInfoPage() {
 	const productId = Number(id)
 	const hasValidProductId = Number.isFinite(productId)
 
-	const [product, setProduct] = useState<StoreProductDto | null>(null)
+	const [product, setProduct] = useState<ProductDto | null>(null)
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 	const [favorite, setFavorite] = useState(false)
@@ -41,7 +41,7 @@ function ProductInfoPage() {
 				setFailedImageSrc(null)
 			} catch (err) {
 				if (!mounted) return
-				setError(getApiErrorMessage(err, 'Failed to load product info.'))
+				setError(getProductApiErrorMessage(err, 'Failed to load product info.'))
 			} finally {
 				if (mounted) setLoading(false)
 			}
@@ -56,6 +56,8 @@ function ProductInfoPage() {
 	// Load cart count
 	useEffect(() => {
 		if (!user || !hasValidProductId) {
+			// Resets the cart badge when there's no logged-in user / no valid product.
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setCartCount(0)
 			return
 		}
@@ -188,7 +190,7 @@ function ProductInfoPage() {
 									className={`pi-favorite ${favorite ? 'pi-favorite--active' : ''}`}
 									onClick={() => setFavorite(v => !v)}
 								>
-									{favorite ? '★' : '☆'}
+									{favorite ? '♥' : '♡'}
 								</button>
 							</div>
 
@@ -210,16 +212,11 @@ function ProductInfoPage() {
 								<div className="pi-rating">
 									Rating:
 									<span className="pi-rating-value">{Number(currentProduct.rating || 0).toFixed(1)}</span>
-									<span className="pi-stars">
-                    {Array.from({ length: 5 }).map((_, i) => {
-						const filled = i < Math.round(Number(currentProduct.rating || 0))
-						return (
-							<span key={i} className={filled ? 'pi-star--filled' : 'pi-star'}>
-                          {filled ? '★' : '☆'}
-                        </span>
-						)
-					})}
-                  </span>
+									<StarRating
+										rating={Number(currentProduct.rating || 0)}
+										wrapperClassName="pi-stars"
+										getStarClassName={(filled) => (filled ? 'pi-star--filled' : 'pi-star')}
+									/>
 								</div>
 							</div>
 

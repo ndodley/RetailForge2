@@ -1,4 +1,4 @@
-import { parseCsvLine } from "./csvUtils"
+import { parseCsvLine, rowsToCsv, downloadCsvFile } from "./csvUtils"
 import type { ReviewRecord } from "../types/store"
 
 export async function parseReviewCsv(file: File) {
@@ -95,30 +95,10 @@ export function exportReviewsCsv(reviews: ReviewRecord[]) {
         r.updated_at,
     ])
 
-    const csv = [headers, ...rows]
-        .map((row) =>
-            row.map((v) => `"${String(v).replaceAll('"', '""')}"`).join(",")
-        )
-        .join("\n")
-
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement("a")
-    link.href = url
-    link.download = "reviews.csv"
-    link.click()
-    URL.revokeObjectURL(url)
+    downloadCsvFile("reviews.csv", rowsToCsv([headers, ...rows]))
 }
 
 export function downloadReviewsTemplate() {
     const headers = ["product_name", "email", "rating", "comment"]
-    const csv = [headers].map((row) => row.join(",")).join("\n")
-
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement("a")
-    link.href = url
-    link.download = "reviews-template.csv"
-    link.click()
-    URL.revokeObjectURL(url)
+    downloadCsvFile("reviews-template.csv", rowsToCsv([headers]))
 }

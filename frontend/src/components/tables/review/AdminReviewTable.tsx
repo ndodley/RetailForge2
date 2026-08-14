@@ -2,7 +2,10 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import Table from "../Table.tsx"
 import AdminButton from "../../admin/AdminButton.tsx"
+import StarRating from "../../common/StarRating.tsx"
 import type { ReviewRecord } from "../../../types/store.ts"
+import { buildAvatarUrl } from "../../../api/users.ts"
+import { buildBackendImageUrl } from "../../../api/products.ts"
 import "./AdminReviewTable.css"
 
 interface ReviewUser {
@@ -15,22 +18,6 @@ interface ReviewTableProps {
     users: ReviewUser[]
     onEdit: (id: number) => void
     onDelete: (id: number) => void
-}
-
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080"
-const DEFAULT_AVATAR = `${apiBaseUrl}/images/other_images/default_avatar.jpg`
-
-function Stars({ rating }: { rating: number }) {
-    const filled = Math.round(rating)
-    return (
-        <span className="rf-review-stars" aria-label={`${filled} out of 5 stars`}>
-            {Array.from({ length: 5 }, (_, i) => (
-                <span key={i} className={i < filled ? "rf-review-star rf-review-star--on" : "rf-review-star"}>
-                    {i < filled ? "★" : "☆"}
-                </span>
-            ))}
-        </span>
-    )
 }
 
 function formatDate(dt: string) {
@@ -64,7 +51,7 @@ function ProductThumb({ productId, imagePath, name }: ProductThumbProps) {
     return (
         <Link to={`/products/${productId}`} className="rf-review-thumb-link" aria-label={`View ${name}`} title={`View ${name}`}>
             <img
-                src={`${apiBaseUrl}${imagePath}`}
+                src={buildBackendImageUrl(imagePath)}
                 alt={name}
                 className="rf-review-thumb"
                 onError={() => setErr(true)}
@@ -80,7 +67,7 @@ interface UserAvatarProps {
 
 function UserAvatar({ avatarPath, name }: UserAvatarProps) {
     const [err, setErr] = useState(false)
-    const src = avatarPath && !err ? `${apiBaseUrl}${avatarPath}` : DEFAULT_AVATAR
+    const src = buildAvatarUrl(err ? null : avatarPath)
 
     return (
         <img
@@ -110,7 +97,14 @@ function AdminReviewTable({ items, users, onEdit, onDelete }: ReviewTableProps) 
                         <div className="rf-review-user-row">
                             <UserAvatar avatarPath={avatarPath} name={review.userEmail} />
                             <div className="rf-review-user-info">
-                                <Stars rating={review.rating} />
+                                <StarRating
+                                    rating={review.rating}
+                                    wrapperClassName="rf-review-stars"
+                                    wrapperAriaLabel={`${Math.round(review.rating)} out of 5 stars`}
+                                    getStarClassName={(filled) =>
+                                        filled ? "rf-review-star rf-review-star--on" : "rf-review-star"
+                                    }
+                                />
                                 <span className="rf-review-user-email" title={review.userEmail}>
                                     {review.userEmail}
                                 </span>

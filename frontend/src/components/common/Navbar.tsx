@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState, useCallback } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import type { AuthUser } from '../../api/authStore'
 import { useAuth } from '../../hooks/useAuth'
-import { fetchCart } from '../../api/cart'
-import { subscribeToCartChanges } from '../../api/cartEvents'
+import { fetchCart, subscribeToCartChanges } from '../../api/cart'
+import { buildAvatarUrl } from '../../api/users'
 import './Navbar.css'
 
 const adminItems = [
@@ -19,14 +18,22 @@ function isAuthRoute(pathname: string) {
 	return pathname === '/auth' || pathname === '/login' || pathname === '/register'
 }
 
-function getUserInitials(user: AuthUser) {
-	const fullName = `${user.firstName} ${user.lastName}`.trim()
-	return fullName
-		.split(/\s+/)
-		.filter(Boolean)
-		.slice(0, 2)
-		.map((part) => part[0]?.toUpperCase() ?? '')
-		.join('')
+const DEFAULT_AVATAR = buildAvatarUrl(null)
+
+// Renders an email with a soft break opportunity right after the "@" so that,
+// if it must wrap, it wraps between the local part and the domain instead of
+// splitting a word in half.
+function renderBreakableEmail(email: string) {
+	const atIndex = email.indexOf('@')
+	if (atIndex === -1) return email
+
+	return (
+		<>
+			{email.slice(0, atIndex + 1)}
+			<wbr />
+			{email.slice(atIndex + 1)}
+		</>
+	)
 }
 
 function Navbar() {
@@ -55,7 +62,7 @@ function Navbar() {
 		[user],
 	)
 
-	const accountInitials = useMemo(() => (user ? getUserInitials(user) : ''), [user])
+	const accountAvatarSrc = useMemo(() => buildAvatarUrl(user?.avatar_path), [user])
 
 	/*const userRoleLabel = useMemo(
 		() => (user ? `${user.role.charAt(0).toUpperCase()}${user.role.slice(1)}` : ''),
@@ -133,7 +140,7 @@ function Navbar() {
 				<div className="navbar-left">
 					<div className="navbar-logo">
 						<Link to="/" className={location.pathname === '/' ? 'active' : ''}>
-							RF2_P2
+							RetailForge2
 						</Link>
 					</div>
 
@@ -196,7 +203,16 @@ function Navbar() {
 								className={`navbar-pill account-button ${accountOpen ? 'open' : ''}`}
 								onClick={() => setAccountOpen((o) => !o)}
 							>
-								<span className="navbar-avatar">{accountInitials}</span>
+								<img
+									className="navbar-avatar"
+									src={accountAvatarSrc}
+									alt={accountDisplayName}
+									onError={(event) => {
+										if (event.currentTarget.src !== DEFAULT_AVATAR) {
+											event.currentTarget.src = DEFAULT_AVATAR
+										}
+									}}
+								/>
 
 								<span className="account-info">
 									<span className="account-name">{accountDisplayName}</span>
@@ -209,7 +225,7 @@ function Navbar() {
 							<ul className={`navbar-menu navbar-menu--right ${accountOpen ? 'open' : ''}`}>
 								<li>
 									<div className="navbar-menu-item account-email">
-										<span>{user.email}</span>
+										<span className="account-email-value">{renderBreakableEmail(user.email)}</span>
 										<span className="account-role small">{userRoleLabel}</span>
 									</div>
 								</li>

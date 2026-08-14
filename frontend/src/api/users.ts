@@ -1,5 +1,18 @@
-import axios from "axios"
+import api, { getApiErrorMessage, API_BASE_URL } from "./apiClient"
 import type { UserRecord } from "../types/store"
+
+export const DEFAULT_AVATAR_PATH = "/images/other_images/default_avatar.jpg"
+
+// Shared avatar-URL builder. Was previously redeclared independently (as a
+// local apiBaseUrl + DEFAULT_AVATAR + ternary) in Navbar, ReviewRow,
+// MyProfilePage, and every admin table/page that shows a user's avatar.
+export function buildAvatarUrl(avatarPath: string | null | undefined) {
+    const normalized = avatarPath?.trim() || DEFAULT_AVATAR_PATH
+    if (/^https?:\/\//i.test(normalized)) {
+        return normalized
+    }
+    return `${API_BASE_URL}${normalized.startsWith("/") ? normalized : `/${normalized}`}`
+}
 
 export interface UserDto {
     id: number
@@ -38,11 +51,6 @@ export interface UserUpsertPayload {
     avatar_path?: string | null
 }
 
-const apiClient = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080",
-    withCredentials: true,
-})
-
 // ✅ Add mapper function to convert backend DTO to frontend Record
 function mapDtoToRecord(dto: UserDto): UserRecord {
     return {
@@ -58,12 +66,12 @@ function mapDtoToRecord(dto: UserDto): UserRecord {
 }
 
 export async function fetchUsers() {
-    const { data } = await apiClient.get<UserDto[]>("/api/users")
+    const { data } = await api.get<UserDto[]>("/api/users")
     return data.map(mapDtoToRecord)
 }
 
 export async function fetchUserById(id: number) {
-    const { data } = await apiClient.get<UserDto>(`/api/users/${id}`)
+    const { data } = await api.get<UserDto>(`/api/users/${id}`)
     return mapDtoToRecord(data)
 }
 
@@ -80,7 +88,7 @@ export async function createUser(payload: UserUpsertPayload) {
         avatar_path: payload.avatar_path || null,
     }
 
-    const { data } = await apiClient.post<UserDto>("/api/users", backendPayload)
+    const { data } = await api.post<UserDto>("/api/users", backendPayload)
     return mapDtoToRecord(data)
 }
 
@@ -101,19 +109,19 @@ export async function updateUser(id: number, payload: UserUpsertPayload) {
         backendPayload.passwordHash = payload.password
     }
 
-    const { data } = await apiClient.put<UserDto>(`/api/users/${id}`, backendPayload)
+    const { data } = await api.put<UserDto>(`/api/users/${id}`, backendPayload)
     return mapDtoToRecord(data)
 }
 
 export async function deleteUser(id: number) {
-    await apiClient.delete(`/api/users/${id}`)
+    await api.delete(`/api/users/${id}`)
 }
 
 export async function uploadUserAvatar(id: number, file: File) {
     const form = new FormData()
     form.append("avatar", file)
 
-    const { data } = await apiClient.put<UserDto>(`/api/users/${id}/avatar`, form, {
+    const { data } = await api.put<UserDto>(`/api/users/${id}/avatar`, form, {
         headers: { "Content-Type": "multipart/form-data" },
     })
     return mapDtoToRecord(data)
@@ -131,18 +139,10 @@ export async function bulkCreateUsers(rows: UserBulkRowDto[]) {
         address: row.address || "",
     }))
 
-    const { data } = await apiClient.post<UserBulkResultDto>("/api/users/bulk", {
+    const { data } = await api.post<UserBulkResultDto>("/api/users/bulk", {
         rows: backendRows,
     })
     return data
 }
 
-export function getUserApiErrorMessage(error: unknown, fallback: string): string {
-    if (axios.isAxiosError(error)) {
-        return error.response?.data?.message ?? fallback
-    }
-    if (error instanceof Error) {
-        return error.message
-    }
-    return fallback
-}
+export const getUserApiErrorMessage = getApiErrorMessage
