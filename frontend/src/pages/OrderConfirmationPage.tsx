@@ -20,6 +20,7 @@ interface OrderItem {
     imagePath: string | null
     price: number
     quantity: number
+    brand: string | null
 }
 
 export default function OrderConfirmationPage() {
@@ -135,54 +136,50 @@ export default function OrderConfirmationPage() {
 
                         {error && <div className="items-error">{error}</div>}
 
-                        <div className="items-table-wrapper">
-                            <table className="items-table">
-                                <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th className="right">Price</th>
-                                    <th className="center">Qty</th>
-                                    <th className="right">Total</th>
-                                </tr>
-                                </thead>
+                        <div className="order-items-list">
+                            <div className="order-item-row order-item-row--head" aria-hidden="true">
+                                <span className="order-item-col order-item-col--product">Product</span>
+                                <span className="order-item-col order-item-col--price">Price</span>
+                                <span className="order-item-col order-item-col--qty">Qty</span>
+                                <span className="order-item-col order-item-col--total">Total</span>
+                            </div>
 
-                                <tbody>
-                                {items.map((item) => (
-                                    <tr key={item.id}>
-                                        <td>
-                                            <div className="item-product">
-                                                <Link to={`/products/${item.productId}`}>
-                                                    <img
-                                                        src={buildBackendImageUrl(item.imagePath)}
-                                                        alt={item.productName}
-                                                        className="item-img"
-                                                        onError={(e) => {
-                                                            e.currentTarget.src = buildBackendImageUrl(null)
-                                                        }}
-                                                    />
-                                                </Link>
+                            {items.map((item) => (
+                                <div key={item.id} className="order-item-row">
+                                    <div className="order-item-col order-item-col--product">
+                                        <Link to={`/products/${item.productId}`} className="item-img-link">
+                                            <img
+                                                src={buildBackendImageUrl(item.imagePath)}
+                                                alt={item.productName}
+                                                className="item-img"
+                                                onError={(e) => {
+                                                    e.currentTarget.src = buildBackendImageUrl(null)
+                                                }}
+                                            />
+                                        </Link>
 
-                                                <div className="item-info">
-                                                    <Link
-                                                        to={`/products/${item.productId}`}
-                                                        className="item-name"
-                                                    >
-                                                        {item.productName}
-                                                    </Link>
-                                                    <div className="item-id">Product ID: {item.productId}</div>
-                                                </div>
-                                            </div>
-                                        </td>
+                                        <div className="item-info">
+                                            <Link
+                                                to={`/products/${item.productId}`}
+                                                className="item-name"
+                                            >
+                                                {item.productName}
+                                            </Link>
+                                            {item.brand && (
+                                                <span className="item-brand-badge">{item.brand}</span>
+                                            )}
+                                        </div>
+                                    </div>
 
-                                        <td className="right link">${item.price}</td>
-                                        <td className="center">{item.quantity}</td>
-                                        <td className="right success">
-                                            ${(item.price * item.quantity).toFixed(2)}
-                                        </td>
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </table>
+                                    <span className="order-item-col order-item-col--price link">
+                                        ${item.price}
+                                    </span>
+                                    <span className="order-item-col order-item-col--qty">×{item.quantity}</span>
+                                    <span className="order-item-col order-item-col--total success">
+                                        ${(item.price * item.quantity).toFixed(2)}
+                                    </span>
+                                </div>
+                            ))}
                         </div>
                     </div>
 

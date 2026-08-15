@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react"
-import type { StoreProductDto } from "../../api/products"
+import type { ProductDto } from "../../api/products"
 import type { CategoryDto } from "../../api/categories"
 import type { DepartmentDto } from "../../api/departments"
 import type { FilterSection } from "../../components/common/AdvancedSearchPanel"
@@ -9,7 +9,7 @@ type SortOrder = "asc" | "desc"
 type StockFilter = "any" | "in" | "out"
 
 export function useMyFavoriteFilters(
-    products: StoreProductDto[],
+    products: ProductDto[],
     categories: CategoryDto[] = [],
     departments: DepartmentDto[] = []
 ) {

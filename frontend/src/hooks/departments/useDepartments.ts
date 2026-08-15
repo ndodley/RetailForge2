@@ -4,7 +4,7 @@ import {
     createDepartment,
     deleteDepartment as deleteDepartmentRequest,
     fetchDepartments,
-    getApiErrorMessage,
+    getDepartmentApiErrorMessage,
     updateDepartment as updateDepartmentRequest,
     type DepartmentDto,
 } from "../../api/departments.ts"
@@ -15,7 +15,6 @@ import { parseDepartmentCsv } from "../../util/departmentCsv.ts"
 const defaultStatus: DepartmentStatus = "active"
 const defaultDescription =
     "Departments are used to group categories and products."
-const defaultManager = "Unassigned"
 const defaultFeaturedProduct = "No featured product yet"
 
 function slugify(value: string) {
@@ -35,7 +34,6 @@ function toDepartmentRecord(department: DepartmentDto): DepartmentRecord {
         categoryCount: department.categoryCount ?? 0,
         productCount: department.productCount ?? 0,
         featuredProduct: defaultFeaturedProduct,
-        manager: defaultManager,
         updatedAt: new Date().toISOString().slice(0, 10),
         status: defaultStatus,
     }
@@ -75,7 +73,7 @@ export function useDepartments() {
             } catch (error) {
                 setDepartments([])
                 setErrorMessage(
-                    getApiErrorMessage(
+                    getDepartmentApiErrorMessage(
                         error,
                         "Unable to load departments from the backend.",
                     ),
@@ -141,7 +139,7 @@ export function useDepartments() {
             setSuccessMessage("Department deleted successfully.")
         } catch (error) {
             setErrorMessage(
-                getApiErrorMessage(error, "Unable to delete the department."),
+                getDepartmentApiErrorMessage(error, "Unable to delete the department."),
             )
         }
     }
@@ -190,7 +188,7 @@ export function useDepartments() {
             setActiveTab("dashboard")
         } catch (error) {
             setErrorMessage(
-                getApiErrorMessage(error, "Unable to save the department."),
+                getDepartmentApiErrorMessage(error, "Unable to save the department."),
             )
         } finally {
             setIsSaving(false)
@@ -224,7 +222,7 @@ export function useDepartments() {
             )
         } catch (error) {
             setErrorMessage(
-                getApiErrorMessage(
+                getDepartmentApiErrorMessage(
                     error,
                     "Unable to complete the bulk upload.",
                 ),

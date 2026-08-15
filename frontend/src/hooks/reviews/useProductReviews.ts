@@ -35,6 +35,7 @@ export function useProductReviews(productId: number) {
     useEffect(() => {
         let active = true
 
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLoading(true)
         setError('')
         void loadReviews().finally(() => {

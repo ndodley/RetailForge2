@@ -1,29 +1,45 @@
 .rf-dept-card {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 
 .rf-dept-title {
-    font-size: 18px;
+    font-size: 19px;
     font-weight: 900;
+    letter-spacing: -0.01em;
     color: var(--admin-text-strong);
-    margin-bottom: 4px;
 }
 
-.rf-dept-sub {
+.rf-dept-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.rf-dept-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--admin-surface-1);
+    border: 1px solid var(--admin-border);
     color: var(--admin-text-muted);
-    font-size: 14px;
-    line-height: 1.5;
+    font-size: 12.5px;
+    font-weight: 700;
 }
 
-.rf-dept-sub strong {
-    color: var(--admin-text);
-    font-weight: 800;
+.rf-dept-stat strong {
+    color: var(--admin-accent);
+    font-weight: 900;
+    font-size: 13.5px;
 }
 
 .rf-dept-actions {
     display: flex;
     gap: 8px;
-    margin-top: 8px;
+    margin-top: 2px;
+    padding-top: 12px;
+    border-top: 1px solid var(--admin-border);
 }

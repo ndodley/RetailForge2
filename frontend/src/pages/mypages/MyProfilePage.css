@@ -6,6 +6,8 @@
 }
 
 .myprof-page {
+    position: relative;
+    isolation: isolate;
     width: 100%;
     max-width: 1100px;
     margin: 0 auto;
@@ -15,6 +17,19 @@
     padding-bottom: 40px;
 }
 
+.myprof-page::before {
+    content: '';
+    position: absolute;
+    inset: -30px -10% auto -10%;
+    height: 300px;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(50% 50% at 22% 25%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%),
+        radial-gradient(50% 50% at 82% 10%, color-mix(in srgb, var(--link) 12%, transparent), transparent 70%);
+    filter: blur(16px);
+}
+
 .myprof-topbar {
     display: flex;
     align-items: center;
@@ -22,34 +37,57 @@
 }
 
 .myprof-back-link {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    width: fit-content;
-    background: var(--nav-pill-bg);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 10px 14px;
+    background: var(--surface-3);
     color: var(--text);
-    font-size: 13px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 12px;
     font-weight: 900;
+    font-size: 13px;
     text-decoration: none;
-    transition: transform 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.15s ease, background 0.15s ease;
 }
 
 .myprof-back-link:hover {
     transform: translateY(-1px);
+    background: var(--surface-2);
 }
 
 .myprof-panel {
+    position: relative;
     background: var(--surface-2);
     border-radius: 18px;
     box-shadow: var(--shadow);
     border: 1px solid var(--border);
     overflow: hidden;
+    animation: myprofFadeUp 380ms ease;
+}
+
+@keyframes myprofFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.myprof-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), #f97316 45%, var(--link));
+    z-index: 1;
 }
 
 .myprof-panel-header {
+    position: relative;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -58,6 +96,39 @@
     padding: 1.75rem 1.5rem 1.25rem;
     background: var(--nav-bg);
     border-bottom: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.myprof-panel-header::after {
+    content: '';
+    position: absolute;
+    inset: -60% auto auto -10%;
+    width: 260px;
+    height: 260px;
+    border-radius: 999px;
+    background: radial-gradient(50% 50% at 50% 50%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%);
+    pointer-events: none;
+}
+
+.myprof-heading {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+
+.myprof-heading-icon {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    font-size: 19px;
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-border);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 .myprof-title-block {
@@ -82,6 +153,7 @@
 }
 
 .myprof-actions {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -97,7 +169,7 @@
     font-weight: 900;
     font-size: 13px;
     color: var(--text);
-    transition: transform 0.15s ease, background 0.15s ease;
+    transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
 }
 
 .myprof-btn:hover:not(:disabled) {
@@ -110,17 +182,47 @@
     cursor: not-allowed;
 }
 
+.myprof-btn--outline {
+    border: 1px solid var(--accent-border);
+    background: var(--accent-bg);
+    color: var(--accent);
+}
+
+.myprof-btn--outline:hover:not(:disabled) {
+    background: var(--accent);
+    color: #1a1200;
+    border-color: var(--accent);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px -12px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
 .myprof-btn--primary {
     border: none;
     background: var(--success);
     color: #fff;
+    box-shadow: 0 10px 22px -12px color-mix(in srgb, var(--success) 70%, transparent);
+}
+
+.myprof-btn--primary:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--success) 86%, black 14%);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 14px 26px -12px color-mix(in srgb, var(--success) 70%, transparent);
 }
 
 .myprof-btn--accent {
     border: none;
-    background: var(--accent);
-    color: #111;
+    background: linear-gradient(120deg, var(--accent), #f97316);
+    color: #1a1200;
     width: 100%;
+    box-shadow: var(--shadow);
+}
+
+.myprof-btn--accent:hover:not(:disabled) {
+    background: linear-gradient(120deg, var(--accent), #f97316);
+    color: #1a1200;
+    transform: translateY(-1px);
+    filter: brightness(1.05);
 }
 
 .myprof-panel-body {
@@ -130,20 +232,34 @@
     gap: 16px;
 }
 
-.myprof-error {
-    background: var(--danger-soft);
-    color: var(--danger);
+.myprof-error,
+.myprof-success {
     padding: 12px 14px;
     border-radius: 12px;
     font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.myprof-error {
+    background: var(--danger-soft);
+    color: var(--danger);
+    border-left: 3px solid var(--danger);
+}
+
+.myprof-error::before {
+    content: '⚠';
 }
 
 .myprof-success {
     background: var(--success-soft);
     color: var(--success);
-    padding: 12px 14px;
-    border-radius: 12px;
-    font-weight: 800;
+    border-left: 3px solid var(--success);
+}
+
+.myprof-success::before {
+    content: '✓';
 }
 
 .myprof-sections {
@@ -167,21 +283,56 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.myprof-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+    border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
 }
 
 .myprof-card-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
     font-weight: 900;
     color: var(--text);
     font-size: 15px;
+}
+
+.myprof-card-title::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
 }
 
 .myprof-avatar-wrap {
     display: flex;
     justify-content: center;
     position: relative;
+    padding-top: 6px;
+}
+
+.myprof-avatar-wrap::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 174px;
+    height: 174px;
+    border-radius: 999px;
+    background: conic-gradient(from 180deg, var(--accent), #f97316, var(--link), var(--accent));
+    opacity: 0.4;
+    filter: blur(9px);
+    z-index: 0;
 }
 
 .myprof-avatar {
+    position: relative;
+    z-index: 1;
     width: 168px;
     height: 168px;
     border-radius: 999px;
@@ -189,11 +340,17 @@
     border: 3px solid var(--surface-2);
     box-shadow: var(--shadow);
     background: var(--surface-2);
+    transition: transform 0.2s ease;
+}
+
+.myprof-avatar-wrap:hover .myprof-avatar {
+    transform: scale(1.03);
 }
 
 .myprof-avatar-role-dot {
     position: absolute;
-    bottom: 6px;
+    z-index: 2;
+    top: 148px;
     right: calc(50% - 84px + 8px);
     width: 22px;
     height: 22px;
@@ -217,12 +374,13 @@
     color: var(--muted-2);
     cursor: pointer;
     background: var(--surface-2);
-    transition: border-color 0.15s ease, color 0.15s ease;
+    transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
 }
 
 .myprof-file-input:hover {
     border-color: var(--accent);
     color: var(--text);
+    background: var(--accent-bg);
 }
 
 .myprof-file-input input[type="file"] {
@@ -232,20 +390,32 @@
 .myprof-fields {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 12px;
-    align-items: stretch;
+    gap: 10px;
+    align-items: start;
 }
 
 .myprof-field {
     border: 1px solid var(--border);
+    border-left: 3px solid transparent;
     border-radius: 14px;
-    padding: 12px;
+    padding: 8px 12px;
     background: var(--surface-2);
     min-width: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 8px;
+    gap: 2px;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.myprof-field:hover {
+    border-left-color: color-mix(in srgb, var(--accent) 55%, transparent);
+    background: color-mix(in srgb, var(--surface-2) 92%, var(--accent) 8%);
+}
+
+.myprof-field:focus-within {
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+    border-left-color: var(--accent);
 }
 
 .myprof-field--full {
@@ -253,11 +423,26 @@
 }
 
 .myprof-field-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     color: var(--muted-2);
     font-weight: 850;
     font-size: 11px;
     letter-spacing: 0.5px;
     text-transform: uppercase;
+}
+
+.myprof-field-label span[aria-hidden] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 5px;
+    background: var(--accent-bg);
+    font-size: 10px;
+    flex-shrink: 0;
 }
 
 .myprof-field:has(.myprof-role-badge) {
@@ -272,7 +457,7 @@
 }
 
 .myprof-value--wrap {
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
 }
 
 .myprof-value--pre {
@@ -291,6 +476,7 @@
     background: transparent;
     color: var(--text);
     font-family: inherit;
+    transition: border-color 0.15s ease;
 }
 
 .myprof-input:focus {
@@ -341,4 +527,22 @@
     color: var(--muted-2);
     font-weight: 700;
     font-size: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .myprof-panel,
+    .myprof-avatar,
+    .myprof-card,
+    .myprof-btn,
+    .myprof-back-link {
+        animation: none;
+        transition: none;
+    }
+
+    .myprof-avatar-wrap:hover .myprof-avatar,
+    .myprof-card:hover,
+    .myprof-btn:hover,
+    .myprof-back-link:hover {
+        transform: none;
+    }
 }

@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { addProductToCart, removeFromCart, fetchCart } from '../../api/cart'
-import { buildBackendImageUrl, type StoreProductDto } from '../../api/products'
+import { buildBackendImageUrl, type ProductDto } from '../../api/products'
 import { useAuth } from '../../hooks/useAuth'
 import { useFavorites } from '../../hooks/useFavorites'
 import './ProductCard.css'
 
 interface ProductCardProps {
-	product: StoreProductDto
+	product: ProductDto
 }
 
 function formatPrice(price: number) {

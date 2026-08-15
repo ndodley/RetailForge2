@@ -55,6 +55,9 @@ export function useMyReviews() {
 
     useEffect(() => {
         if (!loading && user) {
+            // Kicks off the fetch once auth resolves; loadReviews owns its
+            // own loading/error state, this just triggers it.
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             void loadReviews();
         }
         if (!loading && !user) {

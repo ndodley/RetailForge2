@@ -92,7 +92,11 @@ function CartPage() {
 
 					{cartItems.length > 0 && (
 						<div className="cart-header-actions">
-							<Button variant="primary" onClick={() => navigate('/products')}>
+							<Button
+								variant="primary"
+								className="cart-continue-btn"
+								onClick={() => navigate('/products')}
+							>
 								Continue Shopping
 							</Button>
 						</div>
@@ -117,10 +121,10 @@ function CartPage() {
 
 								return (
 									<div key={item.id} className="cart-item-card slide-up">
-										<Link to={`/products/${item.productId}`}>
+										<Link to={`/products/${item.productId}`} className="cart-item-image-link">
 											<img
 												src={buildBackendImageUrl(item.imagePath)}
-												alt={item.name}
+												alt={item.productName}
 												className="cart-item-image"
 												onError={(e) => {
 													e.currentTarget.src = buildBackendImageUrl(null)
@@ -129,40 +133,57 @@ function CartPage() {
 										</Link>
 
 										<div className="cart-item-info">
-                      <span className="cart-item-dept">
-                        {item.categoryName || 'Uncategorized'}
-                      </span>
+											{item.categoryName && (
+												<span className="cart-item-badge">{item.categoryName}</span>
+											)}
 
-											<h3 className="cart-item-name">{item.name}</h3>
+											{item.brand && <span className="cart-item-brand">{item.brand}</span>}
 
-											<div className="cart-item-meta">
-												<span>${item.priceAtTime.toFixed(2)} each</span>
-												<strong>${lineTotal.toFixed(2)}</strong>
-											</div>
+											<Link to={`/products/${item.productId}`} className="cart-item-name-link">
+												<h3 className="cart-item-name">{item.productName}</h3>
+											</Link>
+
+											<span className="cart-item-unit-price">${item.priceAtTime.toFixed(2)} each</span>
+
+											{item.stock > 0 && item.stock <= 5 && (
+												<span className="cart-item-stock-warning">Only {item.stock} left in stock</span>
+											)}
 										</div>
 
 										<div className="cart-item-controls">
-											<Button
-												variant="pill"
-												disabled={item.quantity <= 1}
-												onClick={() => handleQuantityChange(item, item.quantity - 1)}
+											<div className="qty-stepper">
+												<Button
+													variant="pill"
+													className="qty-stepper-btn"
+													disabled={item.quantity <= 1}
+													onClick={() => handleQuantityChange(item, item.quantity - 1)}
+													aria-label="Decrease quantity"
+												>
+													−
+												</Button>
+
+												<strong className="qty-display">{item.quantity}</strong>
+
+												<Button
+													variant="pill"
+													className="qty-stepper-btn"
+													disabled={item.quantity >= item.stock}
+													onClick={() => handleQuantityChange(item, item.quantity + 1)}
+													aria-label="Increase quantity"
+												>
+													+
+												</Button>
+											</div>
+
+											<strong className="cart-item-line-total">${lineTotal.toFixed(2)}</strong>
+
+											<button
+												type="button"
+												className="cart-item-remove"
+												onClick={() => handleRemove(item)}
 											>
-												−
-											</Button>
-
-											<strong className="qty-display">{item.quantity}</strong>
-
-											<Button
-												variant="pill"
-												disabled={item.quantity >= item.stock}
-												onClick={() => handleQuantityChange(item, item.quantity + 1)}
-											>
-												+
-											</Button>
-
-											<Button variant="danger" onClick={() => handleRemove(item)}>
 												Remove
-											</Button>
+											</button>
 										</div>
 									</div>
 								)
@@ -184,11 +205,12 @@ function CartPage() {
 
 							<div className="summary-row total-row">
 								<span className="summary-label">Total</span>
-								<strong className="summary-value">${subtotal.toFixed(2)}</strong>
+								<strong className="summary-value summary-total-value">${subtotal.toFixed(2)}</strong>
 							</div>
 
 							<Button
 								variant="primary"
+								className="cart-checkout-btn"
 								fullWidth
 								onClick={() =>
 									navigate('/checkout', {
@@ -199,9 +221,9 @@ function CartPage() {
 								Proceed to Checkout
 							</Button>
 
-							<Button variant="danger" fullWidth onClick={handleClearCart}>
+							<button type="button" className="cart-clear-btn" onClick={handleClearCart}>
 								Clear Cart
-							</Button>
+							</button>
 						</aside>
 					</div>
 				)}

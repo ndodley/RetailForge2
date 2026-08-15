@@ -68,6 +68,8 @@ export function useMyProfile() {
 
     useEffect(() => {
         if (!selectedFile) {
+            // Clears any stale preview when the selection is removed.
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setPreviewUrl("")
             return
         }

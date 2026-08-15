@@ -9,7 +9,7 @@ import {
     type ReviewDto,
 } from "../../api/reviews";
 import { fetchUsers } from "../../api/users";
-import { fetchProducts, type ProductAdminDto } from "../../api/productAdminApi";
+import { fetchStoreProducts, type ProductDto } from "../../api/products";
 import { fetchCategories, type CategoryDto } from "../../api/categories";
 import { fetchDepartments, type DepartmentDto } from "../../api/departments";
 import type { ReviewRecord } from "../../types/store";
@@ -42,7 +42,7 @@ function mapDtoToRecord(dto: ReviewDto): ReviewRecord {
 export function useReviews() {
     const [reviews, setReviews] = useState<ReviewRecord[]>([]);
     const [users, setUsers] = useState<ReviewUser[]>([]);
-    const [products, setProducts] = useState<ProductAdminDto[]>([]);
+    const [products, setProducts] = useState<ProductDto[]>([]);
     const [categories, setCategories] = useState<CategoryDto[]>([]);
     const [departments, setDepartments] = useState<DepartmentDto[]>([]);
 
@@ -74,7 +74,7 @@ export function useReviews() {
                 const [reviewRes, userRes, productRes, categoryRes, departmentRes] = await Promise.all([
                     fetchReviews(),
                     fetchUsers(),
-                    fetchProducts(),
+                    fetchStoreProducts(),
                     fetchCategories(),
                     fetchDepartments(),
                 ]);

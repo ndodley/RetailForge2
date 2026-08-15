@@ -1,7 +1,6 @@
 /* Admin Page Layout */
 .rf-admin-page {
   background: transparent;
-  min-height: calc(100vh - 120px);
   padding: 0;
 }
 

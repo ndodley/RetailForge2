@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react"
 import type { ReviewRecord } from "../../types/store.ts"
 import type { FilterSection } from "../../components/common/AdvancedSearchPanel.tsx"
-import type { ProductAdminDto } from "../../api/productAdminApi.ts"
+import type { ProductDto } from "../../api/products.ts"
 import type { CategoryDto } from "../../api/categories.ts"
 import type { DepartmentDto } from "../../api/departments.ts"
 
@@ -10,7 +10,7 @@ type SortOrder = "asc" | "desc"
 
 export function useAdminReviewFilters(
     reviews: ReviewRecord[],
-    products: ProductAdminDto[] = [],
+    products: ProductDto[] = [],
     categories: CategoryDto[] = [],
     departments: DepartmentDto[] = []
 ) {
@@ -34,7 +34,7 @@ export function useAdminReviewFilters(
 
     // productId -> product metadata, so a review can be traced to its department/category
     const productMetaById = useMemo(() => {
-        const map = new Map<number, ProductAdminDto>()
+        const map = new Map<number, ProductDto>()
         products.forEach((p) => map.set(p.id, p))
         return map
     }, [products])

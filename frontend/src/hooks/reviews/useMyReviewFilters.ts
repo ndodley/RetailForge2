@@ -1,13 +1,13 @@
 import { useMemo, useState } from "react";
 import type { ReviewRecord } from "../../types/store";
 import type { FilterSection } from "../../components/common/AdvancedSearchPanel";
-import type { StoreProductDto } from "../../api/products";
+import type { ProductDto } from "../../api/products";
 import type { CategoryDto } from "../../api/categories";
 import type { DepartmentDto } from "../../api/departments";
 
 export function useMyReviewFilters(
     reviews: ReviewRecord[],
-    products: StoreProductDto[] = [],
+    products: ProductDto[] = [],
     categories: CategoryDto[] = [],
     departments: DepartmentDto[] = []
 ) {
@@ -32,7 +32,7 @@ export function useMyReviewFilters(
 
     // productId -> product metadata, so a review can be traced to its department/category
     const productMetaById = useMemo(() => {
-        const map = new Map<number, StoreProductDto>();
+        const map = new Map<number, ProductDto>();
         products.forEach((p) => map.set(p.id, p));
         return map;
     }, [products]);

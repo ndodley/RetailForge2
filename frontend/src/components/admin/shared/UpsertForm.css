@@ -54,6 +54,30 @@
     gap: 8px;
 }
 
+/* Optional row wrapper for placing fields side by side instead of stacked.
+   Wraps onto additional lines on its own once fields get too narrow, so it
+   also works for rows with more than two fields (e.g. 4-up on the Users form). */
+.admin-field-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+}
+
+.admin-field-row > .admin-field {
+    flex: 1 1 180px;
+    min-width: 180px;
+}
+
+@media (max-width: 640px) {
+    .admin-field-row {
+        flex-direction: column;
+    }
+
+    .admin-field-row > .admin-field {
+        min-width: 0;
+    }
+}
+
 .admin-label {
     font-weight: 900;
     font-size: 14px;

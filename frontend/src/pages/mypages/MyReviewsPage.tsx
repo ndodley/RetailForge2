@@ -93,9 +93,16 @@ function MyReviewsPage() {
 
                 <div className="myrev-panel">
                     <div className="myrev-panel-header">
-                        <h2 className="myrev-title">My Reviews</h2>
-                        <div className="myrev-subtitle">
-                            View, edit, or delete the reviews you&rsquo;ve written.
+                        <div className="myrev-heading">
+                            <div className="myrev-heading-icon" aria-hidden>
+                                ⭐
+                            </div>
+                            <div className="myrev-title-block">
+                                <h2 className="myrev-title">My Reviews</h2>
+                                <div className="myrev-subtitle">
+                                    View, edit, or delete the reviews you&rsquo;ve written.
+                                </div>
+                            </div>
                         </div>
                     </div>
 

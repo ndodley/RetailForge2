@@ -1,5 +1,17 @@
+@keyframes rfOrderCardFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .rf-order-card-content {
     position: relative;
+    animation: rfOrderCardFadeUp 320ms ease both;
 }
 
 .rf-order-card-content--current::before {
@@ -40,14 +52,45 @@
 .rf-order-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
+}
+
+.rf-order-header-main {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    min-width: 0;
 }
 
 .rf-order-title {
     font-size: 17px;
     font-weight: 900;
     color: var(--admin-text-strong, var(--text));
+}
+
+.rf-order-delete-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border-radius: 8px;
+    border: 1px solid var(--admin-border, var(--border));
+    background: var(--admin-surface-1);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.rf-order-delete-btn:hover {
+    background: color-mix(in srgb, var(--danger, #e53935) 16%, transparent);
+    border-color: var(--danger, #e53935);
+    transform: scale(1.06);
 }
 
 .rf-order-status-badge {
@@ -89,13 +132,14 @@
 }
 
 .rf-order-user-avatar {
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     object-fit: cover;
     flex-shrink: 0;
     margin-top: 2px;
     border: 2px solid var(--admin-surface-3);
+    box-shadow: 0 0 0 1px var(--admin-border);
 }
 
 .rf-order-user-info {
@@ -168,6 +212,9 @@
 }
 
 .rf-order-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     font-weight: 700;
     color: var(--admin-text-muted, var(--text-secondary));
 }
@@ -182,23 +229,3 @@
     font-weight: 800;
 }
 
-.rf-order-actions {
-    display: flex;
-    gap: 8px;
-    padding-top: 10px;
-    border-top: 1px solid var(--admin-border, var(--border));
-}
-
-.rf-order-actions .rf-admin-btn {
-    flex: 1;
-    justify-content: center;
-    padding: 8px 8px;
-    font-size: 12.5px;
-    gap: 4px;
-    white-space: nowrap;
-    box-shadow: none;
-}
-
-.rf-order-actions .rf-admin-btn .rf-admin-btn-label {
-    white-space: nowrap;
-}

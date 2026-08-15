@@ -1,11 +1,12 @@
 .myrev-card {
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 14px;
     display: flex;
     flex-direction: column;
     gap: 14px;
+    transition: transform 0.18s ease;
+}
+
+.myrev-card:hover {
+    transform: translateY(-3px);
 }
 
 .myrev-top {
@@ -14,16 +15,32 @@
 }
 
 .myrev-img-link {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 90px;
+    height: 90px;
+    padding: 6px;
+    box-sizing: border-box;
+    background: var(--surface-3);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.myrev-img-link:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow);
 }
 
 .myrev-img {
-    width: 90px;
-    height: 90px;
-    object-fit: cover;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    flex-shrink: 0;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
 }
 
 .myrev-info {
@@ -32,6 +49,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    gap: 8px;
 }
 
 .myrev-product-name {
@@ -39,9 +57,15 @@
     color: var(--link);
     text-decoration: none;
     display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    overflow-wrap: break-word;
+    line-height: 1.35;
+    transition: color 0.15s ease;
+}
+
+.myrev-product-name:hover {
+    color: var(--accent);
+    text-decoration: underline;
 }
 
 .myrev-rating-row {
@@ -54,23 +78,31 @@
 }
 
 .myrev-date {
-    color: var(--muted);
-    font-size: 13px;
+    color: var(--muted-2);
+    font-size: 12px;
     font-weight: 700;
     white-space: nowrap;
+    background: var(--nav-pill-bg);
+    border-radius: 999px;
+    padding: 3px 10px;
 }
 
 .myrev-stars {
     display: flex;
-    gap: 4px;
+    gap: 2px;
 }
 
 .myrev-star {
     background: transparent;
     border: none;
-    font-size: 20px;
+    font-size: 18px;
     cursor: pointer;
     color: var(--muted);
+    transition: transform 0.12s ease;
+}
+
+.myrev-star:not(:disabled):hover {
+    transform: scale(1.15);
 }
 
 .myrev-star.filled {
@@ -82,10 +114,12 @@
 }
 
 .myrev-comment-box {
+    position: relative;
     background: var(--surface-3);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 10px;
+    border-left: 3px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+    border-radius: 10px;
+    padding: 10px 12px;
     color: var(--text);
     line-height: 1.55;
     white-space: pre-wrap;
@@ -116,8 +150,20 @@
     padding: 10px 12px;
     border-radius: 12px;
     font-weight: 900;
+    font-size: 13px;
     cursor: pointer;
     border: 1.5px solid var(--border);
+    transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+}
+
+.myrev-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+.myrev-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .myrev-btn.edit {
@@ -139,5 +185,5 @@
     background: var(--success);
     color: var(--surface-2);
     border: none;
-    box-shadow: var(--shadow-1);
+    box-shadow: var(--shadow);
 }

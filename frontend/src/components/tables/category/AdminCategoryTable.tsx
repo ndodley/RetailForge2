@@ -17,8 +17,11 @@ function AdminCategoryTable({ items, onEdit, onDelete }: AdminCategoryTableProps
                 <div className="rf-cat-card">
                     <div className="rf-cat-title">{cat.name}</div>
 
-                    <div className="rf-cat-sub">
-                        Department: <strong>{cat.departmentName ?? "Unassigned"}</strong>
+                    <div className="rf-cat-stats">
+                        <span className="rf-cat-badge">{cat.departmentName ?? "Unassigned"}</span>
+                        <span className="rf-cat-stat">
+                            <strong>{cat.productCount}</strong> {cat.productCount === 1 ? "product" : "products"}
+                        </span>
                     </div>
 
                     <div className="rf-cat-actions">

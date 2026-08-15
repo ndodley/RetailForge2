@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react"
-import { fetchStoreProducts, type StoreProductDto } from "../../api/products.ts"
+import { fetchStoreProducts, type ProductDto } from "../../api/products.ts"
 import { fetchCategories, type CategoryDto } from "../../api/categories.ts"
-import { fetchDepartments, getApiErrorMessage, type DepartmentDto } from "../../api/departments.ts"
+import { fetchDepartments, getDepartmentApiErrorMessage, type DepartmentDto } from "../../api/departments.ts"
 
 export function useStorefrontData() {
-    const [products, setProducts] = useState<StoreProductDto[]>([])
+    const [products, setProducts] = useState<ProductDto[]>([])
     const [categories, setCategories] = useState<CategoryDto[]>([])
     const [departments, setDepartments] = useState<DepartmentDto[]>([])
     const [loading, setLoading] = useState(true)
@@ -31,7 +31,7 @@ export function useStorefrontData() {
                 setDepartments(d)
             } catch (err) {
                 if (!isMounted) return
-                setError(getApiErrorMessage(err, "Failed to load storefront data."))
+                setError(getDepartmentApiErrorMessage(err, "Failed to load storefront data."))
             } finally {
                 if (isMounted) setLoading(false)
             }

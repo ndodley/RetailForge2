@@ -31,6 +31,9 @@ export function useMyOrders() {
 
     useEffect(() => {
         if (!loading && user) {
+            // Kicks off the fetch once auth resolves; loadOrders owns its
+            // own loading/error state, this just triggers it.
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             void loadOrders()
         }
         if (!loading && !user) {

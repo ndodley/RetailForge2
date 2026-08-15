@@ -10,7 +10,7 @@ function Footer() {
 			<div className="site-footer-inner">
 				<div className="site-footer-columns">
 					<div className="site-footer-col site-footer-col--brand">
-						<Link to="/" className="site-footer-brand">RF2_P2</Link>
+						<Link to="/" className="site-footer-brand">RetailForge2</Link>
 						<p className="site-footer-tagline">
 							Electronics, games, fashion, and more — with fast delivery and easy returns.
 						</p>
@@ -43,7 +43,7 @@ function Footer() {
 
 				<div className="site-footer-bottom">
 					<span className="site-footer-copy">
-						© {new Date().getFullYear()} RF2_P2. All rights reserved.
+						© {new Date().getFullYear()} RetailForge2. All rights reserved.
 					</span>
 				</div>
 			</div>

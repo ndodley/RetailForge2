@@ -168,6 +168,8 @@
 .adv-search-cardBody {
   border-top: 1px solid var(--accent-border);
   padding: 8px 10px 10px;
+  max-height: 280px;
+  overflow-y: auto;
 }
 
 .adv-search-options {
