@@ -7,10 +7,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class DepartmentMapper {
 
-    public DepartmentDto toDto(Department department) {
+    public DepartmentDto toDto(Department department, long categoryCount, long productCount) {
         return new DepartmentDto(
                 department.getId(),
-                department.getName()
+                department.getName(),
+                (int) categoryCount,
+                (int) productCount
         );
     }
 }

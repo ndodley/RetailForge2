@@ -13,7 +13,7 @@ public record CategoryDto(
         String description,
         @NotNull(message = "Department is required")
         Integer departmentId,
-        String departmentName
+        String departmentName,
+        Integer productCount
 ) {
 }
-

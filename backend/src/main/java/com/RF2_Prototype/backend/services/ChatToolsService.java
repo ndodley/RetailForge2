@@ -3,6 +3,7 @@ package com.RF2_Prototype.backend.services;
 import com.RF2_Prototype.backend.models.dtos.CartDto;
 import com.RF2_Prototype.backend.models.dtos.CartItemDto;
 import com.RF2_Prototype.backend.models.dtos.OrderDto;
+import com.RF2_Prototype.backend.models.dtos.OrderItemDto;
 import com.RF2_Prototype.backend.models.dtos.ProductAvailabilityDto;
 import com.RF2_Prototype.backend.models.dtos.ProductDto;
 import com.RF2_Prototype.backend.models.dtos.ReviewDto;
@@ -135,9 +136,10 @@ public class ChatToolsService implements IChatToolsService {
     }
 
     @Override
-    @Tool(description = "Get the currently logged-in customer's order history - each order's id, status, total, and placement date, " +
+    @Tool(description = "Get the currently logged-in customer's order history - each order's id, status, total, placement date, " +
+            "and the exact items purchased in it (product name, quantity, brand, category, department, and price paid per item), " +
             "plus the total order count, total amount spent, and which single order they spent the most on. " +
-            "Use this for questions about order status, how many orders they've placed, or which order cost the most. " +
+            "Use this for questions about order status, what items/products were in an order, how many orders they've placed, or which order cost the most. " +
             "Only usable when a customer is actually logged in; if nobody is logged in, this says so instead of guessing.")
     public String getMyOrders() {
         Optional<User> user = getCurrentUser();
@@ -160,6 +162,12 @@ public class ChatToolsService implements IChatToolsService {
                 .max(Comparator.comparing(OrderDto::total))
                 .orElse(null);
 
+        // Looked up once so each purchased item can be enriched with its
+        // current category/department, alongside the name/brand/price/quantity
+        // already snapshotted on the order item itself at purchase time.
+        Map<Integer, ProductDto> productById = productService.getProducts().stream()
+                .collect(Collectors.toMap(ProductDto::id, p -> p, (a, b) -> a));
+
         StringBuilder sb = new StringBuilder();
         sb.append("Total orders placed: ").append(orders.size()).append("\n");
         sb.append("Total spent across all orders: $").append(totalSpent).append("\n");
@@ -167,13 +175,35 @@ public class ChatToolsService implements IChatToolsService {
             sb.append("Highest-spend order: #").append(highestSpendOrder.id())
                     .append(" ($").append(highestSpendOrder.total()).append(")\n");
         }
-        sb.append("\nFull order list:\n");
+        sb.append("\nFull order list (each with its purchased items):\n");
         for (OrderDto order : orders) {
             sb.append("- Order #").append(order.id())
                     .append(": status=").append(order.status())
                     .append(", total=$").append(order.total())
                     .append(", placed=").append(order.createdAt())
                     .append("\n");
+
+            List<OrderItemDto> items = order.items();
+            if (items == null || items.isEmpty()) {
+                sb.append("    (no item details available for this order)\n");
+                continue;
+            }
+            for (OrderItemDto item : items) {
+                ProductDto product = productById.get(item.productId());
+                sb.append("    * ").append(item.productName())
+                        .append(" x").append(item.quantity())
+                        .append(" @ $").append(item.price()).append(" each");
+                if (item.brand() != null && !item.brand().isBlank()) {
+                    sb.append(", brand=").append(item.brand());
+                }
+                if (product != null && product.categoryName() != null) {
+                    sb.append(", category=").append(product.categoryName());
+                }
+                if (product != null && product.departmentName() != null) {
+                    sb.append(", department=").append(product.departmentName());
+                }
+                sb.append("\n");
+            }
         }
         return sb.toString();
     }

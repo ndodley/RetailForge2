@@ -10,6 +10,8 @@ import com.RF2_Prototype.backend.repository.ProductRepository;
 import com.RF2_Prototype.backend.repository.UserRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class OrderMapper {
 
@@ -32,6 +34,10 @@ public class OrderMapper {
                 .map(User::getEmail)
                 .orElse("unknown@example.com");
 
+        // Defensive: a freshly built (not-yet-persisted) Order can have a null items
+        // collection depending on how it was constructed, so never trust it's non-null here.
+        List<OrderItem> orderItems = order.getItems() == null ? List.of() : order.getItems();
+
         return new OrderDto(
                 order.getId(),
                 order.getUserId(),
@@ -40,14 +46,15 @@ public class OrderMapper {
                 order.getTotal(),
                 order.getStatus(),
                 order.getCreatedAt(),
-                order.getItems().stream()
+                orderItems.stream()
                         .map(item -> new OrderItemDto(
                                 item.getId(),
                                 item.getProductId(),
                                 item.getProductName(),
                                 resolveImagePath(item),
                                 item.getPrice(),
-                                item.getQuantity()
+                                item.getQuantity(),
+                                resolveBrand(item)
                         ))
                         .toList()
         );
@@ -74,6 +81,18 @@ public class OrderMapper {
                 .map(Product::getImagePath)
                 .filter(path -> path != null && !path.isBlank())
                 .orElse(snapshotPath);
+    }
+
+    /**
+     * Order items don't snapshot brand at checkout time, so look it up from the live
+     * product record for display. Quietly falls back to null (frontend omits the badge)
+     * if the product has since been deleted.
+     */
+    private String resolveBrand(OrderItem item) {
+        return productRepository.findById(item.getProductId())
+                .map(Product::getBrand)
+                .filter(brand -> brand != null && !brand.isBlank())
+                .orElse(null);
     }
 
     public Order toEntity(OrderDto dto) {

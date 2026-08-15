@@ -8,5 +8,6 @@ public record OrderItemDto(
         String productName,
         String imagePath,
         BigDecimal price,
-        Integer quantity
+        Integer quantity,
+        String brand
 ) {}

@@ -42,5 +42,6 @@ public class Order {
             orphanRemoval = true,
             fetch = FetchType.LAZY
     )
+    @Builder.Default
     private List<OrderItem> items = new ArrayList<>();
 }

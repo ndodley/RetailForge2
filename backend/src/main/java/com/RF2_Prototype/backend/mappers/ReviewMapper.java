@@ -21,6 +21,7 @@ public class ReviewMapper {
                 user.getId(),
                 user.getEmail(),
                 fullName,
+                user.getAvatar_path(),
                 review.getRating(),
                 review.getComment(),
                 review.getCreatedAt(),

@@ -14,6 +14,7 @@ public record ReviewDto(
         Integer userId,
         String userEmail,
         String userFullName,
+        String userAvatarPath,
         @NotNull(message = "Rating is required")
         BigDecimal rating,
         String comment,

@@ -11,8 +11,8 @@
 	<groupId>com.RF2_Prototype</groupId>
 	<artifactId>backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
+	<name>RetailForge2</name>
+	<description>RetailForge2 - full-stack storefront prototype (Spring Boot + PostgreSQL)</description>
 	<url/>
 	<licenses>
 		<license/>
