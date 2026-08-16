@@ -5,7 +5,9 @@ import com.RF2_Prototype.backend.mappers.DepartmentMapper;
 import com.RF2_Prototype.backend.models.dtos.DepartmentBulkUploadRowDto;
 import com.RF2_Prototype.backend.models.dtos.DepartmentDto;
 import com.RF2_Prototype.backend.models.entities.Department;
+import com.RF2_Prototype.backend.repository.CategoryRepository;
 import com.RF2_Prototype.backend.repository.DepartmentRepository;
+import com.RF2_Prototype.backend.repository.ProductRepository;
 import com.RF2_Prototype.backend.services.iservices.IDepartmentService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Sort;
@@ -19,28 +21,37 @@ public class DepartmentService implements IDepartmentService {
 
     private final DepartmentRepository departmentRepository;
     private final DepartmentMapper departmentMapper;
+    private final CategoryRepository categoryRepository;
+    private final ProductRepository productRepository;
 
-    public DepartmentService(DepartmentRepository departmentRepository, DepartmentMapper departmentMapper) {
+    public DepartmentService(
+            DepartmentRepository departmentRepository,
+            DepartmentMapper departmentMapper,
+            CategoryRepository categoryRepository,
+            ProductRepository productRepository
+    ) {
         this.departmentRepository = departmentRepository;
         this.departmentMapper = departmentMapper;
+        this.categoryRepository = categoryRepository;
+        this.productRepository = productRepository;
     }
 
     @Override
     public List<DepartmentDto> getDepartments() {
         return departmentRepository.findAll(Sort.by(Sort.Direction.ASC, "id"))
                 .stream()
-                .map(departmentMapper::toDto)
+                .map(this::toDtoWithCounts)
                 .toList();
     }
 
     @Override
     public DepartmentDto getDepartmentById(Integer id) {
-        return departmentMapper.toDto(getDepartmentEntity(id));
+        return toDtoWithCounts(getDepartmentEntity(id));
     }
 
     @Override
     public DepartmentDto createDepartment(DepartmentDto departmentDto) {
-        return departmentMapper.toDto(departmentRepository.save(buildDepartment(departmentDto.name())));
+        return toDtoWithCounts(departmentRepository.save(buildDepartment(departmentDto.name())));
     }
 
     @Override
@@ -58,13 +69,19 @@ public class DepartmentService implements IDepartmentService {
         Department department = getDepartmentEntity(id);
         department.setName(normalizeName(departmentDto.name()));
 
-        return departmentMapper.toDto(departmentRepository.save(department));
+        return toDtoWithCounts(departmentRepository.save(department));
     }
 
     @Override
     public void deleteDepartment(Integer id) {
         Department department = getDepartmentEntity(id);
         departmentRepository.delete(department);
+    }
+
+    private DepartmentDto toDtoWithCounts(Department department) {
+        long categoryCount = categoryRepository.countByDepartment_Id(department.getId());
+        long productCount = productRepository.countByCategory_Department_Id(department.getId());
+        return departmentMapper.toDto(department, categoryCount, productCount);
     }
 
     private Department getDepartmentEntity(Integer id) {

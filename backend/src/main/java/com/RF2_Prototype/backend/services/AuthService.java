@@ -97,7 +97,15 @@ public class AuthService {
             return new AuthResponse("No authenticated user", null);
         }
 
-        return new AuthResponse("Authenticated user", toAuthUserDto(authenticatedUser.getUser()));
+        // The AuthenticatedUser principal is deserialized from the HTTP session (Spring Session JDBC)
+        // and reflects a snapshot of the User entity from login time. Profile edits made afterward
+        // (e.g. via /api/users/{id}) update the database but do not update this cached principal, so
+        // we re-fetch the User fresh here to make sure /api/auth/me (and anything relying on it, like
+        // the navbar's account name) always reflects the latest saved profile data.
+        User freshUser = userRepository.findById(authenticatedUser.getUser().getId())
+                .orElse(authenticatedUser.getUser());
+
+        return new AuthResponse("Authenticated user", toAuthUserDto(freshUser));
     }
 
     // Logout method to clear the security context and invalidate the session

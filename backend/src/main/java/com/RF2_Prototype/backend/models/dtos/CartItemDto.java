@@ -6,6 +6,8 @@ public record CartItemDto(
         Integer id,
         Integer productId,
         String productName,
+        String brand,
+        String categoryName,
         String imagePath,
         BigDecimal priceAtTime,
         Integer quantity,

@@ -126,37 +126,39 @@ function AdminCategoriesPage() {
                     setActiveTab("dashboard")
                   }}
               >
-                <div className="admin-field">
-                  <label className="admin-label">Category Name</label>
-                  <input
-                      className="admin-input"
-                      placeholder="e.g. Laptops"
-                      value={draft.name}
-                      onChange={(e) =>
-                          setDraft((d) => ({ ...d, name: e.target.value }))
-                      }
-                  />
-                </div>
+                <div className="admin-field-row">
+                  <div className="admin-field">
+                    <label className="admin-label">Category Name</label>
+                    <input
+                        className="admin-input"
+                        placeholder="e.g. Laptops"
+                        value={draft.name}
+                        onChange={(e) =>
+                            setDraft((d) => ({ ...d, name: e.target.value }))
+                        }
+                    />
+                  </div>
 
-                <div className="admin-field">
-                  <label className="admin-label">Department</label>
-                  <select
-                      className="admin-input"
-                      value={draft.departmentId || 0}
-                      onChange={(e) =>
-                          setDraft((d) => ({
-                            ...d,
-                            departmentId: Number(e.target.value),
-                          }))
-                      }
-                  >
-                    <option value={0}>Select a department…</option>
-                    {departments.map((dept) => (
-                        <option key={dept.id} value={dept.id}>
-                          {dept.name}
-                        </option>
-                    ))}
-                  </select>
+                  <div className="admin-field">
+                    <label className="admin-label">Department</label>
+                    <select
+                        className="admin-input"
+                        value={draft.departmentId || 0}
+                        onChange={(e) =>
+                            setDraft((d) => ({
+                              ...d,
+                              departmentId: Number(e.target.value),
+                            }))
+                        }
+                    >
+                      <option value={0}>Select a department…</option>
+                      {departments.map((dept) => (
+                          <option key={dept.id} value={dept.id}>
+                            {dept.name}
+                          </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 <div className="admin-field">

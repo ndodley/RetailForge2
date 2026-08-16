@@ -6,7 +6,7 @@ import {
     registerAuthUser,
     type AuthRole,
     type AuthUser,
-} from '../api/authStore'
+} from '../api/auth'
 import { AuthContext, type AuthContextValue } from './authContextShared'
 
 const adminRoles = new Set<AuthRole>(['manager', 'employee'])

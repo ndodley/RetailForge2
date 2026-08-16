@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react"
 import {
-    fetchProducts,
+    fetchStoreProducts,
     createProduct,
     updateProduct,
     deleteProduct,
     bulkCreateProducts,
-    type ProductAdminDto,
-} from "../../api/productAdminApi.ts"
+    getProductApiErrorMessage,
+    type ProductDto,
+} from "../../api/products.ts"
 import { fetchDepartments } from "../../api/departments.ts"
 import { fetchCategories } from "../../api/categories.ts"
-import { getApiErrorMessage } from "../../api/departments.ts"
 import type { ProductRecord, CategoryRecord } from "../../types/store.ts"
 import { parseProductCsv } from "../../util/productCsv.ts"
 
@@ -50,7 +50,7 @@ export function useProducts() {
 
             try {
                 const [productsRes, deptRes, catRes] = await Promise.all([
-                    fetchProducts(),
+                    fetchStoreProducts(),
                     fetchDepartments(),
                     fetchCategories(),
                 ])
@@ -59,7 +59,7 @@ export function useProducts() {
                 setDepartments(deptRes)
                 setCategories(catRes)
             } catch (error) {
-                setErrorMessage(getApiErrorMessage(error, "Unable to load products."))
+                setErrorMessage(getProductApiErrorMessage(error, "Unable to load products."))
             } finally {
                 setIsLoading(false)
             }
@@ -68,7 +68,7 @@ export function useProducts() {
         void load()
     }, [])
 
-    function mapProductDtoToRecord(dto: ProductAdminDto): ProductRecord {
+    function mapProductDtoToRecord(dto: ProductDto): ProductRecord {
         return {
             id: dto.id,
             name: dto.name,
@@ -143,7 +143,7 @@ export function useProducts() {
             setProducts((prev) => prev.filter((p) => p.id !== id))
             setSuccessMessage("Product deleted successfully.")
         } catch (error) {
-            setErrorMessage(getApiErrorMessage(error, "Unable to delete product."))
+            setErrorMessage(getProductApiErrorMessage(error, "Unable to delete product."))
         }
     }
 
@@ -200,7 +200,7 @@ export function useProducts() {
             resetUpsertState()
             setActiveTab("dashboard")
         } catch (error) {
-            setErrorMessage(getApiErrorMessage(error, "Unable to save product."))
+            setErrorMessage(getProductApiErrorMessage(error, "Unable to save product."))
         } finally {
             setIsSaving(false)
         }
@@ -225,13 +225,13 @@ export function useProducts() {
             const result = await bulkCreateProducts(rows)
             setSuccessMessage(`Uploaded ${result.inserted} products successfully.`)
 
-            const refreshed = await fetchProducts()
+            const refreshed = await fetchStoreProducts()
             setProducts(refreshed.map(mapProductDtoToRecord))
 
             resetUpsertState()
             setActiveTab("dashboard")
         } catch (error) {
-            setErrorMessage(getApiErrorMessage(error, "Unable to complete bulk upload."))
+            setErrorMessage(getProductApiErrorMessage(error, "Unable to complete bulk upload."))
         } finally {
             setDraft((d) => ({ ...d, isUploading: false }))
         }

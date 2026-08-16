@@ -1,5 +1,4 @@
-import api from './axios'
-import axios from 'axios'
+import api, { getApiErrorMessage } from './apiClient'
 
 export interface ReviewDto {
     id: number
@@ -9,6 +8,7 @@ export interface ReviewDto {
     userId: number
     userEmail: string
     userFullName: string
+    userAvatarPath: string | null
     rating: number
     comment: string
     created_at: string
@@ -71,12 +71,4 @@ export async function bulkCreateReviews(rows: ReviewBulkUploadRowDto[]) {
     return data
 }
 
-export function getReviewApiErrorMessage(error: unknown, fallback: string) {
-    if (axios.isAxiosError(error)) {
-        const responseData = error.response?.data
-        if (responseData && typeof responseData === 'object' && 'message' in responseData) {
-            return (responseData as { message: string }).message
-        }
-    }
-    return fallback
-}
+export const getReviewApiErrorMessage = getApiErrorMessage

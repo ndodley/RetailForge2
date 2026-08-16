@@ -1,10 +1,10 @@
-import api from './axios'
-import { notifyCartChanged } from './cartEvents'
+import api from './apiClient'
 
 export interface CartItem {
     id: number
     productId: number
-    name: string
+    productName: string
+    brand: string | null
     categoryName: string | null
     imagePath: string | null
     priceAtTime: number
@@ -52,4 +52,27 @@ export async function clearCartApi(): Promise<CartDto> {
     const { data } = await api.delete<CartDto>('/api/cart')
     notifyCartChanged()
     return data
+}
+
+// Lightweight pub/sub so components outside the cart flow (e.g. the navbar's
+// cart count badge) can react when the cart changes, without needing a full
+// store. Merged in from the former cartEvents.ts — the cart API and its
+// change notifications are one concern, not two files.
+type CartListener = () => void
+
+const listeners = new Set<CartListener>()
+
+export function subscribeToCartChanges(listener: CartListener) {
+    listeners.add(listener)
+
+    // Cleanup returns void, not boolean
+    return () => {
+        listeners.delete(listener)
+    }
+}
+
+export function notifyCartChanged() {
+    for (const listener of listeners) {
+        listener()
+    }
 }

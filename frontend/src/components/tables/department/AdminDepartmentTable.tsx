@@ -17,8 +17,13 @@ function AdminDepartmentTable({ items, onEdit, onDelete }: AdminDepartmentTableP
                 <div className="rf-dept-card">
                     <div className="rf-dept-title">{dept.name}</div>
 
-                    <div className="rf-dept-sub">
-                        Manager: <strong>{dept.manager}</strong> · {dept.categoryCount} categories · {dept.productCount} products
+                    <div className="rf-dept-stats">
+                        <span className="rf-dept-stat">
+                            <strong>{dept.categoryCount}</strong> {dept.categoryCount === 1 ? "category" : "categories"}
+                        </span>
+                        <span className="rf-dept-stat">
+                            <strong>{dept.productCount}</strong> {dept.productCount === 1 ? "product" : "products"}
+                        </span>
                     </div>
 
                     <div className="rf-dept-actions">

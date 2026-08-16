@@ -3,6 +3,7 @@ import { Link } from "react-router-dom"
 import Table from "../Table.tsx"
 import AdminButton from "../../admin/AdminButton.tsx"
 import type { ProductRecord } from "../../../types/store.ts"
+import { buildBackendImageUrl } from "../../../api/products.ts"
 import "./AdminProductTable.css"
 
 interface ProductTableProps {
@@ -10,8 +11,6 @@ interface ProductTableProps {
 	onEdit: (id: number) => void
 	onDelete: (id: number) => void
 }
-
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080'
 
 interface ProductImageProps {
 	productId: number
@@ -43,7 +42,7 @@ function ProductImage({ productId, imagePath, name }: ProductImageProps) {
 			title={`View ${name}`}
 		>
 			<img
-				src={`${apiBaseUrl}${imagePath}`}
+				src={buildBackendImageUrl(imagePath)}
 				alt={name}
 				className="rf-product-img"
 				onError={() => setHasLoadError(true)}

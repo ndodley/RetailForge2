@@ -1,29 +1,60 @@
 .rf-cat-card {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 
 .rf-cat-title {
-    font-size: 18px;
+    font-size: 19px;
     font-weight: 900;
+    letter-spacing: -0.01em;
     color: var(--admin-text-strong);
-    margin-bottom: 4px;
 }
 
-.rf-cat-sub {
-    color: var(--admin-text-muted);
-    font-size: 14px;
-    line-height: 1.5;
+.rf-cat-stats {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
 }
 
-.rf-cat-sub strong {
-    color: var(--admin-text);
+.rf-cat-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--admin-accent) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--admin-accent) 35%, transparent);
+    color: var(--admin-accent);
+    font-size: 11.5px;
     font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.rf-cat-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--admin-surface-1);
+    border: 1px solid var(--admin-border);
+    color: var(--admin-text-muted);
+    font-size: 12.5px;
+    font-weight: 700;
+}
+
+.rf-cat-stat strong {
+    color: var(--admin-accent);
+    font-weight: 900;
+    font-size: 13.5px;
 }
 
 .rf-cat-actions {
     display: flex;
     gap: 8px;
-    margin-top: 8px;
+    margin-top: 2px;
+    padding-top: 12px;
+    border-top: 1px solid var(--admin-border);
 }

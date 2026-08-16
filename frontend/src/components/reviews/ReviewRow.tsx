@@ -1,18 +1,10 @@
 import { useState } from 'react'
-import { RATING_OPTIONS, COMMENT_PREVIEW_LENGTH, type ReviewDto } from '../api/reviews'
+import { RATING_OPTIONS, COMMENT_PREVIEW_LENGTH, type ReviewDto } from '../../api/reviews'
+import { buildAvatarUrl } from '../../api/users'
+import StarRating from '../common/StarRating'
 import './ProductReviews.css'
 
-function StarRating({ rating }: { rating: number }) {
-    return (
-        <span className="pr-stars" aria-hidden>
-			{Array.from({ length: 5 }).map((_, idx) => (
-                <span key={idx} className={idx < rating ? 'pr-star pr-star--filled' : 'pr-star'}>
-					{idx < rating ? '★' : '☆'}
-				</span>
-            ))}
-		</span>
-    )
-}
+const DEFAULT_AVATAR = buildAvatarUrl(null)
 
 interface ReviewRowProps {
     review: ReviewDto
@@ -39,9 +31,26 @@ function ReviewRow({ review, isOwnReview, showActionsColumn, onSave, onDelete }:
 
     return (
         <tr>
-            <td className="pr-user-cell">{review.userEmail}</td>
+            <td className="pr-user-cell">
+                <img
+                    className="pr-user-avatar"
+                    src={buildAvatarUrl(review.userAvatarPath)}
+                    alt=""
+                    aria-hidden
+                    onError={(e) => {
+                        const img = e.target as HTMLImageElement
+                        img.onerror = null
+                        img.src = DEFAULT_AVATAR
+                    }}
+                />
+                <span className="pr-user-email">{review.userEmail}</span>
+            </td>
             <td>
-                <StarRating rating={review.rating} />
+                <StarRating
+                    rating={review.rating}
+                    wrapperClassName="pr-stars"
+                    getStarClassName={(filled) => (filled ? 'pr-star pr-star--filled' : 'pr-star')}
+                />
             </td>
             <td className="pr-comment-cell">
                 {isEditing ? (

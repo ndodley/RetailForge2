@@ -1,4 +1,4 @@
-import { parseCsvLine } from "./csvUtils"
+import { parseCsvLine, rowsToCsv, downloadCsvFile } from "./csvUtils"
 import type { UserRecord } from "../types/store"
 
 interface UserCsvRow {
@@ -76,14 +76,7 @@ export function exportUsersCsv(users: UserRecord[]) {
         u.address || "",
     ])
 
-    const csv = [headers, ...rows].map((row) => row.join(",")).join("\n")
-    const blob = new Blob([csv], { type: "text/csv" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = "users.csv"
-    a.click()
-    URL.revokeObjectURL(url)
+    downloadCsvFile("users.csv", rowsToCsv([headers, ...rows]))
 }
 
 export function downloadUsersTemplate() {
@@ -96,12 +89,5 @@ export function downloadUsersTemplate() {
         "phoneNumber",
         "address",
     ]
-    const csv = headers.join(",")
-    const blob = new Blob([csv], { type: "text/csv" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = "users_template.csv"
-    a.click()
-    URL.revokeObjectURL(url)
+    downloadCsvFile("users_template.csv", rowsToCsv([headers]))
 }

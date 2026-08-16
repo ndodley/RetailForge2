@@ -1,6 +1,7 @@
+import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import Layout from '../components/common/Layout'
-import HomeProductShowcase from '../components/HomeProductShowcase.tsx'
+import HomeProductShowcase from '../components/common/HomeProductShowcase.tsx'
 import { useAuth } from '../hooks/useAuth'
 import './HomePage.css'
 
@@ -13,24 +14,28 @@ const trustBadges = [
 
 const featureCards = [
 	{
-		icon: '★',
+		icon: '♥',
 		title: 'Favorites that stick',
-		description: 'Tap the star to save items and come back later.',
+		description: 'Tap the heart to save items and come back later.',
+		accent: 'var(--accent)',
 	},
 	{
 		icon: '🧾',
 		title: 'Order history',
 		description: 'View past orders and details anytime in your account.',
+		accent: 'var(--link)',
 	},
 	{
 		icon: '✍️',
 		title: 'Reviews + ratings',
 		description: 'Read reviews and leave your own to help others decide.',
+		accent: '#8b5cf6',
 	},
 	{
 		icon: '🔒',
 		title: 'Stock-safe checkout',
 		description: 'Checkout handles stock updates safely to avoid overselling.',
+		accent: 'var(--success)',
 	},
 ]
 
@@ -46,7 +51,7 @@ function HomePage() {
 					<span className="home-landing__eyebrow">New arrivals every week</span>
 
 					<h1 className="home-landing__title">
-						Welcome to <span>RF2_P2</span>
+						Welcome to <span>RetailForge2</span>
 					</h1>
 					<p className="home-landing__subtitle">
 						Discover the best deals on electronics, games, fashion, and more. Shop with confidence and
@@ -80,6 +85,7 @@ function HomePage() {
 					<div className="home-feature-shell">
 						<div className="home-feature-shell__header">
 							<div className="home-feature-shell__copy">
+								<span className="home-feature-shell__eyebrow">Account perks</span>
 								<div className="home-feature-shell__title">
 									Built for browsing, saving, and checking out fast.
 								</div>
@@ -105,7 +111,11 @@ function HomePage() {
 
 						<div className="home-feature-grid">
 							{featureCards.map((feature) => (
-								<article key={feature.title} className="home-feature-card">
+								<article
+									key={feature.title}
+									className="home-feature-card"
+									style={{ '--feature-accent': feature.accent } as CSSProperties}
+								>
 									<div className="home-feature-card__icon" aria-hidden>
 										{feature.icon}
 									</div>

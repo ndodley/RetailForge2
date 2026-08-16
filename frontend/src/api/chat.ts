@@ -1,4 +1,4 @@
-import api from './axios'
+import api from './apiClient'
 
 export interface ChatMessage {
     role: 'user' | 'assistant'

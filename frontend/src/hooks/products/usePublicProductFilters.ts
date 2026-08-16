@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react"
-import type { StoreProductDto } from "../../api/products.ts"
+import type { ProductDto } from "../../api/products.ts"
 import type { CategoryDto } from "../../api/categories.ts"
 import type { DepartmentDto } from "../../api/departments.ts"
 import type { FilterSection } from "../../components/common/AdvancedSearchPanel.tsx"
 
 export function usePublicProductFilters(
-    products: StoreProductDto[],
+    products: ProductDto[],
     categories: CategoryDto[],
     departments: DepartmentDto[]
 ) {

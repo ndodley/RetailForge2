@@ -2,13 +2,12 @@ import { useEffect, useState } from "react"
 import { useParams, Link } from "react-router-dom"
 import AdminLayout from "../../../components/admin/AdminLayout"
 import AdminButton from "../../../components/admin/AdminButton"
-import { fetchOrderById, updateOrderStatus, exportOrderDetailCsv } from "../../../api/orders"
-import { fetchUsers } from "../../../api/users"
+import { fetchOrderById, updateOrderStatus } from "../../../api/orders"
+import { exportOrderDetailCsv } from "../../../util/orderCsv"
+import { fetchUsers, buildAvatarUrl } from "../../../api/users"
+import { buildBackendImageUrl } from "../../../api/products"
 import type { OrderDetailRecord } from "../../../types/store"
 import "./AdminOrderDetailPage.css"
-
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080"
-const DEFAULT_AVATAR = `${apiBaseUrl}/images/other_images/default_avatar.jpg`
 
 interface Customer {
     id: number
@@ -23,7 +22,7 @@ interface UserAvatarProps {
 
 function UserAvatar({ avatarPath, name }: UserAvatarProps) {
     const [err, setErr] = useState(false)
-    const src = avatarPath && !err ? `${apiBaseUrl}${avatarPath}` : DEFAULT_AVATAR
+    const src = buildAvatarUrl(err ? null : avatarPath)
 
     return (
         <img
@@ -113,31 +112,36 @@ function AdminOrderDetailPage() {
 
             <div className="rf-order-detail-header">
                 <div className="rf-order-detail-heading">
-                    <div className="rf-order-detail-heading-main">
-                        <h1 className="rf-order-detail-title">Order #{order.id}</h1>
-                        <span className="rf-order-status-badge" data-status={order.status}>
-                            {order.status}
-                        </span>
+                    <div className="rf-order-detail-icon" aria-hidden>
+                        📦
                     </div>
+                    <div className="rf-order-detail-heading-text">
+                        <div className="rf-order-detail-heading-main">
+                            <h1 className="rf-order-detail-title">Order #{order.id}</h1>
+                            <span className="rf-order-status-badge" data-status={order.status}>
+                                {order.status}
+                            </span>
+                        </div>
 
-                    <div className="rf-order-detail-customer">
-                        <UserAvatar avatarPath={customer?.avatar_path} name={order.userEmail} />
-                        <div className="rf-order-detail-customer-info">
-                            <span className="rf-order-detail-customer-email">{order.userEmail}</span>
-                            {customer?.role && (
-                                <span
-                                    className={`rf-order-role-badge rf-order-role-badge--${customer.role.toLowerCase()}`}
-                                >
-                                    {customer.role}
-                                </span>
-                            )}
+                        <div className="rf-order-detail-customer">
+                            <UserAvatar avatarPath={customer?.avatar_path} name={order.userEmail} />
+                            <div className="rf-order-detail-customer-info">
+                                <span className="rf-order-detail-customer-email">{order.userEmail}</span>
+                                {customer?.role && (
+                                    <span
+                                        className={`rf-order-role-badge rf-order-role-badge--${customer.role.toLowerCase()}`}
+                                    >
+                                        {customer.role}
+                                    </span>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div className="rf-order-detail-actions">
                     <AdminButton variant="surface" onClick={handleExportCsv}>
-                        Download CSV
+                        ⬇️ Download CSV
                     </AdminButton>
                 </div>
             </div>
@@ -151,96 +155,106 @@ function AdminOrderDetailPage() {
 
             <div className="rf-order-detail-grid">
                 <div className="rf-order-detail-card">
-                    <h3 className="rf-order-detail-card-title">SUMMARY</h3>
+                    <h3 className="rf-order-detail-card-title">
+                        <span className="rf-order-detail-card-icon" aria-hidden>📌</span>
+                        Summary
+                    </h3>
                     <div className="rf-order-detail-row">
-                        <span className="rf-order-detail-label">Status:</span>
-                        <select
-                            className="rf-order-status-select"
-                            value={status}
-                            onChange={(e) => setStatus(e.target.value)}
-                        >
-                            <option value="pending">pending</option>
-                            <option value="paid">paid</option>
-                            <option value="shipped">shipped</option>
-                            <option value="cancelled">cancelled</option>
-                        </select>
-                        <AdminButton
-                            variant="primary"
-                            onClick={handleSave}
-                            disabled={isSaving}
-                            style={{ marginLeft: "8px" }}
-                        >
-                            Save
-                        </AdminButton>
+                        <span className="rf-order-detail-label">Status</span>
+                        <div className="rf-order-status-control">
+                            <select
+                                className="rf-order-status-select"
+                                value={status}
+                                onChange={(e) => setStatus(e.target.value)}
+                            >
+                                <option value="pending">pending</option>
+                                <option value="paid">paid</option>
+                                <option value="shipped">shipped</option>
+                                <option value="cancelled">cancelled</option>
+                            </select>
+                            <AdminButton
+                                variant="primary"
+                                onClick={handleSave}
+                                disabled={isSaving}
+                            >
+                                {isSaving ? "Saving…" : "💾 Save"}
+                            </AdminButton>
+                        </div>
                     </div>
                     <div className="rf-order-detail-row">
-                        <span className="rf-order-detail-label">Total:</span>
+                        <span className="rf-order-detail-label">Total</span>
                         <span className="rf-order-detail-value rf-order-detail-value--green">
                             ${order.total.toFixed(2)}
                         </span>
                     </div>
                     <div className="rf-order-detail-row">
-                        <span className="rf-order-detail-label">Date:</span>
+                        <span className="rf-order-detail-label">Date</span>
                         <span className="rf-order-detail-value">{order.createdAt}</span>
                     </div>
                 </div>
 
                 <div className="rf-order-detail-card">
-                    <h3 className="rf-order-detail-card-title">SHIPPING</h3>
+                    <h3 className="rf-order-detail-card-title">
+                        <span className="rf-order-detail-card-icon" aria-hidden>📍</span>
+                        Shipping
+                    </h3>
                     <p className="rf-order-detail-address">{order.shippingAddress}</p>
                 </div>
             </div>
 
             <div className="rf-order-detail-items">
-                <h3 className="rf-order-detail-section-title">Purchased Items</h3>
-                <table className="rf-order-items-table">
-                    <thead>
-                    <tr>
-                        <th>PRODUCT</th>
-                        <th>IMAGE</th>
-                        <th>PRICE</th>
-                        <th>QTY</th>
-                        <th>LINE TOTAL</th>
-                    </tr>
-                    </thead>
-                    <tbody>
+                <div className="rf-order-detail-items-header">
+                    <h3 className="rf-order-detail-section-title">Purchased Items</h3>
+                    <span className="rf-order-items-count">
+                        {order.items.length} item{order.items.length === 1 ? "" : "s"}
+                    </span>
+                </div>
+
+                <div className="rf-order-items-list">
+                    <div className="rf-order-item-row rf-order-item-row--head" aria-hidden="true">
+                        <span className="rf-order-item-col rf-order-item-col--product">Product</span>
+                        <span className="rf-order-item-col rf-order-item-col--price">Price</span>
+                        <span className="rf-order-item-col rf-order-item-col--qty">Qty</span>
+                        <span className="rf-order-item-col rf-order-item-col--total">Line total</span>
+                    </div>
+
                     {order.items.map((item, idx) => (
-                        <tr key={idx}>
-                            <td>
+                        <div key={idx} className="rf-order-item-row">
+                            <div className="rf-order-item-col rf-order-item-col--product">
+                                <Link
+                                    to={`/products/${item.productId}`}
+                                    className="rf-order-item-image-wrap"
+                                >
+                                    <img
+                                        src={buildBackendImageUrl(item.imagePath)}
+                                        alt={item.productName}
+                                        className="rf-order-item-image"
+                                        onError={(e) => {
+                                            const img = e.target as HTMLImageElement
+                                            img.onerror = null
+                                            img.src = buildBackendImageUrl(null)
+                                        }}
+                                    />
+                                </Link>
                                 <Link
                                     to={`/products/${item.productId}`}
                                     className="rf-order-item-link"
                                 >
                                     {item.productName}
                                 </Link>
-                            </td>
-                            <td>
-                                <Link to={`/products/${item.productId}`}>
-                                    <img
-                                        src={
-                                            item.imagePath
-                                                ? `${apiBaseUrl}${item.imagePath}`
-                                                : `${apiBaseUrl}/images/other_images/dummy_product.jpg`
-                                        }
-                                        alt={item.productName}
-                                        className="rf-order-item-image"
-                                        onError={(e) => {
-                                            const img = e.target as HTMLImageElement
-                                            img.onerror = null
-                                            img.src = `${apiBaseUrl}/images/other_images/dummy_product.jpg`
-                                        }}
-                                    />
-                                </Link>
-                            </td>
-                            <td>${item.price.toFixed(2)}</td>
-                            <td>{item.quantity}</td>
-                            <td className="rf-order-item-line-total">
+                            </div>
+                            <span className="rf-order-item-col rf-order-item-col--price">
+                                ${item.price.toFixed(2)}
+                            </span>
+                            <span className="rf-order-item-col rf-order-item-col--qty">
+                                ×{item.quantity}
+                            </span>
+                            <span className="rf-order-item-col rf-order-item-col--total rf-order-item-line-total">
                                 ${(item.price * item.quantity).toFixed(2)}
-                            </td>
-                        </tr>
+                            </span>
+                        </div>
                     ))}
-                    </tbody>
-                </table>
+                </div>
             </div>
         </AdminLayout>
     )

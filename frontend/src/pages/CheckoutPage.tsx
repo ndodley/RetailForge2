@@ -10,11 +10,26 @@ import { useAuth } from "../hooks/useAuth"
 import axios from "axios"
 import "./CheckoutPage.css"
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
+// Stripe.js injects its own floating UI (the "Link" quick-checkout badge) into the page
+// the moment it's loaded — and that injected element lives outside React's DOM, so it
+// isn't tied to this component's lifecycle at all. Previously `loadStripe()` ran at
+// module scope, which executes as soon as this file is evaluated by the bundler —
+// regardless of which route the user is actually on — so the badge showed up
+// everywhere (cart, product pages, etc.), not just at checkout. Deferring the call
+// into a lazily-initialized singleton means Stripe.js only loads once this component
+// actually renders, i.e. once the user is really on the checkout page.
+let stripePromise: ReturnType<typeof loadStripe> | undefined
+
+function getStripe() {
+    if (!stripePromise) {
+        stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
+    }
+    return stripePromise
+}
 
 interface CartItemDto {
     id: number
-    name: string
+    productName: string
     priceAtTime: number
     quantity: number
     imagePath: string | null
@@ -28,8 +43,19 @@ function CheckoutForm() {
     const { user } = useAuth()
 
     const [address, setAddress] = useState<string>("")
+    const [addressPrefilled, setAddressPrefilled] = useState(false)
     const [processing, setProcessing] = useState<boolean>(false)
     const [error, setError] = useState<string>("")
+
+    // Default the shipping address to the user's saved address, but only once —
+    // after that the user is free to edit it (e.g. shipping to a different place)
+    // without it getting clobbered by a later re-render.
+    useEffect(() => {
+        if (!addressPrefilled && user?.address) {
+            setAddress(user.address)
+            setAddressPrefilled(true)
+        }
+    }, [user, addressPrefilled])
 
     const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -68,6 +94,9 @@ function CheckoutForm() {
 
     return (
         <form onSubmit={handleSubmit} className="payment-form">
+            <label htmlFor="shipping_address" className="checkout-section-label">
+                Shipping Address
+            </label>
             <input id={"shipping_address"}
                    type="text"
                    placeholder="Shipping Address"
@@ -77,11 +106,13 @@ function CheckoutForm() {
                    className="address-input"
             />
 
+            <div className="checkout-section-label">Payment Method</div>
             <PaymentElement className="payment-element" />
 
             <Button
                 variant="primary"
                 fullWidth
+                className="checkout-pay-btn"
                 disabled={!stripe || processing}
                 type="submit"
             >
@@ -94,6 +125,7 @@ function CheckoutForm() {
 }
 
 export default function CheckoutPage() {
+    const navigate = useNavigate()
     const [cartItems, setCartItems] = useState<CartItemDto[]>([])
     const [cartTotal, setCartTotal] = useState(0)
     const [clientSecret, setClientSecret] = useState<string | null>(null)
@@ -133,64 +165,78 @@ export default function CheckoutPage() {
     return (
         <Layout isStorefront>
             <div className="checkout-page">
-                <div className="checkout-card fade-in">
+                <div className="checkout-shell fade-in">
+                    <button
+                        type="button"
+                        className="checkout-back"
+                        onClick={() => navigate("/cart")}
+                    >
+                        <span aria-hidden>←</span> Back to Cart
+                    </button>
+
                     <h2 className="checkout-title">Checkout</h2>
 
-                    {/* Order Summary */}
-                    <div className="order-summary">
-                        <h3>Order Summary</h3>
+                    <div className="checkout-grid">
+                        {/* Order Summary */}
+                        <div className="checkout-order-summary">
+                            <h3>Order Summary</h3>
 
-                        <div className="order-items">
-                            {cartItems.length === 0 ? (
-                                <div className="empty-msg">Your cart is empty.</div>
-                            ) : (
-                                cartItems.map((item) => (
-                                    <div key={item.id} className="order-item">
-                                        <div className="item-left">
-                                            <img
-                                                src={buildBackendImageUrl(item.imagePath)}
-                                                alt={item.name}
-                                                className="item-img"
-                                                onError={(e) => {
-                                                    e.currentTarget.src = buildBackendImageUrl(null)
-                                                }}
-                                            />
+                            <div className="checkout-order-items">
+                                {cartItems.length === 0 ? (
+                                    <div className="checkout-empty-msg">Your cart is empty.</div>
+                                ) : (
+                                    cartItems.map((item) => (
+                                        <div key={item.id} className="checkout-order-item">
+                                            <div className="checkout-item-left">
+                                                <img
+                                                    src={buildBackendImageUrl(item.imagePath)}
+                                                    alt={item.productName}
+                                                    className="checkout-item-img"
+                                                    onError={(e) => {
+                                                        e.currentTarget.src = buildBackendImageUrl(null)
+                                                    }}
+                                                />
 
-                                            <div className="item-info">
-                                                <div className="item-name">{item.name}</div>
-                                                <div className="item-category">
-                                                    {item.categoryName || "Uncategorized"}
-                                                </div>
-                                                <div className="item-sub">
-                                                    Qty {item.quantity} · ${item.priceAtTime.toFixed(2)}
+                                                <div className="checkout-item-info">
+                                                    <div className="checkout-item-name">{item.productName}</div>
+                                                    <div className="checkout-item-category">
+                                                        {item.categoryName || "Uncategorized"}
+                                                    </div>
+                                                    <div className="checkout-item-sub">
+                                                        Qty {item.quantity} · ${item.priceAtTime.toFixed(2)}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <div className="item-total">
-                                            ${(item.priceAtTime * item.quantity).toFixed(2)}
+                                            <div className="checkout-item-total">
+                                                ${(item.priceAtTime * item.quantity).toFixed(2)}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))
-                            )}
+                                    ))
+                                )}
+                            </div>
+
+                            <div className="checkout-order-total">
+                                Total: <span>${cartTotal.toFixed(2)}</span>
+                            </div>
                         </div>
 
-                        <div className="order-total">
-                            Total: <span>${cartTotal.toFixed(2)}</span>
+                        {/* Shipping + Payment, combined into a single card */}
+                        <div className="checkout-payment-card">
+                            <h3>Shipping &amp; Payment</h3>
+
+                            {clientSecret && (
+                                <Elements
+                                    stripe={getStripe()}
+                                    options={{ clientSecret }}
+                                >
+                                    <CheckoutForm />
+                                </Elements>
+                            )}
+
+                            {error && <div className="error-msg">{error}</div>}
                         </div>
                     </div>
-
-                    {/* Stripe Elements wrapper */}
-                    {clientSecret && (
-                        <Elements
-                            stripe={stripePromise}
-                            options={{ clientSecret }}
-                        >
-                            <CheckoutForm />
-                        </Elements>
-                    )}
-
-                    {error && <div className="error-msg">{error}</div>}
                 </div>
             </div>
         </Layout>

@@ -1,8 +1,8 @@
-import type { ProductAdminBulkRowDto } from "../api/productAdminApi"
+import type { ProductBulkRowDto } from "../api/products"
 import type { ProductRecord } from "../types/store"
-import { parseCsvLine } from "./csvUtils"
+import { parseCsvLine, rowsToCsv, downloadCsvFile } from "./csvUtils"
 
-export async function parseProductCsv(file: File): Promise<ProductAdminBulkRowDto[]> {
+export async function parseProductCsv(file: File): Promise<ProductBulkRowDto[]> {
     const text = await file.text()
     const lines = text
         .split(/\r?\n/)
@@ -76,14 +76,7 @@ export function exportProductsCsv(products: ProductRecord[]) {
         p.imagePath || "",
     ])
 
-    const csv = [headers, ...rows].map((row) => row.join(",")).join("\n")
-    const blob = new Blob([csv], { type: "text/csv" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = "products.csv"
-    a.click()
-    URL.revokeObjectURL(url)
+    downloadCsvFile("products.csv", rowsToCsv([headers, ...rows]))
 }
 
 export function downloadProductsTemplate() {
@@ -98,12 +91,5 @@ export function downloadProductsTemplate() {
         "department_name",
         "image_path",
     ]
-    const csv = headers.join(",")
-    const blob = new Blob([csv], { type: "text/csv" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = "products_template.csv"
-    a.click()
-    URL.revokeObjectURL(url)
+    downloadCsvFile("products_template.csv", rowsToCsv([headers]))
 }

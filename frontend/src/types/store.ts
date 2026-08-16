@@ -8,7 +8,6 @@ export interface DepartmentRecord {
   categoryCount: number
   productCount: number
   featuredProduct: string
-  manager: string
   updatedAt: string
   status: DepartmentStatus
 }
@@ -19,6 +18,7 @@ export interface CategoryRecord {
   description: string
   departmentId: number | null
   departmentName: string | null
+  productCount: number
 }
 
 export interface ProductRecord {

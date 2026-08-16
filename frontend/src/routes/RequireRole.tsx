@@ -1,7 +1,7 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import type { ReactElement } from 'react'
 import { useAuth } from '../hooks/useAuth'
-import type { AuthRole } from '../api/authStore'
+import type { AuthRole } from '../api/auth'
 
 interface RequireRoleProps {
   allowedRoles: AuthRole[]

@@ -2,10 +2,10 @@ import { Navigate, useLocation, Link } from "react-router-dom"
 import Layout from "../../components/common/Layout"
 import { useAuth } from "../../hooks/useAuth"
 import { useMyProfile } from "../../hooks/profile/useMyProfile"
+import { buildAvatarUrl } from "../../api/users"
 import "./MyProfilePage.css"
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080"
-const DEFAULT_AVATAR = `${apiBaseUrl}/images/other_images/default_avatar.jpg`
+const DEFAULT_AVATAR = buildAvatarUrl(null)
 
 function MyProfilePage() {
     const { user, loading } = useAuth()
@@ -42,7 +42,7 @@ function MyProfilePage() {
         return <div className="myprof-fullscreen">Loading your profile...</div>
     }
 
-    const avatarSrc = previewUrl || (profile?.avatar_path ? `${apiBaseUrl}${profile.avatar_path}` : DEFAULT_AVATAR)
+    const avatarSrc = previewUrl || buildAvatarUrl(profile?.avatar_path)
     const roleValue = String(profile?.role || "").toLowerCase()
     const shouldShowRole = roleValue !== "customer" && roleValue !== ""
 
@@ -57,16 +57,21 @@ function MyProfilePage() {
 
                 <div className="myprof-panel">
                     <div className="myprof-panel-header">
-                        <div className="myprof-title-block">
-                            <h2 className="myprof-title">My Profile</h2>
-                            <span className="myprof-subtitle">
-                                View and edit your account info, plus upload an avatar.
-                            </span>
+                        <div className="myprof-heading">
+                            <div className="myprof-heading-icon" aria-hidden>
+                                👤
+                            </div>
+                            <div className="myprof-title-block">
+                                <h2 className="myprof-title">My Profile</h2>
+                                <span className="myprof-subtitle">
+                                    View and edit your account info, plus upload an avatar.
+                                </span>
+                            </div>
                         </div>
 
                         <div className="myprof-actions">
                             {!isEditing ? (
-                                <button type="button" className="myprof-btn" onClick={startEdit}>
+                                <button type="button" className="myprof-btn myprof-btn--outline" onClick={startEdit}>
                                     Edit Profile
                                 </button>
                             ) : (
@@ -170,7 +175,35 @@ function MyProfilePage() {
                                     </div>
 
                                     <div className="myprof-field">
-                                        <span className="myprof-field-label">Email</span>
+                                        <span className="myprof-field-label">
+                                            <span aria-hidden>📱</span> Phone
+                                        </span>
+                                        {isEditing ? (
+                                            <input
+                                                className="myprof-input"
+                                                value={draft.phoneNumber}
+                                                onChange={(e) =>
+                                                    setDraft((d) => ({ ...d, phoneNumber: e.target.value }))
+                                                }
+                                            />
+                                        ) : (
+                                            <span className="myprof-value">{profile?.phoneNumber || "—"}</span>
+                                        )}
+                                    </div>
+
+                                    {shouldShowRole && (
+                                        <div className="myprof-field">
+                                            <span className="myprof-field-label">Role</span>
+                                            <span className={`myprof-role-badge myprof-role-badge--${roleValue}`}>
+                                                {profile?.role}
+                                            </span>
+                                        </div>
+                                    )}
+
+                                    <div className="myprof-field myprof-field--full">
+                                        <span className="myprof-field-label">
+                                            <span aria-hidden>📧</span> Email
+                                        </span>
                                         {isEditing ? (
                                             <input
                                                 className="myprof-input"
@@ -186,32 +219,10 @@ function MyProfilePage() {
                                         )}
                                     </div>
 
-                                    {shouldShowRole && (
-                                        <div className="myprof-field">
-                                            <span className="myprof-field-label">Role</span>
-                                            <span className={`myprof-role-badge myprof-role-badge--${roleValue}`}>
-                                                {profile?.role}
-                                            </span>
-                                        </div>
-                                    )}
-
-                                    <div className="myprof-field">
-                                        <span className="myprof-field-label">Phone</span>
-                                        {isEditing ? (
-                                            <input
-                                                className="myprof-input"
-                                                value={draft.phoneNumber}
-                                                onChange={(e) =>
-                                                    setDraft((d) => ({ ...d, phoneNumber: e.target.value }))
-                                                }
-                                            />
-                                        ) : (
-                                            <span className="myprof-value">{profile?.phoneNumber || "—"}</span>
-                                        )}
-                                    </div>
-
                                     <div className="myprof-field myprof-field--full">
-                                        <span className="myprof-field-label">Address</span>
+                                        <span className="myprof-field-label">
+                                            <span aria-hidden>📍</span> Address
+                                        </span>
                                         {isEditing ? (
                                             <textarea
                                                 className="myprof-input myprof-textarea"

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useProductReviews } from '../hooks/reviews/useProductReviews'
-import { RATING_OPTIONS } from '../api/reviews'
+import { useProductReviews } from '../../hooks/reviews/useProductReviews'
+import { RATING_OPTIONS } from '../../api/reviews'
 import ReviewRow from './ReviewRow'
 import './ProductReviews.css'
 

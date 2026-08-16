@@ -80,6 +80,7 @@ public class OrderService implements IOrderService {
                     .build();
 
             orderItemRepository.save(item);
+            order.getItems().add(item);
         }
 
         cart.getItems().clear();

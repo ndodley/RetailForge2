@@ -9,6 +9,7 @@ import com.RF2_Prototype.backend.models.entities.Category;
 import com.RF2_Prototype.backend.models.entities.Department;
 import com.RF2_Prototype.backend.repository.CategoryRepository;
 import com.RF2_Prototype.backend.repository.DepartmentRepository;
+import com.RF2_Prototype.backend.repository.ProductRepository;
 import com.RF2_Prototype.backend.services.iservices.ICategoryService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Sort;
@@ -25,42 +26,45 @@ public class CategoryService implements ICategoryService {
     private final CategoryRepository categoryRepository;
     private final DepartmentRepository departmentRepository;
     private final CategoryMapper categoryMapper;
+    private final ProductRepository productRepository;
 
     public CategoryService(
             CategoryRepository categoryRepository,
             DepartmentRepository departmentRepository,
-            CategoryMapper categoryMapper
+            CategoryMapper categoryMapper,
+            ProductRepository productRepository
     ) {
         this.categoryRepository = categoryRepository;
         this.departmentRepository = departmentRepository;
         this.categoryMapper = categoryMapper;
+        this.productRepository = productRepository;
     }
 
     @Override
     public List<CategoryDto> getCategories() {
         return categoryRepository.findAll(Sort.by(Sort.Direction.ASC, "id"))
                 .stream()
-                .map(categoryMapper::toDto)
+                .map(this::toDtoWithCount)
                 .toList();
     }
 
     @Override
     public CategoryDto getCategoryById(Integer id) {
-        return categoryMapper.toDto(getCategoryEntity(id));
+        return toDtoWithCount(getCategoryEntity(id));
     }
 
     @Override
     public CategoryDto createCategory(CategoryDto categoryDto) {
         Category category = new Category();
         applyCategoryValues(category, categoryDto);
-        return categoryMapper.toDto(categoryRepository.save(category));
+        return toDtoWithCount(categoryRepository.save(category));
     }
 
     @Override
     public CategoryDto updateCategory(Integer id, CategoryDto categoryDto) {
         Category category = getCategoryEntity(id);
         applyCategoryValues(category, categoryDto);
-        return categoryMapper.toDto(categoryRepository.save(category));
+        return toDtoWithCount(categoryRepository.save(category));
     }
 
     @Override
@@ -76,6 +80,11 @@ public class CategoryService implements ICategoryService {
     @Override
     public void deleteCategory(Integer id) {
         categoryRepository.delete(getCategoryEntity(id));
+    }
+
+    private CategoryDto toDtoWithCount(Category category) {
+        long productCount = productRepository.countByCategory_Id(category.getId());
+        return categoryMapper.toDto(category, productCount);
     }
 
     private void applyCategoryValues(Category category, CategoryDto categoryDto) {
@@ -144,4 +153,3 @@ public class CategoryService implements ICategoryService {
     }
 
 }
-

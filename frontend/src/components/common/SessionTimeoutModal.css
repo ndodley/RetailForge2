@@ -1,0 +1,72 @@
+.session-timeout-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    animation: session-timeout-fade-in 0.2s ease;
+}
+
+.session-timeout-card {
+    width: 100%;
+    max-width: 380px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    padding: 32px 28px 28px;
+    text-align: center;
+    font-family: var(--sans);
+    animation: session-timeout-pop-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.session-timeout-icon {
+    font-size: 40px;
+    line-height: 1;
+    margin-bottom: 12px;
+}
+
+.session-timeout-card h2 {
+    margin: 0 0 10px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-h);
+}
+
+.session-timeout-card p {
+    margin: 0 0 24px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--muted);
+}
+
+.session-timeout-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.session-timeout-actions button {
+    min-width: 96px;
+}
+
+@keyframes session-timeout-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes session-timeout-pop-in {
+    from {
+        opacity: 0;
+        transform: scale(0.94) translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}

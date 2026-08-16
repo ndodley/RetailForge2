@@ -1,4 +1,4 @@
-# PostgreSQL Docker setup for RF2_P2
+# PostgreSQL Docker setup for RetailForge2
 
 ## What this project now uses
 

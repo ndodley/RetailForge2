@@ -1,7 +1,7 @@
 import { useState } from "react"
 import Table from "../Table.tsx"
-import AdminButton from "../../admin/AdminButton.tsx"
 import type { OrderRecord } from "../../../types/store.ts"
+import { buildAvatarUrl } from "../../../api/users.ts"
 import "./AdminOrderTable.css"
 
 interface OrderUser {
@@ -18,9 +18,6 @@ interface OrderTableProps {
     onDelete: (id: number) => void
 }
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080"
-const DEFAULT_AVATAR = `${apiBaseUrl}/images/other_images/default_avatar.jpg`
-
 interface UserAvatarProps {
     avatarPath: string | null | undefined
     name: string
@@ -28,7 +25,7 @@ interface UserAvatarProps {
 
 function UserAvatar({ avatarPath, name }: UserAvatarProps) {
     const [err, setErr] = useState(false)
-    const src = avatarPath && !err ? `${apiBaseUrl}${avatarPath}` : DEFAULT_AVATAR
+    const src = buildAvatarUrl(err ? null : avatarPath)
 
     return (
         <img
@@ -44,6 +41,7 @@ function AdminOrderTable({ items, users, currentUserId, onEdit, onDelete }: Orde
     return (
         <Table
             items={items}
+            onItemClick={(order) => onEdit(order.id)}
             renderItem={(order) => {
                 const orderUser = users.find((u) => u.id === order.userId)
                 const isCurrentUser = currentUserId != null && order.userId === currentUserId   // NEW
@@ -53,10 +51,23 @@ function AdminOrderTable({ items, users, currentUserId, onEdit, onDelete }: Orde
                         className={`rf-order-card-content${isCurrentUser ? " rf-order-card-content--current" : ""}`}
                     >
                         <div className="rf-order-header">
-                            <div className="rf-order-title">Order #{order.id}</div>
-                            <div className="rf-order-status-badge" data-status={order.status}>
-                                {order.status}
+                            <div className="rf-order-header-main">
+                                <div className="rf-order-title">Order #{order.id}</div>
+                                <div className="rf-order-status-badge" data-status={order.status}>
+                                    {order.status}
+                                </div>
                             </div>
+                            <button
+                                type="button"
+                                className="rf-order-delete-btn"
+                                aria-label={`Delete order #${order.id}`}
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    onDelete(order.id)
+                                }}
+                            >
+                                🗑️
+                            </button>
                         </div>
 
                         <div className="rf-order-user-row">
@@ -78,24 +89,27 @@ function AdminOrderTable({ items, users, currentUserId, onEdit, onDelete }: Orde
 
                         <div className="rf-order-info">
                             <div className="rf-order-info-item">
-                                <span className="rf-order-label">Total</span>
+                                <span className="rf-order-label">
+                                    <span aria-hidden>📦</span> Items
+                                </span>
+                                <span className="rf-order-value">
+                                    {order.itemCount} item{order.itemCount === 1 ? "" : "s"}
+                                </span>
+                            </div>
+                            <div className="rf-order-info-item">
+                                <span className="rf-order-label">
+                                    <span aria-hidden>💰</span> Total
+                                </span>
                                 <span className="rf-order-value rf-order-value--price">
                                     ${order.total.toFixed(2)}
                                 </span>
                             </div>
                             <div className="rf-order-info-item">
-                                <span className="rf-order-label">Date</span>
+                                <span className="rf-order-label">
+                                    <span aria-hidden>📅</span> Date
+                                </span>
                                 <span className="rf-order-value">{order.createdAt}</span>
                             </div>
-                        </div>
-
-                        <div className="rf-order-actions">
-                            <AdminButton variant="pill" icon="edit" onClick={() => onEdit(order.id)}>
-                                View Details
-                            </AdminButton>
-                            <AdminButton variant="danger" icon="delete" onClick={() => onDelete(order.id)}>
-                                Delete
-                            </AdminButton>
                         </div>
                     </div>
                 )

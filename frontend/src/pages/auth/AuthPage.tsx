@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
-import type { AuthRole, RegisterAuthInput } from '../../api/authStore'
+import type { AuthRole, RegisterAuthInput } from '../../api/auth'
 import Footer from '../../components/common/Footer'
 import Navbar from '../../components/common/Navbar'
 import { useAuth } from '../../hooks/useAuth'

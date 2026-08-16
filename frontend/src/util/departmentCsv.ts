@@ -1,4 +1,4 @@
-import { parseCsvLine } from "./csvUtils"
+import { parseCsvLine, rowsToCsv, downloadCsvFile } from "./csvUtils"
 import type { DepartmentRecord } from "../types/store"
 
 export async function parseDepartmentCsv(file: File) {
@@ -27,29 +27,9 @@ export async function parseDepartmentCsv(file: File) {
 export function exportDepartmentsCsv(departments: DepartmentRecord[]) {
     const headers = ["name"]
     const rows = departments.map((d) => [d.name])
-
-    const csv = [headers, ...rows]
-        .map((row) =>
-            row.map((v) => `"${String(v).replaceAll('"', '""')}"`).join(","),
-        )
-        .join("\n")
-
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement("a")
-    link.href = url
-    link.download = "departments.csv"
-    link.click()
-    URL.revokeObjectURL(url)
+    downloadCsvFile("departments.csv", rowsToCsv([headers, ...rows]))
 }
 
 export function downloadDepartmentsTemplate() {
-    const csv = "name\n"
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement("a")
-    link.href = url
-    link.download = "departments-template.csv"
-    link.click()
-    URL.revokeObjectURL(url)
+    downloadCsvFile("departments-template.csv", rowsToCsv([["name"]]))
 }

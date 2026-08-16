@@ -123,7 +123,37 @@ function AdminUsersPage() {
                             setActiveTab("dashboard")
                         }}
                     >
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "16px" }}>
+                        <div className="admin-field-row">
+                            <div className="admin-field">
+                                <label className="admin-label">Email</label>
+                                <input
+                                    className="admin-input"
+                                    type="email"
+                                    placeholder="user@example.com"
+                                    value={draft.email}
+                                    onChange={(e) =>
+                                        setDraft((d) => ({ ...d, email: e.target.value }))
+                                    }
+                                />
+                            </div>
+
+                            <div className="admin-field">
+                                <label className="admin-label">
+                                    Password {draft.id && "(leave blank to keep current)"}
+                                </label>
+                                <input
+                                    className="admin-input"
+                                    type="password"
+                                    placeholder={draft.id ? "••••••••" : "Enter password"}
+                                    value={draft.password}
+                                    onChange={(e) =>
+                                        setDraft((d) => ({ ...d, password: e.target.value }))
+                                    }
+                                />
+                            </div>
+                        </div>
+
+                        <div className="admin-field-row">
                             <div className="admin-field">
                                 <label className="admin-label">First Name</label>
                                 <input
@@ -149,14 +179,14 @@ function AdminUsersPage() {
                             </div>
 
                             <div className="admin-field">
-                                <label className="admin-label">Email</label>
+                                <label className="admin-label">Phone Number</label>
                                 <input
                                     className="admin-input"
-                                    type="email"
-                                    placeholder="user@example.com"
-                                    value={draft.email}
+                                    type="tel"
+                                    placeholder="e.g., 555-1234"
+                                    value={draft.phoneNumber}
                                     onChange={(e) =>
-                                        setDraft((d) => ({ ...d, email: e.target.value }))
+                                        setDraft((d) => ({ ...d, phoneNumber: e.target.value }))
                                     }
                                 />
                             </div>
@@ -176,34 +206,6 @@ function AdminUsersPage() {
                                     <option value="admin">Admin</option>
                                 </select>
                             </div>
-                        </div>
-
-                        <div className="admin-field">
-                            <label className="admin-label">
-                                Password {draft.id && "(leave blank to keep current)"}
-                            </label>
-                            <input
-                                className="admin-input"
-                                type="password"
-                                placeholder={draft.id ? "••••••••" : "Enter password"}
-                                value={draft.password}
-                                onChange={(e) =>
-                                    setDraft((d) => ({ ...d, password: e.target.value }))
-                                }
-                            />
-                        </div>
-
-                        <div className="admin-field">
-                            <label className="admin-label">Phone Number</label>
-                            <input
-                                className="admin-input"
-                                type="tel"
-                                placeholder="e.g., 555-1234"
-                                value={draft.phoneNumber}
-                                onChange={(e) =>
-                                    setDraft((d) => ({ ...d, phoneNumber: e.target.value }))
-                                }
-                            />
                         </div>
 
                         <div className="admin-field">
