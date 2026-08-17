@@ -21,12 +21,12 @@ export async function parseUserCsv(file: File): Promise<UserCsvRow[]> {
     if (lines.length === 0) return []
 
     const headers = parseCsvLine(lines[0]).map((h) => h.toLowerCase())
-    const firstNameIndex = headers.indexOf("firstName")
-    const lastNameIndex = headers.indexOf("lastName")
+    const firstNameIndex = headers.indexOf("first_name")
+    const lastNameIndex = headers.indexOf("last_name")
     const emailIndex = headers.indexOf("email")
     const passwordIndex = headers.indexOf("password")
     const roleIndex = headers.indexOf("role")
-    const phoneIndex = headers.indexOf("phoneNumber")
+    const phoneIndex = headers.indexOf("phone_number")
     const addressIndex = headers.indexOf("address")
 
     if (
@@ -37,7 +37,7 @@ export async function parseUserCsv(file: File): Promise<UserCsvRow[]> {
         roleIndex === -1
     ) {
         throw new Error(
-            "CSV must include firstName, lastName, email, password, and role columns."
+            "CSV must include first_name, last_name, email, password, and role columns."
         )
     }
 
@@ -58,12 +58,12 @@ export async function parseUserCsv(file: File): Promise<UserCsvRow[]> {
 
 export function exportUsersCsv(users: UserRecord[]) {
     const headers = [
-        "firstName",
-        "lastName",
+        "first_name",
+        "last_name",
         "email",
         "password",
         "role",
-        "phoneNumber",
+        "phone_number",
         "address",
     ]
     const rows = users.map((u) => [
@@ -81,12 +81,12 @@ export function exportUsersCsv(users: UserRecord[]) {
 
 export function downloadUsersTemplate() {
     const headers = [
-        "firstName",
-        "lastName",
+        "first_name",
+        "last_name",
         "email",
         "password",
         "role",
-        "phoneNumber",
+        "phone_number",
         "address",
     ]
     downloadCsvFile("users_template.csv", rowsToCsv([headers]))

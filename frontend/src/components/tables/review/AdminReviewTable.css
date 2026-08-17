@@ -11,10 +11,11 @@
 }
 
 .rf-review-thumb {
-    width: 64px;
-    height: 64px;
+    width: 96px;
+    height: 96px;
     border-radius: 8px;
-    object-fit: cover;
+    object-fit: contain;
+    background: var(--admin-surface-3);
     flex-shrink: 0;
 }
 
@@ -37,11 +38,11 @@ a.rf-review-thumb--placeholder:focus-visible {
 .rf-review-thumb--placeholder {
     display: grid;
     place-items: center;
-    width: 64px;
-    height: 64px;
+    width: 96px;
+    height: 96px;
     background: var(--admin-surface-3);
     color: var(--admin-text-muted);
-    font-size: 22px;
+    font-size: 28px;
     font-weight: 900;
 }
 

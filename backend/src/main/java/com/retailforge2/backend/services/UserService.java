@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,16 +32,19 @@ public class UserService implements IUserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
     private final Path mediaRoot;
     private final Path avatarImagesDir;
 
     public UserService(
             UserRepository userRepository,
             UserMapper userMapper,
+            PasswordEncoder passwordEncoder,
             @Value("${app.media.root:${user.dir}/media}") String mediaRoot
     ) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
         this.mediaRoot = Path.of(mediaRoot).toAbsolutePath().normalize();
         this.avatarImagesDir = this.mediaRoot.resolve("avatar_images");
         ensureAvatarDirectory();
@@ -182,7 +186,12 @@ public class UserService implements IUserService {
         user.setLastName(userDto.lastName().trim());
         user.setEmail(userDto.email().trim());
         if (userDto.passwordHash() != null && !userDto.passwordHash().isBlank()) {
-            user.setPasswordHash(userDto.passwordHash().trim());
+            // Despite the field name, this carries a plaintext password from
+            // the admin create/edit form (not an actual hash) - it must be
+            // encoded here, same as bulk upload and registration do, or the
+            // stored value fails BCryptPasswordEncoder's format check on the
+            // next login attempt.
+            user.setPasswordHash(passwordEncoder.encode(userDto.passwordHash().trim()));
         }
         user.setRole(userDto.role());
         user.setPhoneNumber(userDto.phoneNumber() == null ? null : userDto.phoneNumber().trim());
@@ -197,6 +206,10 @@ public class UserService implements IUserService {
         user.setFirstName(row.firstName().trim());
         user.setLastName(row.lastName().trim());
         user.setEmail(row.email().trim());
+        // password_hash is NOT NULL - bulk rows carry a plaintext password
+        // (same as the single-user create form) that gets hashed here,
+        // same encoder AuthService uses for registration/login.
+        user.setPasswordHash(passwordEncoder.encode(row.password()));
         user.setRole(row.userRole());
         user.setPhoneNumber(row.phoneNumber().trim());
         user.setAddress(row.address().trim());

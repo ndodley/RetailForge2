@@ -41,7 +41,11 @@ export async function parseReviewCsv(file: File) {
 }
 
 /**
- * ⭐ Parse CSV for preview (NEW FUNCTION)
+ * Parse CSV for preview. Looks columns up by name (same lookup
+ * parseReviewCsv itself uses) rather than by position, so the preview rows
+ * are keyed productName/userEmail/rating/comment - matching what
+ * AdminReviewsPage's REVIEW_PREVIEW_COLUMNS expects - regardless of what
+ * order the columns appear in in the uploaded file.
  */
 export function parseCsvPreview(text: string) {
     const lines = text
@@ -56,21 +60,31 @@ export function parseCsvPreview(text: string) {
         }
     }
 
-    const headers = parseCsvLine(lines[0])
-    const columns = headers.map((h, i) => ({
-        key: `col_${i}`,
-        label: h,
-    }))
+    const rawHeaders = parseCsvLine(lines[0])
+    const headers = rawHeaders.map((h) => h.toLowerCase())
+
+    const productNameIndex = headers.indexOf("product_name")
+    const emailIndex = headers.indexOf("email")
+    const ratingIndex = headers.indexOf("rating")
+    const commentIndex = headers.indexOf("comment")
+
+    const columns = [
+        { key: "productName", label: "Product Name" },
+        { key: "userEmail", label: "User Email" },
+        { key: "rating", label: "Rating" },
+        { key: "comment", label: "Comment" },
+    ]
 
     const rows = lines
         .slice(1, 11) // First 10 rows only for preview
         .map((line) => {
             const values = parseCsvLine(line)
-            const row: Record<string, string | number> = {}
-            headers.forEach((_, i) => {
-                row[`col_${i}`] = values[i] ?? ""
-            })
-            return row
+            return {
+                productName: productNameIndex !== -1 ? values[productNameIndex] ?? "" : "",
+                userEmail: emailIndex !== -1 ? values[emailIndex] ?? "" : "",
+                rating: ratingIndex !== -1 ? values[ratingIndex] ?? "" : "",
+                comment: commentIndex !== -1 ? values[commentIndex] ?? "" : "",
+            }
         })
 
     return { columns, rows }

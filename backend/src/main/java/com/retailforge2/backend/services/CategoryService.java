@@ -17,7 +17,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -69,12 +72,35 @@ public class CategoryService implements ICategoryService {
 
     @Override
     public int createCategoriesBulk(List<CategoryBulkUploadRowDto> rows) {
-        List<Category> categories = rows.stream()
-                .map(this::toCategoryEntity)
-                .toList();
+        // Re-uploading a CSV that overlaps with categories already created
+        // (e.g. a broader "all departments" file after an earlier partial
+        // upload) should not create duplicate rows. A category is treated
+        // as the same one if its name matches an existing category within
+        // the same department, case/whitespace-insensitively - dedup also
+        // applies within the incoming batch itself, so a CSV with its own
+        // repeated rows only inserts one copy.
+        Set<String> seenKeys = new HashSet<>();
+        for (Category existing : categoryRepository.findAll()) {
+            seenKeys.add(categoryLookupKey(existing));
+        }
 
-        categoryRepository.saveAll(categories);
-        return categories.size();
+        List<Category> categoriesToInsert = new ArrayList<>();
+        for (CategoryBulkUploadRowDto row : rows) {
+            Category candidate = toCategoryEntity(row);
+            if (seenKeys.add(categoryLookupKey(candidate))) {
+                categoriesToInsert.add(candidate);
+            }
+        }
+
+        categoryRepository.saveAll(categoriesToInsert);
+        return categoriesToInsert.size();
+    }
+
+    private String categoryLookupKey(Category category) {
+        String departmentKey = category.getDepartment() == null
+                ? ""
+                : normalizeLookupKey(category.getDepartment().getName());
+        return normalizeLookupKey(category.getName()) + "|" + departmentKey;
     }
 
     @Override
@@ -112,10 +138,10 @@ public class CategoryService implements ICategoryService {
                     "Each category row requires name, description, and department_name.");
         }
 
-        String normalizedLookupKey = normalizeDepartmentLookupKey(normalizedDepartmentName);
+        String normalizedLookupKey = normalizeLookupKey(normalizedDepartmentName);
         List<Department> matches = departmentRepository.findAll()
                 .stream()
-                .filter(department -> normalizeDepartmentLookupKey(department.getName()).equals(normalizedLookupKey))
+                .filter(department -> normalizeLookupKey(department.getName()).equals(normalizedLookupKey))
                 .toList();
 
         if (matches.isEmpty()) {
@@ -130,7 +156,7 @@ public class CategoryService implements ICategoryService {
         return matches.getFirst();
     }
 
-    private String normalizeDepartmentLookupKey(String departmentName) {
+    private String normalizeLookupKey(String departmentName) {
         return departmentName == null
                 ? ""
                 : departmentName

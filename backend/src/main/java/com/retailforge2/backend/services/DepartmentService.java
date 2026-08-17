@@ -13,7 +13,10 @@ import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -56,12 +59,37 @@ public class DepartmentService implements IDepartmentService {
 
     @Override
     public int createDepartmentsBulk(List<DepartmentBulkUploadRowDto> rows) {
-        List<Department> departments = rows.stream()
-                .map(row -> buildDepartment(row.name()))
-                .toList();
+        // Same idempotency guard as CategoryService.createCategoriesBulk -
+        // re-uploading a CSV that overlaps with departments already created
+        // should not create duplicate rows, case/whitespace-insensitively,
+        // and duplicates within the incoming batch collapse to one insert.
+        Set<String> seenNames = new HashSet<>();
+        for (Department existing : departmentRepository.findAll()) {
+            seenNames.add(normalizeLookupKey(existing.getName()));
+        }
 
-        departmentRepository.saveAll(departments);
-        return departments.size();
+        List<Department> departmentsToInsert = new ArrayList<>();
+        for (DepartmentBulkUploadRowDto row : rows) {
+            Department candidate = buildDepartment(row.name());
+            if (seenNames.add(normalizeLookupKey(candidate.getName()))) {
+                departmentsToInsert.add(candidate);
+            }
+        }
+
+        departmentRepository.saveAll(departmentsToInsert);
+        return departmentsToInsert.size();
+    }
+
+    private String normalizeLookupKey(String name) {
+        return name == null
+                ? ""
+                : name
+                .trim()
+                .toLowerCase()
+                .replace("&", " and ")
+                .replaceAll("[^a-z0-9]+", " ")
+                .trim()
+                .replaceAll("\\s+", " ");
     }
 
     @Override
