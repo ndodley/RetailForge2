@@ -269,6 +269,7 @@
     border-left: 4px solid var(--accent);
     border-radius: 14px;
     box-shadow: var(--shadow);
+    text-align: left;
 }
 
 .pi-description::before {

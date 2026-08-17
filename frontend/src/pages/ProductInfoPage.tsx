@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { fetchCart, addProductToCart, removeFromCart } from '../api/cart'
 import { buildBackendImageUrl, fetchStoreProductById, getProductApiErrorMessage, type ProductDto } from '../api/products'
 import { useAuth } from '../hooks/useAuth'
+import { useFavorites } from '../hooks/useFavorites'
 import Layout from '../components/common/Layout'
 import ProductReviews from '../components/reviews/ProductReviews'
 import StarRating from '../components/common/StarRating'
@@ -12,6 +13,7 @@ function ProductInfoPage() {
 	const { id } = useParams()
 	const navigate = useNavigate()
 	const { user } = useAuth()
+	const { isFavorite, toggleFavorite } = useFavorites()
 
 	const productId = Number(id)
 	const hasValidProductId = Number.isFinite(productId)
@@ -19,7 +21,6 @@ function ProductInfoPage() {
 	const [product, setProduct] = useState<ProductDto | null>(null)
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
-	const [favorite, setFavorite] = useState(false)
 	const [cartCount, setCartCount] = useState(0)
 	const [failedImageSrc, setFailedImageSrc] = useState<string | null>(null)
 
@@ -120,6 +121,7 @@ function ProductInfoPage() {
 	}
 
 	const currentProduct = product
+	const favorite = isFavorite(currentProduct.id)
 	const stockCount = Number(currentProduct.stock ?? 0)
 	const isOutOfStock = !Number.isFinite(stockCount) || stockCount <= 0
 	const isInCart = cartCount > 0
@@ -188,7 +190,15 @@ function ProductInfoPage() {
 								<button
 									type="button"
 									className={`pi-favorite ${favorite ? 'pi-favorite--active' : ''}`}
-									onClick={() => setFavorite(v => !v)}
+									onClick={() => {
+										if (!user) {
+											navigate('/auth?tab=login')
+											return
+										}
+										void toggleFavorite(currentProduct.id)
+									}}
+									title={favorite ? 'Remove from favorites' : 'Add to favorites'}
+									aria-label={favorite ? 'Remove from favorites' : 'Add to favorites'}
 								>
 									{favorite ? '♥' : '♡'}
 								</button>

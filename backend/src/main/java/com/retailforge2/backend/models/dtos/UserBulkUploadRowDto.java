@@ -2,6 +2,7 @@ package com.retailforge2.backend.models.dtos;
 
 import com.retailforge2.backend.models.enums.UserRole;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record UserBulkUploadRowDto(
@@ -18,8 +19,11 @@ public record UserBulkUploadRowDto(
         @Size(max = 255, message = "User email must be 255 characters or fewer")
         String email,
 
-        @NotBlank(message = "User role is required")
-        @Size(max = 255, message = "User role must be either CUSTOMER, MANAGER, EMPLOYEE")
+        @NotBlank(message = "User password is required")
+        @Size(min = 8, message = "User password must be at least 8 characters")
+        String password,
+
+        @NotNull(message = "User role is required and must be CUSTOMER, MANAGER, or EMPLOYEE")
         UserRole userRole,
 
         @NotBlank(message = "User phone number is required")

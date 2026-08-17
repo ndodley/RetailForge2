@@ -50,9 +50,7 @@ function AdminCategoriesPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
   function handleExportCsv() {
-    exportCategoriesCsv(
-        visibleCategories.map((c) => [c.name, c.departmentId])
-    )
+    exportCategoriesCsv(visibleCategories)
   }
 
   return (
