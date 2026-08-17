@@ -48,7 +48,7 @@ It covers the full customer journey — browsing/search, a backend-persisted car
 
 Beyond the stack rewrite above, a few things are genuinely new or meaningfully better than the original RetailForge, not just re-implemented in a different language:
 
-- **A real AI assistant, from scratch** — the original had no AI at all. RF2's floating chat widget is role-gated server-side (shoppers and `manager`/`employee` sessions get different tool sets), keeps persisted, resumable chat history per user, and can answer questions like "what did I buy in my last order" with the actual purchased items, not just an order status.
+- **A real AI assistant, from scratch** — the original had no AI at all. RetailForge2's floating chat widget is role-gated server-side (shoppers and `manager`/`employee` sessions get different tool sets), keeps persisted, resumable chat history per user, and can answer questions like "what did I buy in my last order" with the actual purchased items, not just an order status.
 - **One merged auth page instead of two** — Login and Register are now tabs on a single page backed by real backend sessions, rather than separate pages.
 - **TypeScript across the whole frontend** — replacing the original's plain JavaScript, catching a category of bugs (typos in prop names, wrong argument types, null-unsafe access) at compile time instead of runtime.
 - **A more refined admin experience** — clickable order cards instead of a separate "View Details" button, uncropped product images in a consistent frame instead of cropped thumbnails, and one shared CRUD shell (search, filter, pagination, CSV export, CSV bulk upload with template + row preview) reused across all six admin entities instead of built ad hoc per page.
@@ -202,7 +202,7 @@ A few original RetailForge concepts haven't been carried over to this rebuild ye
 ## 🏗️ Project structure
 
 ```text
-RF2_P2/
+RetailForge2/
 ├─ frontend/                 React + TypeScript app
 ├─ backend/                  Spring Boot app
 ├─ docs/                     setup notes and project-specific docs
@@ -251,12 +251,12 @@ The repo includes:
 
 ### Root `.env.example`
 
-- `POSTGRES_DB=rf2_p2`
-- `POSTGRES_USER=rf2_user`
-- `POSTGRES_PASSWORD=rf2_dev_password`
-- `SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5434/rf2_p2`
-- `SPRING_DATASOURCE_USERNAME=rf2_user`
-- `SPRING_DATASOURCE_PASSWORD=rf2_dev_password`
+- `POSTGRES_DB=retailforge2`
+- `POSTGRES_USER=retailforge2_user`
+- `POSTGRES_PASSWORD=retailforge2_dev_password`
+- `SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5434/retailforge2`
+- `SPRING_DATASOURCE_USERNAME=retailforge2_user`
+- `SPRING_DATASOURCE_PASSWORD=retailforge2_dev_password`
 
 ### Frontend `frontend/.env.example`
 
@@ -284,7 +284,7 @@ From the project root:
 docker compose up -d
 ```
 
-By default, PostgreSQL is exposed on `localhost:5434` and uses the `rf2_p2` database.
+By default, PostgreSQL is exposed on `localhost:5434` and uses the `retailforge2` database.
 
 ### 2. Start the backend
 
@@ -298,7 +298,7 @@ Set-Location .\backend
 Current backend defaults from `backend/src/main/resources/application.properties`:
 
 - app port: `8080`
-- datasource: `jdbc:postgresql://localhost:5434/rf2_p2`
+- datasource: `jdbc:postgresql://localhost:5434/retailforge2`
 - media root: `${user.dir}/media`
 
 Important: start the backend from the `backend` folder so `${user.dir}/media` resolves to `backend/media`. Make sure `application-secrets.properties` exists if you want the AI chat assistant to work locally.

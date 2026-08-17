@@ -1,18 +1,18 @@
 services:
   postgres:
     image: postgres:18.3
-    container_name: rf2-p2-postgres
+    container_name: retailforge2-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-rf2_p2}
-      POSTGRES_USER: ${POSTGRES_USER:-rf2_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rf2_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-retailforge2}
+      POSTGRES_USER: ${POSTGRES_USER:-retailforge2_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-retailforge2_dev_password}
     ports:
       - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-rf2_user} -d ${POSTGRES_DB:-rf2_p2}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-retailforge2_user} -d ${POSTGRES_DB:-retailforge2}"]
       interval: 10s
       timeout: 5s
       retries: 5
