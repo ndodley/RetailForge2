@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
 import { useLocation, Link } from "react-router-dom"
-import Layout from "../components/common/Layout"
-import axios from "axios"
-import { buildBackendImageUrl } from "../api/products"
+import Layout from "../../components/common/Layout.tsx"
+import api from "../../api/apiClient.ts"
+import { buildBackendImageUrl } from "../../api/products.ts"
 import "./OrderConfirmationPage.css"
 
 /*interface Order {
@@ -40,7 +40,7 @@ export default function OrderConfirmationPage() {
             if (!order?.id) return
 
             try {
-                const res = await axios.get(`/api/order-details/order/${order.id}`)
+                const res = await api.get(`/api/order-details/order/${order.id}`)
                 setItems(res.data)
             } catch {
                 setError("Failed to load order items.")

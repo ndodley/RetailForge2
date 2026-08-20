@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import Layout from '../components/common/Layout'
-import Button from '../components/common/Button'
-import { useAuth } from '../hooks/useAuth'
+import Layout from '../../components/common/Layout.tsx'
+import Button from '../../components/common/Button.tsx'
+import { useAuth } from '../../hooks/useAuth.ts'
 import {
 	fetchCart,
 	updateCartQuantity,
@@ -10,8 +10,8 @@ import {
 	clearCartApi,
 	type CartItem,
 	type CartDto,
-} from '../api/cart'
-import { buildBackendImageUrl } from '../api/products'
+} from '../../api/cart.ts'
+import { buildBackendImageUrl } from '../../api/products.ts'
 import './CartPage.css'
 
 function CartPage() {
