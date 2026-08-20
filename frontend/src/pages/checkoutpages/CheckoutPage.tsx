@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js"
 import { loadStripe } from "@stripe/stripe-js"
-import Layout from "../components/common/Layout"
-import Button from "../components/common/Button"
-import { fetchCart } from "../api/cart"
-import { buildBackendImageUrl } from "../api/products"
-import { useAuth } from "../hooks/useAuth"
-import axios from "axios"
+import Layout from "../../components/common/Layout.tsx"
+import Button from "../../components/common/Button.tsx"
+import { fetchCart } from "../../api/cart.ts"
+import { buildBackendImageUrl } from "../../api/products.ts"
+import { useAuth } from "../../hooks/useAuth.ts"
+import api from "../../api/apiClient.ts"
 import "./CheckoutPage.css"
 
 // Stripe.js injects its own floating UI (the "Link" quick-checkout badge) into the page
@@ -77,7 +77,7 @@ function CheckoutForm() {
         }
 
         try {
-            const orderRes = await axios.post("/api/payment/complete-checkout", {
+            const orderRes = await api.post("/api/payment/complete-checkout", {
                 userId: user?.id,
                 address,
             })
@@ -151,7 +151,7 @@ export default function CheckoutPage() {
 
         async function createIntent() {
             try {
-                const res = await axios.post("/api/payment/create-payment-intent", {
+                const res = await api.post("/api/payment/create-payment-intent", {
                     amount: Math.round(cartTotal * 100),
                 })
                 setClientSecret(res.data.clientSecret)

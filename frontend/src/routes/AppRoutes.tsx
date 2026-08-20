@@ -3,9 +3,9 @@ import AuthPage from '../pages/auth/AuthPage'
 import HomePage from '../pages/HomePage'
 import ProductsPage from '../pages/ProductsPage.tsx'
 import ProductInfoPage from '../pages/ProductInfoPage'
-import CartPage from '../pages/CartPage.tsx'
-import CheckoutPage from '../pages/CheckoutPage'
-import OrderConfirmationPage from "../pages/OrderConfirmationPage.tsx";
+import CartPage from '../pages/checkoutpages/CartPage.tsx'
+import CheckoutPage from '../pages/checkoutpages/CheckoutPage.tsx'
+import OrderConfirmationPage from "../pages/checkoutpages/OrderConfirmationPage.tsx";
 import AdminCategoriesPage from '../pages/admin/categories/AdminCategoriesPage.tsx'
 import AdminDepartmentsPage from '../pages/admin/departments/AdminDepartmentsPage.tsx'
 import AdminProductsPage from '../pages/admin/products/AdminProductsPage.tsx'

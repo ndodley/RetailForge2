@@ -159,7 +159,7 @@
 }
 
 .summary-status {
-    align-self: flex-start;
+    align-self: center;
     padding: 2px 10px;
     border-radius: 999px;
     background: var(--nav-pill-bg);
@@ -288,7 +288,7 @@
 .item-img {
     width: 56px;
     height: 56px;
-    object-fit: cover;
+    object-fit: contain;
     display: block;
     border: 1px solid var(--border);
     background: var(--surface-3);
@@ -303,9 +303,6 @@
     color: var(--text);
     text-decoration: none;
     display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .item-name:hover {
