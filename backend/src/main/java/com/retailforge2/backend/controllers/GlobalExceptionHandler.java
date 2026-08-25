@@ -1,6 +1,8 @@
 package com.retailforge2.backend.controllers;
 
 import com.retailforge2.backend.models.dtos.AuthResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,8 @@ import java.util.stream.Collectors;
 // Global exception handler to catch and format validation errors and other exceptions in a consistent way for the AuthController
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     // Handle IllegalArgumentExceptions thrown by the AuthService and return a 400 Bad Request with the error message
     @ExceptionHandler(IllegalArgumentException.class)
@@ -30,6 +34,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(OptimisticLockingFailureException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public AuthResponse handleOptimisticLocking(OptimisticLockingFailureException ex) {
+        log.warn("Optimistic locking conflict: {}", ex.getMessage());
         return new AuthResponse("This action conflicted with another request in progress. Please try again.", null);
     }
 
@@ -42,6 +47,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public AuthResponse handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        log.warn("Data integrity conflict: {}", ex.getMessage());
         return new AuthResponse("This action conflicted with another request in progress. Please try again.", null);
     }
 
