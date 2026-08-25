@@ -20,6 +20,7 @@ import java.util.Map;
 public class PaymentService implements IPaymentService {
 
     private final IOrderService orderService;
+    private final KafkaEventPublisher kafkaEventPublisher;
 
     @Value("${stripe.currency}")
     private String currency;
@@ -42,6 +43,8 @@ public class PaymentService implements IPaymentService {
     @Override
     @Transactional
     public OrderDto completeCheckout(Integer userId, String address) {
-        return orderService.createOrder(userId, address);
+        OrderDto order = orderService.createOrder(userId, address);
+        kafkaEventPublisher.publishOrderCreated(order.id(), order.userId(), order.total(), order.status());
+        return order;
     }
 }
