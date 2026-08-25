@@ -34,6 +34,17 @@ services:
       STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY:-pk_test_}
       SPRING_AI_OPENAI_API_KEY: ${SPRING_AI_OPENAI_API_KEY:-sk-}
       SPRING_AI_ANTHROPIC_API_KEY: ${SPRING_AI_ANTHROPIC_API_KEY:-sk-}
+      # Without these, KAFKA_ENABLED and friends only exist in .env on the host -
+      # docker-compose.yml has to explicitly pass each one through to actually
+      # land inside the container's environment, the same as every variable above.
+      KAFKA_ENABLED: ${KAFKA_ENABLED:-false}
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
+      KAFKA_CLIENT_ID: ${KAFKA_CLIENT_ID:-retailforge2-backend}
+      KAFKA_CONSUMER_GROUP_ID: ${KAFKA_CONSUMER_GROUP_ID:-retailforge2-backend}
+      KAFKA_TOPIC_ORDERS: ${KAFKA_TOPIC_ORDERS:-rf2.orders}
+      KAFKA_TOPIC_AUTH: ${KAFKA_TOPIC_AUTH:-rf2.auth}
+      KAFKA_TOPIC_INVENTORY: ${KAFKA_TOPIC_INVENTORY:-rf2.inventory}
+      LOW_STOCK_THRESHOLD: ${LOW_STOCK_THRESHOLD:-5}
     ports:
       - "8080:8080"
     volumes:
@@ -47,6 +58,44 @@ services:
       timeout: 5s
       retries: 10
       start_period: 45s
+
+  kafka:
+    image: apache/kafka:3.8.0
+    container_name: retailforge2-kafka
+    restart: unless-stopped
+    # Opt-in: this service only starts when you explicitly ask for it with
+    # `docker compose --profile kafka up --build -d`. A plain `docker compose
+    # up --build -d` (no --profile flag) never starts this container, matching
+    # KAFKA_ENABLED defaulting to false - the rest of the stack is completely
+    # unaffected by Kafka's presence or absence.
+    profiles: ["kafka"]
+    # Single-node broker using KRaft mode (Kafka's built-in consensus/metadata
+    # system) - no separate Zookeeper container needed, unlike older Kafka setups.
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,PLAINTEXT_HOST://:29092
+      # Two advertised listeners: PLAINTEXT is what other containers (backend)
+      # use via the Docker network hostname "kafka"; PLAINTEXT_HOST is what
+      # tools running directly on your machine (e.g. Artillery, if you ever
+      # run it outside Docker) use via localhost.
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    ports:
+      - "29092:29092"
+    volumes:
+      - kafka_data:/tmp/kraft-combined-logs
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
 
   frontend:
     build:
@@ -65,3 +114,4 @@ services:
 volumes:
   postgres_data:
   backend_media:
+  kafka_data:
