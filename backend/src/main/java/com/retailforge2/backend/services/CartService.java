@@ -43,6 +43,25 @@ public class CartService implements ICartService {
                 });
     }
 
+    // Same lookup-or-create as getOrCreateCart, but takes a pessimistic write lock on an
+    // existing cart row (via CartRepository.findByUserIdForUpdate - the same locked query
+    // OrderService.createOrder already uses). Every method here that WRITES to cart_items
+    // (add/update/remove/clear) needs this instead of the unlocked helper: under concurrent
+    // requests for the same shared cart, two unlocked reads can load the same in-memory
+    // items list and race on insert/delete, which is what threw
+    // DataIntegrityViolationException (duplicate key on ux_cart_items_cart_product) here and
+    // would risk the same ObjectOptimisticLockingFailureException that OrderService hit on
+    // clearCart's cascade delete. getCartForCurrentUser (a plain read) stays on the unlocked
+    // helper since it doesn't modify anything and shouldn't block on other requests' locks.
+    private Cart getOrCreateCartForUpdate(User user) {
+        return cartRepository.findByUserIdForUpdate(user.getId())
+                .orElseGet(() -> {
+                    Cart c = new Cart();
+                    c.setUser(user);
+                    return cartRepository.save(c);
+                });
+    }
+
     @Override
     @Transactional
     public CartDto getCartForCurrentUser() {
@@ -56,7 +75,7 @@ public class CartService implements ICartService {
     @Transactional
     public CartDto addItem(Integer productId, int quantity) {
         User user = getCurrentUser();
-        Cart cart = getOrCreateCart(user);
+        Cart cart = getOrCreateCartForUpdate(user);
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
@@ -82,7 +101,7 @@ public class CartService implements ICartService {
     @Transactional
     public CartDto updateQuantity(Integer productId, int quantity) {
         User user = getCurrentUser();
-        Cart cart = getOrCreateCart(user);
+        Cart cart = getOrCreateCartForUpdate(user);
 
         CartItem item = cartItemRepository
                 .findByCart_IdAndProduct_Id(cart.getId(), productId)
@@ -102,7 +121,7 @@ public class CartService implements ICartService {
     @Transactional
     public CartDto removeItem(Integer productId) {
         User user = getCurrentUser();
-        Cart cart = getOrCreateCart(user);
+        Cart cart = getOrCreateCartForUpdate(user);
 
         cartItemRepository.findByCart_IdAndProduct_Id(cart.getId(), productId)
                 .ifPresent(item -> {
@@ -117,7 +136,7 @@ public class CartService implements ICartService {
     @Transactional
     public CartDto clearCart() {
         User user = getCurrentUser();
-        Cart cart = getOrCreateCart(user);
+        Cart cart = getOrCreateCartForUpdate(user);
 
         cart.getItems().clear();
         cartRepository.save(cart);

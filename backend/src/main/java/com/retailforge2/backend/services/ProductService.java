@@ -43,12 +43,17 @@ public class ProductService implements IProductService {
     private final Path mediaRoot;
     private final Path productImagesDir;
     private final Path otherImagesDir;
+    private final KafkaEventPublisher kafkaEventPublisher;
+
+    @Value("${kafka.low-stock-threshold}")
+    private int lowStockThreshold;
 
     public ProductService(
             ProductRepository productRepository,
             CategoryRepository categoryRepository,
             ProductMapper productMapper,
-            @Value("${app.media.root:${user.dir}/media}") String mediaRoot
+            @Value("${app.media.root:${user.dir}/media}") String mediaRoot,
+            KafkaEventPublisher kafkaEventPublisher
     ) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
@@ -56,6 +61,7 @@ public class ProductService implements IProductService {
         this.mediaRoot = Path.of(mediaRoot).toAbsolutePath().normalize();
         this.productImagesDir = this.mediaRoot.resolve("product_images");
         this.otherImagesDir = this.mediaRoot.resolve("other_images");
+        this.kafkaEventPublisher = kafkaEventPublisher;
         ensureMediaDirectories();
     }
 
@@ -76,16 +82,26 @@ public class ProductService implements IProductService {
     public ProductDto createProduct(ProductUpsertRequest request) {
         Product product = new Product();
         applyProductValues(product, request, null);
-        return productMapper.toDto(productRepository.save(product));
+        Product savedProduct = productRepository.save(product);
+        // New product - no "previous" stock to compare against, so this is an
+        // initial-stock announcement rather than a change notification.
+        publishStockEvent(savedProduct);
+        return productMapper.toDto(savedProduct);
     }
 
     @Override
     public ProductDto updateProduct(Integer id, ProductUpsertRequest request) {
         Product product = getProductEntity(id);
         String previousImagePath = product.getImagePath();
+        Integer previousStock = product.getStock();
         applyProductValues(product, request, previousImagePath);
         Product savedProduct = productRepository.saveAndFlush(product);
         deleteProductImageIfReplaced(previousImagePath, savedProduct.getImagePath());
+        // Only publish when the stock value actually changed - an admin editing
+        // the price or description shouldn't spam rf2.inventory with a no-op event.
+        if (!Objects.equals(previousStock, savedProduct.getStock())) {
+            publishStockEvent(savedProduct);
+        }
         return productMapper.toDto(savedProduct);
     }
 
@@ -95,8 +111,14 @@ public class ProductService implements IProductService {
                 .map(this::toProductEntity)
                 .toList();
 
-        productRepository.saveAll(products);
-        return products.size();
+        List<Product> savedProducts = productRepository.saveAll(products);
+        savedProducts.forEach(this::publishStockEvent);
+        return savedProducts.size();
+    }
+
+    private void publishStockEvent(Product product) {
+        boolean lowStock = product.getStock() <= lowStockThreshold;
+        kafkaEventPublisher.publishInventoryEvent(product.getId(), product.getName(), product.getStock(), lowStock);
     }
 
     @Override
