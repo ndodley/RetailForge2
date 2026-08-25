@@ -1,0 +1,37 @@
+# http_browse.yml
+#
+# Simulates anonymous shoppers browsing the storefront: no login, no cookies
+# needed. This is the lightest possible load pattern and a good first
+# scenario to run, since it only exercises ProductController and does not
+# touch the cart, auth, or payment code paths at all.
+
+config:
+  target: "http://localhost:8080"
+  plugins:
+    expect: {}
+  phases:
+    - name: "Warm up"
+      duration: 30
+      arrivalRate: 2
+    - name: "Steady browsing traffic"
+      duration: 60
+      arrivalRate: 10
+    - name: "Spike"
+      duration: 30
+      arrivalRate: 25
+
+scenarios:
+  - name: "Browse product catalog and drill into one product"
+    flow:
+      - get:
+          url: "/api/products"
+          expect:
+            - statusCode: 200
+          capture:
+            - json: "$[0].id"
+              as: "productId"
+
+      - get:
+          url: "/api/products/{{ productId }}"
+          expect:
+            - statusCode: 200

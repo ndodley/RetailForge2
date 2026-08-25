@@ -1,0 +1,18 @@
+{
+  "name": "retailforge2-load-testing",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Artillery HTTP load-testing scenarios for RetailForge2",
+  "scripts": {
+    "test:browse": "artillery run http_browse.yml",
+    "test:checkout": "artillery run http_login_cart_checkout.yml",
+    "test:login-failed": "artillery run http_login_failed.yml"
+  },
+  "devDependencies": {
+    "artillery": "^2.0.34",
+    "artillery-plugin-expect": "^2.27.0"
+  },
+  "overrides": {
+    "encoding-sniffer": "^1.0.2"
+  }
+}

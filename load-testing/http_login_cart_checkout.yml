@@ -1,0 +1,133 @@
+# http_login_cart_checkout.yml
+#
+# The full, realistic customer journey: register a fresh account -> browse ->
+# add an item to the cart -> view the cart -> create a Stripe payment intent
+# -> complete checkout. This is the scenario that most heavily exercises the
+# Kafka wiring, because a successful run touches all three event types:
+#   - AuthEvent (REGISTER, success=true)              published by AuthService
+#   - InventoryEvent (per cart item, on stock change) published by OrderService
+#   - OrderCreatedEvent (on completeCheckout)          published by PaymentService
+#
+# Session handling: RetailForge2 uses server-side session cookies (Spring
+# Session / HttpSession), not JWTs. Artillery's HTTP engine keeps a cookie
+# jar per virtual user automatically, so once the register request receives a
+# Set-Cookie header, every subsequent request in that same virtual user's
+# flow automatically sends the cookie back. No custom processor script is
+# needed to carry auth state between requests.
+#
+# ACCOUNT STRATEGY (updated after step 10 load testing): this scenario used
+# to log every virtual user into one shared seeded demo account
+# (customer.demo@retailforge.com). That meant all virtual users fought over
+# one literal cart row, which is exactly what surfaced three real backend
+# concurrency bugs (empty-cart 500, ObjectOptimisticLockingFailureException,
+# and a duplicate-key race in CartService) -- all now fixed. But even after
+# those fixes, a shared cart still produces plenty of CORRECT 400 responses
+# (whoever checks out first legitimately empties the cart for everyone else),
+# which is a test-design artifact, not a bug, yet it shows up as "failures"
+# in the Artillery report. To get a clean signal on a clean run, each virtual
+# user now registers its OWN brand-new account via POST /api/auth/register
+# (which also logs it in and starts its session, per AuthService.register),
+# so each one gets its own private cart with zero contention. Side effect:
+# every run inserts one new row per virtual user into the users table -- fine
+# for a local dev database, just be aware it accumulates over repeated runs.
+#
+# NOTE / known limitation: this scenario always adds the FIRST product
+# returned by GET /api/products ($[0].id) to the cart. That means every
+# virtual user in a given run is buying the same product, so at any real
+# arrival rate this test will concentrate stock depletion onto a single
+# product rather than spreading it across the catalog. That is intentional
+# for keeping the scenario simple and deterministic, but it does mean: (a)
+# you will exhaust that one product's stock quickly at higher arrival rates
+# and start seeing checkout failures once stock hits 0, and (b) the
+# low-stock WARN log you saw during step 8's manual verification will very
+# likely fire again here, on the same product, almost immediately. If you
+# want to spread load across many products instead, capture a random index
+# from the products array rather than always $[0].
+
+config:
+  target: "http://localhost:8080"
+  plugins:
+    expect: {}
+  phases:
+    - name: "Warm up"
+      duration: 20
+      arrivalRate: 1
+    - name: "Steady checkout traffic"
+      duration: 60
+      arrivalRate: 3
+
+scenarios:
+  - name: "Register, add to cart, checkout"
+    flow:
+      # 1. Register a brand-new, unique account for this virtual user rather
+      #    than logging into a shared demo account. {{ $uuid }} is Artillery's
+      #    built-in per-virtual-user unique id, so every run gets distinct
+      #    emails and every virtual user gets its own empty cart to start
+      #    from -- no contention with any other virtual user. AuthService's
+      #    register() call also authenticates and stores the session, so the
+      #    cookie jar is populated here exactly like it was after /login.
+      - post:
+          url: "/api/auth/register"
+          json:
+            firstName: "Load"
+            lastName: "Tester"
+            email: "loadtest+{{ $uuid }}@retailforge.com"
+            password: "LoadTest123!"
+            role: "CUSTOMER"
+            phoneNumber: "555-000-0000"
+            address: "123 Load Test Ave, Testville, TS 00000"
+          expect:
+            - statusCode: 201
+          capture:
+            - json: "$.user.id"
+              as: "userId"
+
+      # 2. Browse the catalog, same as an anonymous user would, and grab
+      #    the first product's id to add to the cart.
+      - get:
+          url: "/api/products"
+          expect:
+            - statusCode: 200
+          capture:
+            - json: "$[0].id"
+              as: "productId"
+
+      # 3. Add that product to the cart. Note productId/quantity are query
+      #    params on this endpoint, not a JSON body (see CartController).
+      - post:
+          url: "/api/cart/items?productId={{ productId }}&quantity=1"
+          expect:
+            - statusCode: 200
+
+      # 4. Fetch the cart to get the real subtotal, so the payment intent
+      #    amount below matches what checkout actually expects rather than
+      #    a hardcoded guess.
+      - get:
+          url: "/api/cart"
+          expect:
+            - statusCode: 200
+          capture:
+            - json: "$.subtotal"
+              as: "cartSubtotal"
+
+      # 5. Create the Stripe payment intent for that amount. This uses
+      #    Stripe test-mode keys from your .env -- no real charge occurs.
+      - post:
+          url: "/api/payment/create-payment-intent"
+          json:
+            amount: "{{ cartSubtotal }}"
+          expect:
+            - statusCode: 200
+
+      # 6. Complete checkout. As noted in PaymentService, this does NOT
+      #    verify the Stripe payment intent status server-side -- it trusts
+      #    the client -- so this call succeeds regardless of what a real
+      #    Stripe confirmation would have done. This is what actually
+      #    triggers OrderCreatedEvent and the per-item InventoryEvent(s).
+      - post:
+          url: "/api/payment/complete-checkout"
+          json:
+            userId: "{{ userId }}"
+            address: "123 Load Test Ave, Testville, TS 00000"
+          expect:
+            - statusCode: 200

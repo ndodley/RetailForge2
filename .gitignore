@@ -10,6 +10,10 @@
 /frontend/dist-ssr/
 /frontend/*.local
 
+# Load-testing generated files
+/load-testing/node_modules/
+/load-testing/_to_delete/
+
 # Original reference project generated files
 original/**/node_modules/
 original/**/dist/
@@ -36,4 +40,3 @@ original/**/dist/
 # OS and log files
 .DS_Store
 *.log
-

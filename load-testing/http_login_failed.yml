@@ -1,0 +1,31 @@
+# http_login_failed.yml
+#
+# Deliberately submits a valid, seeded email address with the WRONG password.
+# This exercises the failure path in AuthService.login() -- the
+# BadCredentialsException branch that now publishes a Kafka AuthEvent with
+# success=false (see KafkaEventPublisher / AuthService).
+#
+# GlobalExceptionHandler maps authentication failures to HTTP 400 (not 401),
+# via the IllegalArgumentException -> @ResponseStatus(BAD_REQUEST) handler,
+# so the assertion below checks for 400, matching the real behavior of the
+# app rather than a generic REST assumption.
+
+config:
+  target: "http://localhost:8080"
+  plugins:
+    expect: {}
+  phases:
+    - name: "Repeated bad login attempts"
+      duration: 30
+      arrivalRate: 5
+
+scenarios:
+  - name: "Login with correct email, wrong password"
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "customer.demo@retailforge.com"
+            password: "WrongPassword!"
+          expect:
+            - statusCode: 400
