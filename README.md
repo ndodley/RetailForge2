@@ -12,6 +12,8 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-4169E1?logo=postgresql&logoColor=white&style=for-the-badge)](https://www.postgresql.org/)
 [![OpenAI](https://img.shields.io/badge/OpenAI-Spring%20AI-412991?logo=openai&logoColor=white&style=for-the-badge)](https://spring.io/projects/spring-ai)
 [![Stripe](https://img.shields.io/badge/Stripe-Payments-635BFF?logo=stripe&logoColor=white&style=for-the-badge)](https://stripe.com/)
+[![Kafka](https://img.shields.io/badge/Apache%20Kafka-3.8-231F20?logo=apachekafka&logoColor=white&style=for-the-badge)](https://kafka.apache.org/)
+[![Artillery](https://img.shields.io/badge/Artillery-Load%20Testing-FF4C4C?style=for-the-badge)](https://www.artillery.io/)
 
 </div>
 
@@ -37,6 +39,7 @@ It covers the full customer journey — browsing/search, a backend-persisted car
 | **Auth** | Session-based (HTTP-only cookies) | Session-based (Spring Security + Spring Session JDBC) |
 | **Payments** | Stripe | Stripe |
 | **AI assistant** | — | **New**: role-aware chat assistant (OpenAI via Spring AI) with separate shopper and admin tool sets |
+| **Event streaming** | Kafka (order/auth/inventory events) | Kafka (same three event types), opt-in via `KAFKA_ENABLED` |
 
 </div>
 
@@ -53,8 +56,9 @@ Beyond the stack rewrite above, a few things are genuinely new or meaningfully b
 - **TypeScript across the whole frontend** — replacing the original's plain JavaScript, catching a category of bugs (typos in prop names, wrong argument types, null-unsafe access) at compile time instead of runtime.
 - **A more refined admin experience** — clickable order cards instead of a separate "View Details" button, uncropped product images in a consistent frame instead of cropped thumbnails, and one shared CRUD shell (search, filter, pagination, CSV export, CSV bulk upload with template + row preview) reused across all six admin entities instead of built ad hoc per page.
 - **A more structured backend** — Spring Security + Spring Data JPA + Flyway-managed schema in place of hand-rolled Express middleware, with sessions, cart, favorites, and chat history all persisted server-side in Postgres rather than leaning on `localStorage`.
+- **Kafka event publishing and Artillery load testing, carried over from the original** — auth, order, and inventory events publish to Kafka (opt-in, off by default) and a logging listener proves the pipeline works end to end; a new Artillery suite load-tests browsing, repeated failed logins, and the full checkout flow. Running that suite is what surfaced — and got fixed — three real concurrency bugs in the checkout/cart-write code. See [Kafka events](#kafka-events) and [Load testing](#load-testing).
 
-Not everything made the jump yet, though — the original's Kafka event visibility and Artillery load-testing scenarios haven't been carried over. See [Roadmap](#roadmap) for the full list of what's still ahead.
+A few other original RetailForge concepts still haven't made the jump — see [Roadmap](#roadmap) for what's still ahead.
 
 ---
 
@@ -73,6 +77,8 @@ Not everything made the jump yet, though — the original's Kafka event visibili
 - [Auth](#auth)
 - [AI chat assistant](#ai-chat-assistant)
 - [Payments](#payments)
+- [Kafka events](#kafka-events)
+- [Load testing](#load-testing)
 - [Media and image handling](#media-and-image-handling)
 - [Database and migrations](#database-and-migrations)
 - [Development commands](#development-commands)
@@ -109,11 +115,14 @@ Not everything made the jump yet, though — the original's Kafka event visibili
 - Spring Session JDBC
 - Spring AI (Anthropic Claude + OpenAI starters, JDBC-backed chat memory)
 - Stripe Java SDK (payments)
+- Spring for Apache Kafka (`spring-kafka`) — opt-in event publishing/consumption
 - PostgreSQL
 
 ### Infrastructure
 
-- PostgreSQL 18.3 via `docker-compose.yml`
+- PostgreSQL, backend, and frontend via `docker-compose.yml`, each as its own container
+- Apache Kafka 3.8.0 via `docker-compose.yml`, KRaft mode, opt-in via the `kafka` Compose profile
+- Artillery (HTTP load testing, `load-testing/`)
 - Maven Wrapper for backend builds
 - npm for frontend builds
 
@@ -167,6 +176,11 @@ Not everything made the jump yet, though — the original's Kafka event visibili
 - **Payments**: `POST /api/payment/create-payment-intent`, `POST /api/payment/complete-checkout` (Stripe)
 - **AI chat**: `POST /api/chat`, `POST/GET/DELETE /api/chat/sessions`, `/api/chat/sessions/{id}/messages`, `/api/chat/sessions/{id}/clear`
 
+### Observability & load testing
+
+- Kafka event publishing for auth, order, and inventory changes — opt-in, off by default — see [Kafka events](#kafka-events)
+- Artillery HTTP load-testing suite covering anonymous browsing, repeated failed logins, and the full checkout flow — see [Load testing](#load-testing)
+
 ---
 
 <a id="architecture-highlights"></a>
@@ -193,7 +207,6 @@ A few original RetailForge concepts haven't been carried over to this rebuild ye
 - Rate limiting on the public chat endpoint
 - Production-hardened Stripe key management (see [Security / local dev notes](#security--local-dev-notes))
 - Broader automated test coverage across the newer order/payment/chat flows
-- Kafka-based event visibility and Artillery load-testing scenarios from the original project
 
 ---
 
@@ -205,8 +218,9 @@ A few original RetailForge concepts haven't been carried over to this rebuild ye
 RetailForge2/
 ├─ frontend/                 React + TypeScript app
 ├─ backend/                  Spring Boot app
+├─ load-testing/             Artillery HTTP load-testing scenarios
 ├─ docs/                     setup notes and project-specific docs
-├─ docker-compose.yml        local PostgreSQL service
+├─ docker-compose.yml        PostgreSQL, backend, frontend, and optional Kafka services
 └─ .env.example              root environment example
 ```
 
@@ -222,6 +236,8 @@ Important app folders:
 - `backend/src/main/java/.../controllers/` - REST controllers (auth, cart, orders, payments, chat, etc.)
 - `backend/src/main/java/.../services/` - service layer, including the chat tool implementations used by the AI assistant
 - `backend/src/main/java/.../security/` - Spring Security config and session-based auth setup
+- `backend/src/main/java/.../config/` - Spring config, including Kafka producer/consumer and topic setup
+- `backend/src/main/java/.../events/` - Kafka event record definitions (auth, order, inventory)
 - `backend/src/main/resources/db/migration/` - Flyway migrations
 - `backend/media/` - local media storage for uploaded/shared product and avatar images
 
@@ -231,7 +247,7 @@ Important app folders:
 
 ## 🧩 Local requirements
 
-- Docker Desktop / Docker Compose
+- Docker Desktop / Docker Compose (runs PostgreSQL, backend, frontend, and optionally Kafka)
 - Node.js + npm
 - Java 25
 
@@ -257,6 +273,14 @@ The repo includes:
 - `SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5434/retailforge2`
 - `SPRING_DATASOURCE_USERNAME=retailforge2_user`
 - `SPRING_DATASOURCE_PASSWORD=retailforge2_dev_password`
+- `KAFKA_ENABLED=false` (opt-in — see [Kafka events](#kafka-events))
+- `KAFKA_BOOTSTRAP_SERVERS=kafka:9092`
+- `KAFKA_CLIENT_ID=retailforge2-backend`
+- `KAFKA_CONSUMER_GROUP_ID=retailforge2-backend`
+- `KAFKA_TOPIC_ORDERS=rf2.orders`
+- `KAFKA_TOPIC_AUTH=rf2.auth`
+- `KAFKA_TOPIC_INVENTORY=rf2.inventory`
+- `LOW_STOCK_THRESHOLD=5`
 
 ### Frontend `frontend/.env.example`
 
@@ -276,17 +300,41 @@ You can copy the root/frontend examples into local `.env` files if you want, but
 
 ## ⚙️ Quick start
 
-### 1. Start PostgreSQL
+### Full stack via Docker (recommended)
 
-From the project root:
+Copy `.env.example` to `.env` in the project root and fill in real values (see [Environment files](#environment-files)), then from the project root:
 
 ```powershell
-docker compose up -d
+docker compose up --build -d
+```
+
+This builds and starts PostgreSQL, the backend, and the frontend as containers:
+
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:8080`
+- PostgreSQL: `localhost:5434`
+
+Check everything came up healthy with `docker compose ps`. To also start Kafka (event publishing/consumption — see [Kafka events](#kafka-events)), set `KAFKA_ENABLED=true` in `.env` and add the `kafka` Compose profile:
+
+```powershell
+docker compose --profile kafka up --build -d
+```
+
+A plain `docker compose up --build -d` (no `--profile` flag) never starts the Kafka container, and the rest of the stack is unaffected by its presence or absence.
+
+### Local development (without full Docker)
+
+For faster iteration (hot reload) on the backend or frontend, run PostgreSQL only via Docker and the app processes directly:
+
+**1. Start PostgreSQL**
+
+```powershell
+docker compose up -d postgres
 ```
 
 By default, PostgreSQL is exposed on `localhost:5434` and uses the `retailforge2` database.
 
-### 2. Start the backend
+**2. Start the backend**
 
 From the `backend` folder:
 
@@ -301,9 +349,9 @@ Current backend defaults from `backend/src/main/resources/application.properties
 - datasource: `jdbc:postgresql://localhost:5434/retailforge2`
 - media root: `${user.dir}/media`
 
-Important: start the backend from the `backend` folder so `${user.dir}/media` resolves to `backend/media`. Make sure `application-secrets.properties` exists if you want the AI chat assistant to work locally.
+Important: start the backend from the `backend` folder so `${user.dir}/media` resolves to `backend/media`. Make sure `application-secrets.properties` exists if you want the AI chat assistant to work locally. Kafka publishing stays off automatically unless you also start the `kafka` container and set `KAFKA_ENABLED=true`.
 
-### 3. Start the frontend
+**3. Start the frontend**
 
 From the `frontend` folder:
 
@@ -384,6 +432,65 @@ Checkout uses Stripe, similar to the original project:
 
 ---
 
+<a id="kafka-events"></a>
+
+## 📡 Kafka events
+
+RetailForge2 optionally publishes domain events to Kafka — off by default (`KAFKA_ENABLED=false`), so the app runs exactly the same with or without a broker present.
+
+- **Auth events** (`rf2.auth`) — published on every login attempt (success or failure) and successful registration
+- **Order events** (`rf2.orders`) — published when a checkout completes (`PaymentService.completeCheckout`)
+- **Inventory events** (`rf2.inventory`) — published whenever a product's stock changes, whether from an admin create/update/bulk-upload or from a checkout decrementing stock; flags whether the new level is at or below `LOW_STOCK_THRESHOLD`
+
+A `KafkaEventListener` subscribes to all three topics and logs what arrives, demonstrating the full publish → broker → consume pipeline end to end. Nothing else currently reacts to these events — they're a foundation for future consumers (an email alert, a dashboard, etc.), not a finished feature in their own right.
+
+### Enabling Kafka
+
+1. Set `KAFKA_ENABLED=true` in your `.env`
+2. Start the stack with the `kafka` Compose profile:
+
+   ```powershell
+   docker compose --profile kafka up --build -d
+   ```
+
+3. Watch events arrive in the backend logs:
+
+   ```powershell
+   docker compose logs backend --tail=100 -f
+   ```
+
+See [Environment files](#environment-files) for the full list of `KAFKA_*` variables (bootstrap servers, client/group ids, topic names) and `LOW_STOCK_THRESHOLD`.
+
+---
+
+<a id="load-testing"></a>
+
+## 🧪 Load testing
+
+An [Artillery](https://www.artillery.io/) HTTP load-testing suite lives in `load-testing/`, covering three scenarios against a running backend:
+
+| Command | Scenario |
+|---|---|
+| `npm run test:browse` | Anonymous catalog browsing |
+| `npm run test:login-failed` | Repeated failed logins (verifies BCrypt's intentional slowness doesn't break under load) |
+| `npm run test:checkout` | Full journey: register a fresh account → add to cart → create a Stripe payment intent → complete checkout |
+
+`test:checkout` registers a brand-new account per virtual user (rather than sharing one login), so virtual users don't contend over a single cart. Each run adds one new row to the `users` table — fine for a local dev database, worth knowing before pointing this at anything shared.
+
+### Running the suite
+
+```powershell
+Set-Location .\load-testing
+npm install
+npm run test:browse
+npm run test:login-failed
+npm run test:checkout
+```
+
+Requires the backend running and reachable at `http://localhost:8080` (see [Quick start](#quick-start)). This suite is what surfaced three real concurrency bugs in the checkout/cart-write paths under load — all fixed; see the commit history for details.
+
+---
+
 <a id="media-and-image-handling"></a>
 
 ## 🖼️ Media and image handling
@@ -457,6 +564,18 @@ Set-Location .\backend
 .\mvnw.cmd test
 ```
 
+### Load testing
+
+```powershell
+Set-Location .\load-testing
+npm install
+npm run test:browse
+npm run test:login-failed
+npm run test:checkout
+```
+
+See [Load testing](#load-testing) for details.
+
 ---
 
 <a id="security--local-dev-notes"></a>
@@ -466,8 +585,9 @@ Set-Location .\backend
 - CORS is restricted to `http://localhost:5173` with credentials enabled (required for session cookies) — this is tighter than a permissive "allow all localhost" setup
 - Public (unauthenticated) reads are allowed for products/categories/departments/reviews and the chat endpoints; writes require authentication, and catalog admin writes require the `MANAGER` or `EMPLOYEE` role
 - **Note:** `application.properties` currently contains hardcoded Stripe *test-mode* keys (`sk_test_...` / `pk_test_...`). These should be moved to `application-secrets.properties` (gitignored) or environment variables before a production deployment, the same way the AI provider API keys are already handled
-- Do not commit local `.env` or `application-secrets.properties` files with real secrets, or generated output such as `frontend/dist/`, `frontend/node_modules/`, or `backend/target/`
+- Do not commit local `.env` or `application-secrets.properties` files with real secrets, or generated output such as `frontend/dist/`, `frontend/node_modules/`, `backend/target/`, or `load-testing/node_modules/`
 - If Docker volumes already contain older database state, review `docs/postgres-setup.md` before resetting or recreating the database
+- The `test:checkout` load-testing scenario registers a new account per virtual user, so repeated runs accumulate rows in the `users` table — fine for local dev, but don't point it at a shared/production database
 
 ---
 
