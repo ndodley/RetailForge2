@@ -29,14 +29,17 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final KafkaEventPublisher kafkaEventPublisher;
 
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       AuthenticationManager authenticationManager
+                       AuthenticationManager authenticationManager,
+                       KafkaEventPublisher kafkaEventPublisher
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
+        this.kafkaEventPublisher = kafkaEventPublisher;
     }
 
     // Registration method with validation and authentication
@@ -67,6 +70,8 @@ public class AuthService {
 
         storeAuthentication(authentication, session);
 
+        kafkaEventPublisher.publishAuthEvent(normalizedEmail, "REGISTER", true);
+
         return new AuthResponse("Registration successful", toAuthUserDto(savedUser));
     }
 
@@ -82,10 +87,13 @@ public class AuthService {
             );
             System.out.println("AUTH OK, principal class = " + authentication.getPrincipal().getClass());
         } catch (BadCredentialsException ex) {
+            kafkaEventPublisher.publishAuthEvent(normalizedEmail, "LOGIN", false);
             throw new IllegalArgumentException("Invalid email or password.");
         }
 
         storeAuthentication(authentication, session);
+
+        kafkaEventPublisher.publishAuthEvent(normalizedEmail, "LOGIN", true);
 
         AuthenticatedUser authenticatedUser = (AuthenticatedUser) authentication.getPrincipal();
         return new AuthResponse("Login successful", toAuthUserDto(authenticatedUser.getUser()));
